@@ -31,7 +31,6 @@ const initialAvatars = [
     { id: 'avatar6', url: 'https://i.pinimg.com/736x/75/c6/15/75c615115d305891d9cf541bea9ec1bd.jpg' }, // Bard
 ];
 
-
 const initialSkillsData = [
   { id: 'html', name: 'HTML5', description: 'The foundational language for structuring web content.', dependencies: [], status: 'available', position: { row: 2, col: 1 }, category: 'structure', color: 'text-orange-400', icon: <Code /> },
   { id: 'css', name: 'CSS3', description: 'The language for styling and designing web pages.', dependencies: ['html'], status: 'locked', position: { row: 2, col: 2 }, category: 'styling', color: 'text-blue-400', icon: <Palette /> },
@@ -93,13 +92,14 @@ const initialGuidesData = [
 export default function App() {
   const [skills, setSkills] = useState(initialSkillsData);
   const [quests, setQuests] = useState(initialQuestsData);
+  
   const [selectedSkill, setSelectedSkill] = useState(null);
   const [activePage, setActivePage] = useState('quests');
   const [activeChallenge, setActiveChallenge] = useState(null);
   const [activeGuide, setActiveGuide] = useState(null);
   
-  const [user, setUser] = useState({});
-  const [currentUser, setCurrentUser] = useState(null); 
+  const [userProgress, setUserProgress] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
   const [userAvatar, setUserAvatar] = useState(initialAvatars[0].url);
   const [mascotStage, setMascotStage] = useState(1);
   const [userClass, setUserClass] = useState('Novice');
@@ -118,7 +118,7 @@ export default function App() {
         unsubscribeFromFirestore = onSnapshot(userDocRef, (doc) => {
           if (doc.exists()) {
             const userDataFromDb = doc.data();
-            setUser(userDataFromDb);
+            setUserProgress(userDataFromDb);
             setUserAvatar(userDataFromDb.avatarUrl);
             setMascotStage(userDataFromDb.mascotStage);
             setQuests(prevQuests => 
@@ -127,11 +127,14 @@ export default function App() {
                 completed: userDataFromDb.completedQuests.includes(q.id)
               }))
             );
+          } else {
+             console.log("Documento do usuário não encontrado, aguardando criação...");
           }
         });
       } else {
         setCurrentUser(null);
         setShowAuthModal(true);
+        setUserProgress(null); 
         if (unsubscribeFromFirestore) unsubscribeFromFirestore();
       }
     });
@@ -142,7 +145,14 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    const completedSkills = skills.filter(s => s.status === 'completed');
+    if (!userProgress) return; 
+
+    const completedSkills = skills.filter(s => 
+        initialQuestsData
+            .filter(q => q.skillId === s.id)
+            .every(q => userProgress.completedQuests.includes(q.id))
+    );
+
     const completedCategories = new Set(completedSkills.map(s => s.category));
     let newClass = 'Novice';
     if (completedCategories.has('mastery')) { newClass = 'Grandmaster'; } 
@@ -153,16 +163,16 @@ export default function App() {
     setUserClass(newClass);
 
     const completedSkillIds = new Set(completedSkills.map(s => s.id));
-    let hasChanged = false;
     const newSkills = skills.map(skill => {
-      if (skill.status === 'completed') return skill;
+      const isCompleted = completedSkillIds.has(skill.id);
+      if (isCompleted) return { ...skill, status: 'completed' };
+      
       const dependenciesMet = skill.dependencies.every(depId => completedSkillIds.has(depId));
       const newStatus = dependenciesMet ? 'available' : 'locked';
-      if (skill.status !== newStatus) hasChanged = true;
       return { ...skill, status: newStatus };
     });
-    if (hasChanged) setSkills(newSkills);
-  }, [skills]);
+    setSkills(newSkills);
+  }, [userProgress]); 
 
   useEffect(() => {
     const faviconHref = `data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>`;
@@ -171,11 +181,13 @@ export default function App() {
     document.getElementsByTagName('head')[0].appendChild(link);
   }, []);
 
+
   const handleSignUp = async (email, password) => {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const newUser = userCredential.user;
       await setDoc(doc(db, "users", newUser.uid), {
+        name: email.split('@')[0],
         level: 1, currentXp: 0, nextLevelXp: 100,
         avatarUrl: initialAvatars[0].url, completedQuests: [], mascotStage: 1,
       });
@@ -193,20 +205,20 @@ export default function App() {
   };
 
   const handleCompleteQuest = useCallback(async (questId) => {
-    if (!currentUser || !user.completedQuests) return;
-    if (user.completedQuests.includes(questId)) return;
+    if (!currentUser || !userProgress) return;
+    if (userProgress.completedQuests.includes(questId)) return;
 
     const userDocRef = doc(db, "users", currentUser.uid);
     const quest = initialQuestsData.find(q => q.id === questId);
     if (!quest) return;
     
-    const newCompletedQuests = [...user.completedQuests, questId];
-    let newXp = user.currentXp + quest.xp;
-    let newLevel = user.level;
-    let newNextLevelXp = user.nextLevelXp;
+    const newCompletedQuests = [...userProgress.completedQuests, questId];
+    let newXp = userProgress.currentXp + quest.xp;
+    let newLevel = userProgress.level;
+    let newNextLevelXp = userProgress.nextLevelXp;
     
     if (newXp >= newNextLevelXp) {
-      const oldLevel = user.level;
+      const oldLevel = userProgress.level;
       newXp -= newNextLevelXp;
       newLevel += 1;
       newNextLevelXp = Math.floor(newNextLevelXp * 1.5);
@@ -219,7 +231,7 @@ export default function App() {
       level: newLevel,
       nextLevelXp: newNextLevelXp,
     });
-  }, [currentUser, user]);
+  }, [currentUser, userProgress]);
 
   const handleCloseLevelUp = async () => {
     if (!levelUpInfo || !currentUser) return;
@@ -229,7 +241,6 @@ export default function App() {
     for (const stage in evolutionThresholds) {
         if (oldLevel < evolutionThresholds[stage] && newLevel >= evolutionThresholds[stage]) {
             const newStage = Number(stage);
-            setMascotStage(newStage);
             setTimeout(() => setEvolutionInfo({ newStage }), 100);
             const userDocRef = doc(db, "users", currentUser.uid);
             await updateDoc(userDocRef, { mascotStage: newStage });
@@ -272,28 +283,26 @@ export default function App() {
         @keyframes wingFlap { from { transform: scale(1); } to { transform: scale(1.05); } }
       `}</style>
       
-      {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} onSignUp={handleSignUp} onLogin={handleLogin} />}
+      {showAuthModal && !currentUser && <AuthModal onClose={() => setShowAuthModal(false)} onSignUp={handleSignUp} onLogin={handleLogin} />}
       {activeChallenge && <ChallengeModal quest={activeChallenge} onClose={() => setActiveChallenge(null)} onComplete={handleCompleteQuest} />}
       {levelUpInfo && <LevelUpModal newLevel={levelUpInfo.newLevel} onClose={handleCloseLevelUp} />}
       {evolutionInfo && <MascotEvolutionModal newStage={evolutionInfo.newStage} onClose={() => setEvolutionInfo(null)} mascotGifs={mascotGifs} />}
       {activeGuide && <GuideModal guide={activeGuide} onClose={() => setActiveGuide(null)} />}
 
       <div className="max-w-7xl mx-auto relative z-10">
-        {currentUser && <Header userAvatar={userAvatar} onNavClick={setActivePage} activePage={activePage} />}
+        {currentUser && userProgress && <Header userAvatar={userAvatar} onNavClick={setActivePage} activePage={activePage} />}
         <main>
-            {currentUser ? (
+            {currentUser && userProgress ? (
               <>
                 {activePage === 'quests' && <QuestsPage skills={skills} selectedSkill={selectedSkill} onSelectSkill={setSelectedSkill} quests={questsForSelectedSkill} onStartQuest={setActiveChallenge} mascotStage={mascotStage} mascotGifs={mascotGifs} />}
                 {activePage === 'guides' && <GuidesPage onOpenGuide={setActiveGuide} guides={initialGuidesData} />}
-                {activePage === 'character' && <CharacterPage user={user} userClass={userClass} avatars={initialAvatars} selectedAvatar={userAvatar} onAvatarSelect={handleAvatarSelect} onLogout={handleLogout} />}
+                {activePage === 'character' && <CharacterPage user={userProgress} userClass={userClass} avatars={initialAvatars} selectedAvatar={userAvatar} onAvatarSelect={handleAvatarSelect} onLogout={handleLogout} />}
               </>
             ) : (
-              !showAuthModal && (
-                <div className="text-center mt-20 p-4">
-                  <h2 className="text-3xl font-cinzel text-amber-300">Aguardando um Herói...</h2>
-                  <p className="text-amber-100/80 mt-2">Carregando o reino ou aguardando autenticação...</p>
-                </div>
-              )
+              <div className="text-center mt-20 p-4">
+                <h2 className="text-3xl font-cinzel text-amber-300">Aguardando um Herói...</h2>
+                <p className="text-amber-100/80 mt-2">Carregando o reino ou aguardando autenticação...</p>
+              </div>
             )}
         </main>
       </div>
