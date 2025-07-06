@@ -1,54 +1,46 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { auth } from './firebase/config';
+import { auth, db } from './firebase/config';
 import { 
   createUserWithEmailAndPassword, 
   signInWithEmailAndPassword, 
   onAuthStateChanged,
   signOut 
 } from "firebase/auth";
-import AuthModal from './components/modals/AuthModal';
+import { doc, setDoc, onSnapshot, updateDoc } from "firebase/firestore";
+
 import Header from './components/Header';
 import QuestsPage from './pages/QuestsPage';
 import GuidesPage from './pages/GuidesPage';
 import CharacterPage from './pages/CharacterPage';
+import AuthModal from './components/modals/AuthModal';
 import ChallengeModal from './components/modals/ChallengeModal';
 import LevelUpModal from './components/modals/LevelUpModal';
 import MascotEvolutionModal from './components/modals/MascotEvolutionModal';
 import GuideModal from './components/modals/GuideModal';
-import { Code, Palette, Server, Database, Wind, Shield, User as UserIcon, BookCopy, LayoutGrid } from 'lucide-react';
-
-const initialUserData = {
-  name: "Enzo Esmeraldo",
-  level: 1,
-  currentXp: 0,
-  nextLevelXp: 100,
-};
+import { Code, Palette, Server, Database, Wind, Shield } from 'lucide-react';
+import mascot1Icon from `./assets/tyrunt.png`;
+import macot2Icon from `./assets/tyrantrum.png`;
+import mascot3Icon from `./assets/wizardTyrantrum.png`;
 
 const initialAvatars = [
-    { id: 'avatar1', url: 'https://i.imgur.com/sC5nBv4.png' }, // Knight
-    { id: 'avatar2', url: 'https://i.imgur.com/tTz2N8j.png' }, // Mage
-    { id: 'avatar3', url: 'https://i.imgur.com/G0mB6nS.png' }, // Ranger
-    { id: 'avatar4', url: 'https://i.imgur.com/vHqj5a9.png' }, // Rogue
-    { id: 'avatar5', url: 'https://i.imgur.com/f0a4rJj.png' }, // Paladin
-    { id: 'avatar6', url: 'https://i.imgur.com/t8zQQ8l.png' }, // Sorceress
+    { id: 'avatar1', url: 'https://i.pinimg.com/736x/ce/5a/2e/ce5a2e6db10c43ba0f3b4381dbe9de23.jpg' }, // Warrior
+    { id: 'avatar2', url: 'https://i.pinimg.com/736x/2f/25/07/2f25074d2a6db23d675596cb701f10c2.jpg' }, // Mage
+    { id: 'avatar3', url: 'https://i.pinimg.com/736x/dd/18/a2/dd18a2387bd7806d90f494b294844570.jpg' }, // Ranger
+    { id: 'avatar4', url: 'https://i.pinimg.com/736x/f8/ac/38/f8ac38d8c48e9b23d0acf8f4fa48fef6.jpg' }, // Necromancer
+    { id: 'avatar5', url: 'https://i.pinimg.com/736x/fb/27/3f/fb273f6ef25d231d05870f6aac7c04f4.jpg' }, // Druid
+    { id: 'avatar6', url: 'https://i.pinimg.com/736x/75/c6/15/75c615115d305891d9cf541bea9ec1bd.jpg' }, // Bard
 ];
 
+
 const initialSkillsData = [
-  // Tier 1
   { id: 'html', name: 'HTML5', description: 'The foundational language for structuring web content.', dependencies: [], status: 'available', position: { row: 2, col: 1 }, category: 'structure', color: 'text-orange-400', icon: <Code /> },
   { id: 'css', name: 'CSS3', description: 'The language for styling and designing web pages.', dependencies: ['html'], status: 'locked', position: { row: 2, col: 2 }, category: 'styling', color: 'text-blue-400', icon: <Palette /> },
   { id: 'js', name: 'JavaScript ES6+', description: 'The core programming language of the web.', dependencies: ['html'], status: 'locked', position: { row: 2, col: 3 }, category: 'logic', color: 'text-yellow-400', icon: <Code /> },
-  
-  // Tier 2
   { id: 'tailwind', name: 'Tailwind CSS', description: 'A utility-first CSS framework for rapid UI development.', dependencies: ['css'], status: 'locked', position: { row: 3, col: 2 }, category: 'styling', color: 'text-teal-400', icon: <Wind /> },
   { id: 'react', name: 'React', description: 'A JavaScript library for building user interfaces.', dependencies: ['js'], status: 'locked', position: { row: 3, col: 3 }, category: 'logic', color: 'text-cyan-400', icon: <Code /> },
   { id: 'nodejs', name: 'Node.js', description: 'A JavaScript runtime for building server-side applications.', dependencies: ['js'], status: 'locked', position: { row: 1, col: 4 }, category: 'backend', color: 'text-green-400', icon: <Server /> },
-  
-  // Tier 3
   { id: 'express', name: 'Express.js', description: 'A minimal and flexible Node.js web application framework.', dependencies: ['nodejs'], status: 'locked', position: { row: 2, col: 4 }, category: 'backend', color: 'text-gray-400', icon: <Server /> },
   { id: 'sql', name: 'SQL Databases', description: 'Mastering relational databases like PostgreSQL.', dependencies: ['nodejs'], status: 'locked', position: { row: 3, col: 4 }, category: 'database', color: 'text-indigo-400', icon: <Database /> },
-
-  // Mastery Tier
   { id: 'mastery-fullstack', name: 'Full-Stack Mastery', description: 'Combine frontend and backend skills to build a complete application.', dependencies: ['react', 'express', 'sql'], status: 'locked', position: { row: 4, col: 3 }, category: 'mastery', color: 'text-purple-400', icon: <Shield /> },
 ];
 
@@ -86,9 +78,9 @@ const initialQuestsData = [
 ];
 
 const mascotGifs = {
-  1: 'https://i.imgur.com/3ZImK4M.gif', // Whelp
-  2: 'https://i.imgur.com/sDEW3r9.gif', // Drake
-  3: 'https://i.imgur.com/OAvp2iL.gif', // Dragon
+  1: mascot1Icon, 
+  2: macot2Icon, 
+  3: mascot3Icon, 
 };
 
 const initialGuidesData = [
@@ -99,66 +91,55 @@ const initialGuidesData = [
 ];
 
 export default function App() {
-  const [user, setUser] = useState(initialUserData);
   const [skills, setSkills] = useState(initialSkillsData);
   const [quests, setQuests] = useState(initialQuestsData);
   const [selectedSkill, setSelectedSkill] = useState(null);
+  const [activePage, setActivePage] = useState('quests');
   const [activeChallenge, setActiveChallenge] = useState(null);
+  const [activeGuide, setActiveGuide] = useState(null);
+  
+  const [user, setUser] = useState({});
+  const [currentUser, setCurrentUser] = useState(null); 
+  const [userAvatar, setUserAvatar] = useState(initialAvatars[0].url);
+  const [mascotStage, setMascotStage] = useState(1);
+  const [userClass, setUserClass] = useState('Novice');
+  
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const [levelUpInfo, setLevelUpInfo] = useState(null);
   const [evolutionInfo, setEvolutionInfo] = useState(null);
-  const [userClass, setUserClass] = useState('Novice');
-  const [mascotStage, setMascotStage] = useState(1);
-  const [activePage, setActivePage] = useState('quests');
-  const [userAvatar, setUserAvatar] = useState(initialAvatars[0].url);
-  const [activeGuide, setActiveGuide] = useState(null);
-  const [currentUser, setCurrentUser] = useState(null);
-  const [showAuthModal, setShowAuthModal] = useState(true);
-
+  
   useEffect(() => {
-    const faviconHref = `data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>`;
-    const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
-    link.type = 'image/svg+xml';
-    link.rel = 'shortcut icon';
-    link.href = faviconHref;
-    document.getElementsByTagName('head')[0].appendChild(link);
-  }, []);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setCurrentUser(user);
+    let unsubscribeFromFirestore = () => {};
+    const unsubscribeFromAuth = onAuthStateChanged(auth, (userAuth) => {
+      if (userAuth) {
+        setCurrentUser(userAuth);
         setShowAuthModal(false);
+        const userDocRef = doc(db, "users", userAuth.uid);
+        unsubscribeFromFirestore = onSnapshot(userDocRef, (doc) => {
+          if (doc.exists()) {
+            const userDataFromDb = doc.data();
+            setUser(userDataFromDb);
+            setUserAvatar(userDataFromDb.avatarUrl);
+            setMascotStage(userDataFromDb.mascotStage);
+            setQuests(prevQuests => 
+              prevQuests.map(q => ({
+                ...q,
+                completed: userDataFromDb.completedQuests.includes(q.id)
+              }))
+            );
+          }
+        });
       } else {
         setCurrentUser(null);
         setShowAuthModal(true);
+        if (unsubscribeFromFirestore) unsubscribeFromFirestore();
       }
     });
-    return () => unsubscribe();
+    return () => {
+      unsubscribeFromAuth();
+      unsubscribeFromFirestore();
+    };
   }, []);
-
-  const handleSignUp = async (email, password) => {
-    try {
-      await createUserWithEmailAndPassword(auth, email, password);
-    } catch (error) {
-      alert(error.message); 
-    }
-  };
-
-  const handleLogin = async (email, password) => {
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-    } catch (error) {
-      alert(error.message);
-    }
-  };
-
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-    } catch (error) {
-      alert(error.message);
-    }
-  };
 
   useEffect(() => {
     const completedSkills = skills.filter(s => s.status === 'completed');
@@ -170,6 +151,7 @@ export default function App() {
     else if (completedCategories.has('styling')) { newClass = 'UI Artisan'; } 
     else if (completedCategories.has('backend')) { newClass = 'Data Engineer'; }
     setUserClass(newClass);
+
     const completedSkillIds = new Set(completedSkills.map(s => s.id));
     let hasChanged = false;
     const newSkills = skills.map(skill => {
@@ -182,66 +164,97 @@ export default function App() {
     if (hasChanged) setSkills(newSkills);
   }, [skills]);
 
-  const handleCompleteQuest = useCallback((questId) => {
-    let completedQuest = null;
-    setQuests(currentQuests => {
-        const newQuests = currentQuests.map(q => {
-            if (q.id === questId && !q.completed) { completedQuest = { ...q, completed: true }; return completedQuest; }
-            return q;
-        });
-        if (completedQuest) {
-            setUser(currentUser => {
-                const oldLevel = currentUser.level;
-                let tempXp = currentUser.currentXp + completedQuest.xp;
-                let tempLevel = currentUser.level;
-                let tempNextLevelXp = currentUser.nextLevelXp;
-                if (tempXp >= tempNextLevelXp) {
-                    tempXp -= tempNextLevelXp;
-                    tempLevel += 1;
-                    tempNextLevelXp = Math.floor(tempNextLevelXp * 1.5);
-                    setTimeout(() => setLevelUpInfo({ newLevel: tempLevel, oldLevel: oldLevel }), 100);
-                }
-                return { ...currentUser, level: tempLevel, currentXp: tempXp, nextLevelXp: tempNextLevelXp };
-            });
-            const allQuestsForSkillCompleted = newQuests.filter(q => q.skillId === completedQuest.skillId).every(q => q.completed);
-            if (allQuestsForSkillCompleted) {
-                setSkills(currentSkills => currentSkills.map(s => s.id === completedQuest.skillId ? { ...s, status: 'completed' } : s));
-            }
-        }
-        return newQuests;
-    });
+  useEffect(() => {
+    const faviconHref = `data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>`;
+    const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+    link.type = 'image/svg+xml'; link.rel = 'shortcut icon'; link.href = faviconHref;
+    document.getElementsByTagName('head')[0].appendChild(link);
   }, []);
 
-  const handleSelectSkill = (skill) => setSelectedSkill(skill);
-  const handleStartQuest = (quest) => setActiveChallenge(quest);
-  const handleCloseChallenge = () => setActiveChallenge(null);
-  const handleCloseLevelUp = () => {
-    if (!levelUpInfo) return;
+  const handleSignUp = async (email, password) => {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const newUser = userCredential.user;
+      await setDoc(doc(db, "users", newUser.uid), {
+        level: 1, currentXp: 0, nextLevelXp: 100,
+        avatarUrl: initialAvatars[0].url, completedQuests: [], mascotStage: 1,
+      });
+    } catch (error) { alert(error.message); }
+  };
+
+  const handleLogin = async (email, password) => {
+    try { await signInWithEmailAndPassword(auth, email, password); } 
+    catch (error) { alert(error.message); }
+  };
+
+  const handleLogout = async () => {
+    try { await signOut(auth); } 
+    catch (error) { alert(error.message); }
+  };
+
+  const handleCompleteQuest = useCallback(async (questId) => {
+    if (!currentUser || !user.completedQuests) return;
+    if (user.completedQuests.includes(questId)) return;
+
+    const userDocRef = doc(db, "users", currentUser.uid);
+    const quest = initialQuestsData.find(q => q.id === questId);
+    if (!quest) return;
+    
+    const newCompletedQuests = [...user.completedQuests, questId];
+    let newXp = user.currentXp + quest.xp;
+    let newLevel = user.level;
+    let newNextLevelXp = user.nextLevelXp;
+    
+    if (newXp >= newNextLevelXp) {
+      const oldLevel = user.level;
+      newXp -= newNextLevelXp;
+      newLevel += 1;
+      newNextLevelXp = Math.floor(newNextLevelXp * 1.5);
+      setTimeout(() => setLevelUpInfo({ newLevel, oldLevel }), 100);
+    }
+    
+    await updateDoc(userDocRef, {
+      completedQuests: newCompletedQuests,
+      currentXp: newXp,
+      level: newLevel,
+      nextLevelXp: newNextLevelXp,
+    });
+  }, [currentUser, user]);
+
+  const handleCloseLevelUp = async () => {
+    if (!levelUpInfo || !currentUser) return;
     const { oldLevel, newLevel } = levelUpInfo;
     setLevelUpInfo(null);
     const evolutionThresholds = { 2: 5, 3: 10 };
     for (const stage in evolutionThresholds) {
         if (oldLevel < evolutionThresholds[stage] && newLevel >= evolutionThresholds[stage]) {
-            setMascotStage(Number(stage));
-            setTimeout(() => setEvolutionInfo({ newStage: Number(stage) }), 100);
+            const newStage = Number(stage);
+            setMascotStage(newStage);
+            setTimeout(() => setEvolutionInfo({ newStage }), 100);
+            const userDocRef = doc(db, "users", currentUser.uid);
+            await updateDoc(userDocRef, { mascotStage: newStage });
             break; 
         }
     }
   };
-  const handleCloseEvolution = () => setEvolutionInfo(null);
-  const handleOpenGuide = (guide) => setActiveGuide(guide);
-  const handleCloseGuide = () => setActiveGuide(null);
   
+  const handleAvatarSelect = async (avatarUrl) => {
+    if (!currentUser) return;
+    setUserAvatar(avatarUrl);
+    const userDocRef = doc(db, "users", currentUser.uid);
+    await updateDoc(userDocRef, { avatarUrl });
+  };
+
   const questsForSelectedSkill = selectedSkill ? quests.filter(q => q.skillId === selectedSkill.id) : [];
 
   return (
-    <div className="bg-sky-night min-h-screen text-white/90 font-poppins p-2 sm:p-4 relative overflow-hidden">
+    <div className="bg-sky-night min-h-screen text-white/90 font-poppins p-2 sm:p-4 relative overflow-hidden" style={{width: `100vw`}}>
         <div id="stars"></div><div id="stars2"></div><div id="stars3"></div>
         <div className="absolute inset-0 bg-radial-vignette pointer-events-none"></div>
         <div className="absolute bottom-0 left-0 w-full h-1/3 bg-gradient-to-t from-black/50 to-transparent pointer-events-none"></div>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Poppins:wght@400;600;700&display=swap');
-        body { font-family: 'Poppins', sans-serif; }
+        body { font-family: 'Poppins', sans-serif; overflow-x: hidden; }
         .font-cinzel { font-family: 'Cinzel Decorative', cursive; }
         .bg-sky-night { background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%); }
         .bg-parchment-dark { background-color: #2a241c; background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px); background-size: 20px 20px; }
@@ -252,12 +265,7 @@ export default function App() {
         #stars { background: transparent url(https://www.script-tutorials.com/demos/360/images/stars.png) repeat top center; animation: move-twink-back 200s linear infinite; }
         #stars2 { background: transparent url(https://www.script-tutorials.com/demos/360/images/twinkling.png) repeat top center; animation: move-twink-back 150s linear infinite; }
         #stars3 { background: transparent url(https://www.script-tutorials.com/demos/360/images/clouds.png) repeat top center; animation: move-twink-back 100s linear infinite; }
-        .animate-fade-in { animation: fadeIn 0.3s ease-out; }
-        .animate-shake { animation: shake 0.5s ease-in-out; }
-        .animate-pulse-fast { animation: pulse 1s infinite; }
-        .animate-spin-slow { animation: spin 10s linear infinite; }
-        .animate-float { animation: float 6s ease-in-out infinite; }
-        .animate-wing-flap { animation: wingFlap 1s ease-in-out infinite alternate; }
+        .animate-fade-in { animation: fadeIn 0.3s ease-out; } .animate-shake { animation: shake 0.5s ease-in-out; } .animate-pulse-fast { animation: pulse 1s infinite; } .animate-spin-slow { animation: spin 10s linear infinite; } .animate-float { animation: float 6s ease-in-out infinite; } .animate-wing-flap { animation: wingFlap 1s ease-in-out infinite alternate; }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); } 20%, 40%, 60%, 80% { transform: translateX(5px); } }
         @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { translateY(0px); } }
@@ -265,25 +273,27 @@ export default function App() {
       `}</style>
       
       {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} onSignUp={handleSignUp} onLogin={handleLogin} />}
-      {activeChallenge && <ChallengeModal quest={activeChallenge} onClose={handleCloseChallenge} onComplete={handleCompleteQuest} />}
+      {activeChallenge && <ChallengeModal quest={activeChallenge} onClose={() => setActiveChallenge(null)} onComplete={handleCompleteQuest} />}
       {levelUpInfo && <LevelUpModal newLevel={levelUpInfo.newLevel} onClose={handleCloseLevelUp} />}
-      {evolutionInfo && <MascotEvolutionModal newStage={evolutionInfo.newStage} onClose={handleCloseEvolution} mascotGifs={mascotGifs} />}
-      {activeGuide && <GuideModal guide={activeGuide} onClose={handleCloseGuide} />}
+      {evolutionInfo && <MascotEvolutionModal newStage={evolutionInfo.newStage} onClose={() => setEvolutionInfo(null)} mascotGifs={mascotGifs} />}
+      {activeGuide && <GuideModal guide={activeGuide} onClose={() => setActiveGuide(null)} />}
 
       <div className="max-w-7xl mx-auto relative z-10">
-        <Header userAvatar={userAvatar} onNavClick={setActivePage} activePage={activePage} />
+        {currentUser && <Header userAvatar={userAvatar} onNavClick={setActivePage} activePage={activePage} />}
         <main>
             {currentUser ? (
               <>
-                {activePage === 'quests' && <QuestsPage skills={skills} selectedSkill={selectedSkill} onSelectSkill={handleSelectSkill} quests={questsForSelectedSkill} onStartQuest={handleStartQuest} mascotStage={mascotStage} mascotGifs={mascotGifs} />}
-                {activePage === 'guides' && <GuidesPage onOpenGuide={handleOpenGuide} guides={initialGuidesData} />}
-                {activePage === 'character' && <CharacterPage user={user} userClass={userClass} avatars={initialAvatars} selectedAvatar={userAvatar} onAvatarSelect={setUserAvatar} onLogout={handleLogout} />}
+                {activePage === 'quests' && <QuestsPage skills={skills} selectedSkill={selectedSkill} onSelectSkill={setSelectedSkill} quests={questsForSelectedSkill} onStartQuest={setActiveChallenge} mascotStage={mascotStage} mascotGifs={mascotGifs} />}
+                {activePage === 'guides' && <GuidesPage onOpenGuide={setActiveGuide} guides={initialGuidesData} />}
+                {activePage === 'character' && <CharacterPage user={user} userClass={userClass} avatars={initialAvatars} selectedAvatar={userAvatar} onAvatarSelect={handleAvatarSelect} onLogout={handleLogout} />}
               </>
             ) : (
-              <div className="text-center mt-20 p-4">
-                <h2 className="text-3xl font-cinzel text-amber-300">Aguardando um Herói...</h2>
-                <p className="text-amber-100/80 mt-2">Por favor, entre ou registre-se para começar sua jornada.</p>
-              </div>
+              !showAuthModal && (
+                <div className="text-center mt-20 p-4">
+                  <h2 className="text-3xl font-cinzel text-amber-300">Aguardando um Herói...</h2>
+                  <p className="text-amber-100/80 mt-2">Carregando o reino ou aguardando autenticação...</p>
+                </div>
+              )
             )}
         </main>
       </div>
