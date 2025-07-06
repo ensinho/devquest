@@ -8,6 +8,7 @@ import {
 } from "firebase/auth";
 import { doc, setDoc, onSnapshot, updateDoc } from "firebase/firestore";
 
+// Importe todos os seus componentes e páginas
 import Header from './components/Header';
 import QuestsPage from './pages/QuestsPage';
 import GuidesPage from './pages/GuidesPage';
@@ -98,7 +99,7 @@ export default function App() {
   const [activeChallenge, setActiveChallenge] = useState(null);
   const [activeGuide, setActiveGuide] = useState(null);
   
-  const [userProgress, setUserProgress] = useState(null);
+  const [userProgress, setUserProgress] = useState(null); 
   const [currentUser, setCurrentUser] = useState(null);
   const [userAvatar, setUserAvatar] = useState(initialAvatars[0].url);
   const [mascotStage, setMascotStage] = useState(1);
@@ -172,7 +173,7 @@ export default function App() {
       return { ...skill, status: newStatus };
     });
     setSkills(newSkills);
-  }, [userProgress]); 
+  }, [userProgress, skills]); 
 
   useEffect(() => {
     const faviconHref = `data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>`;
@@ -187,7 +188,7 @@ export default function App() {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const newUser = userCredential.user;
       await setDoc(doc(db, "users", newUser.uid), {
-        name: email.split('@')[0],
+        name: email.split('@')[0], // Nome padrão
         level: 1, currentXp: 0, nextLevelXp: 100,
         avatarUrl: initialAvatars[0].url, completedQuests: [], mascotStage: 1,
       });
@@ -290,7 +291,7 @@ export default function App() {
       {activeGuide && <GuideModal guide={activeGuide} onClose={() => setActiveGuide(null)} />}
 
       <div className="max-w-7xl mx-auto relative z-10">
-        {currentUser && userProgress && <Header userAvatar={userAvatar} onNavClick={setActivePage} activePage={activePage} />}
+        {currentUser && userProgress && <Header user={userProgress} userClass={userClass} userAvatar={userAvatar} onNavClick={setActivePage} activePage={activePage} />}
         <main>
             {currentUser && userProgress ? (
               <>
