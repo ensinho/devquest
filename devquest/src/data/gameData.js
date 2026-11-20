@@ -75,6 +75,17 @@ export const INITIAL_SKILLS = [
       'No backend com Express/Node, cada rota recebe req, valida dados e responde com res.json()!',
   },
   {
+    id: 'a11y-tests',
+    name: 'A11y & Testes',
+    shortLabel: 'Qualidade',
+    description: 'Acessibilidade real (ARIA/teclado) e testes unitários automatizados com Vitest.',
+    dependencies: ['tailwind', 'react'],
+    position: { col: 4, row: 1 },
+    category: 'styling',
+    mentorLesson:
+      'Produto de portfólio real tem aria-label em botões de ícone e testes unitários que protegem cada regra!',
+  },
+  {
     id: 'sql',
     name: 'Banco SQL',
     shortLabel: 'Dados',
@@ -89,9 +100,9 @@ export const INITIAL_SKILLS = [
     id: 'mastery-fullstack',
     name: 'Maestria Full-Stack',
     shortLabel: 'Lendário',
-    description: 'Una frontend, API e banco de dados em uma arquitetura completa.',
-    dependencies: ['react', 'tailwind', 'sql'],
-    position: { col: 4, row: 1 },
+    description: 'Una frontend, qualidade, API e banco de dados em uma arquitetura completa.',
+    dependencies: ['a11y-tests', 'react', 'sql'],
+    position: { col: 5, row: 2 },
     category: 'mastery',
     mentorLesson:
       'O desafio final do Códice! Conecte Frontend React, API Express, Banco de Dados e autenticação JWT em um plano coeso.',
@@ -374,6 +385,7 @@ export const INITIAL_QUESTS = [
   {
     id: 'boss-ui-token',
     skillId: 'tailwind',
+    language: 'css',
     title: 'Boss: Cartão 0-1-2 com Tokens',
     isBossFight: true,
     xp: 95,
@@ -565,6 +577,48 @@ export const INITIAL_QUESTS = [
     ],
     solution: (code) =>
       /count\(\s*\*\s*\)/i.test(code) && /group\s+by\s+category/i.test(code),
+  },
+
+  // A11y & Testes (2)
+  {
+    id: 'q-a11y-label',
+    skillId: 'a11y-tests',
+    language: 'html',
+    title: 'Botão Acessível para Leitor de Tela',
+    xp: 65,
+    challenge:
+      'Crie um <button type="button" aria-label="Alternar tema"> contendo o ícone "☀" (sem usar div!).',
+    hint: 'Botões apenas com ícone precisam de type="button" e um aria-label descritivo.',
+    hint2: '<button type="button" aria-label="Alternar tema">☀</button>',
+    starterCode: '<button>☀</button>',
+    checks: [
+      { label: 'Atributo type="button"', test: (c) => /type\s*=\s*["']button["']/i.test(c) },
+      { label: 'Atributo aria-label preenchido', test: (c) => /aria-label\s*=\s*["'][^"']+["']/i.test(c) },
+    ],
+    solution: (code) =>
+      /<button\b/i.test(code) &&
+      /<\/button>/i.test(code) &&
+      /type\s*=\s*["']button["']/i.test(code) &&
+      /aria-label\s*=\s*["'][^"']+["']/i.test(code),
+  },
+  {
+    id: 'boss-vitest',
+    skillId: 'a11y-tests',
+    language: 'js',
+    title: 'Boss: Teste Unitário com Vitest',
+    isBossFight: true,
+    xp: 115,
+    challenge:
+      'Escreva um teste usando expect(sum(2, 3)).toBe(5) dentro de uma função de validação.',
+    hint: 'Chame expect(sum(2, 3)) encadeado com .toBe(5) para validar a soma.',
+    hint2: 'function runTest() {\n  expect(sum(2, 3)).toBe(5);\n}',
+    starterCode: 'function runTest() {\n  // Escreva sua asserção abaixo\n  \n}',
+    checks: [
+      { label: 'Chamada expect(sum(2, 3))', test: (c) => /expect\(\s*sum\(\s*2\s*,\s*3\s*\)\s*\)/.test(c) },
+      { label: 'Matcher .toBe(5)', test: (c) => /\.toBe\(\s*5\s*\)/.test(c) },
+    ],
+    solution: (code) =>
+      /expect\(\s*sum\(\s*2\s*,\s*3\s*\)\s*\)/.test(code) && /\.toBe\(\s*5\s*\)/.test(code),
   },
 
   // Full-Stack Mastery (1)

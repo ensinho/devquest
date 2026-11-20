@@ -31,43 +31,40 @@ export default function QuestsPage({
 }) {
   return (
     <div className="dq-page-stack">
-      <CompanionCamp
-        unlockedStage={unlockedStage}
-        displayStage={displayStage}
-        onPreviewStage={onPreviewStage}
-        accessoryId={accessoryId}
-        onSelectAccessory={onSelectAccessory}
-        companionName={companionName}
-        completedCount={completedCount}
-        completedQuizzes={completedQuizzes}
-        bondInfo={bondInfo}
-        streak={streak}
-        mentorMessage={mentorMessage}
-        mentorTag={mentorTag}
-        avatarState={avatarState}
-        avatarMood={avatarMood}
-        theme={theme}
-        onPet={onPet}
-        onAskLesson={onAskLesson}
-        onAnswerQuiz={onAnswerQuiz}
+      <SkillTree
+        skills={skills}
+        selectedSkillId={selectedSkill?.id ?? null}
+        onSelectSkill={onSelectSkill}
+        onHoverSkill={onHoverSkill}
       />
 
-      <div className="dq-quests-layout">
-        <div className="dq-quests-map-col">
-          <SkillTree
-            skills={skills}
-            selectedSkillId={selectedSkill?.id ?? null}
-            onSelectSkill={onSelectSkill}
-            onHoverSkill={onHoverSkill}
-          />
-        </div>
-        <div className="dq-quests-side-col">
-          <SidePanel
-            skill={selectedSkill}
-            quests={quests}
-            onStartQuest={onStartQuest}
-          />
-        </div>
+      <div className="dq-command-deck">
+        <CompanionCamp
+          unlockedStage={unlockedStage}
+          displayStage={displayStage}
+          onPreviewStage={onPreviewStage}
+          accessoryId={accessoryId}
+          onSelectAccessory={onSelectAccessory}
+          companionName={companionName}
+          completedCount={completedCount}
+          completedQuizzes={completedQuizzes}
+          bondInfo={bondInfo}
+          streak={streak}
+          mentorMessage={mentorMessage}
+          mentorTag={mentorTag}
+          avatarState={avatarState}
+          avatarMood={avatarMood}
+          theme={theme}
+          onPet={onPet}
+          onAskLesson={onAskLesson}
+          onAnswerQuiz={onAnswerQuiz}
+        />
+
+        <SidePanel
+          skill={selectedSkill}
+          quests={quests}
+          onStartQuest={onStartQuest}
+        />
       </div>
     </div>
   );

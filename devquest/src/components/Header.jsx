@@ -2,6 +2,7 @@ import React from 'react';
 import {
   Shield,
   Compass,
+  Swords,
   BookOpen,
   User,
   Sun,
@@ -15,7 +16,8 @@ import { HERO_SIGILS } from '../data/gameData.js';
 import { getCompanionStageData } from '../data/companionAvatars.js';
 
 const NAV_ITEMS = [
-  { id: 'quests', label: 'Mapa & Quests', icon: Compass },
+  { id: 'quests', label: 'Mapa', icon: Compass },
+  { id: 'arena', label: 'Arena', icon: Swords },
   { id: 'guides', label: 'Grimórios', icon: BookOpen },
   { id: 'character', label: 'Herói & Mascote', icon: User },
 ];

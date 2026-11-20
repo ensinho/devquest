@@ -1,13 +1,13 @@
 import React, { useMemo } from 'react';
 import SkillNode from './SkillNode.jsx';
 
-const GRID_COLS = 4;
+const GRID_COLS = 5;
 const GRID_ROWS = 3;
 
 function getNodeCenter(pos) {
   return {
-    x: ((pos.col - 0.5) / GRID_COLS) * 1000,
-    y: ((pos.row - 0.5) / GRID_ROWS) * 420,
+    x: ((pos.col - 0.5) / GRID_COLS) * 1200,
+    y: ((pos.row - 0.5) / GRID_ROWS) * 400,
   };
 }
 
@@ -47,20 +47,21 @@ export default function SkillTree({
     <section className="dq-constellation" aria-label="Constellation Skill Map">
       <div className="dq-section-header">
         <div>
-          <h2 className="dq-h2">Constellation Skill Map</h2>
+          <span className="dq-eyebrow">Mapa de Evolução Full-Stack</span>
+          <h1 className="dq-h1">Constellation Skill Map</h1>
           <p className="dq-section-sub">
-            Selecione uma constelação ativa para abrir suas quests e ouvir a dica do seu mascote.
+            Trilha simétrica 1 → 2 → 3 → 2 → 1. Selecione qualquer constelação ativa para inspecionar e abrir a Arena de Código.
           </p>
         </div>
         <span className="dq-badge dq-badge-live dq-tabular">
-          {completedSkillsCount} / {skills.length} Skills
+          {completedSkillsCount} / {skills.length} Skills Dominadas
         </span>
       </div>
 
       <div className="dq-map-canvas">
         <svg
           className="dq-map-edges"
-          viewBox="0 0 1000 420"
+          viewBox="0 0 1200 400"
           preserveAspectRatio="none"
           aria-hidden="true"
         >

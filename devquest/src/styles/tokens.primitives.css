@@ -66,6 +66,11 @@
   --primitive-violet-600: #7c3aed;
   --primitive-violet-700: #6d28d9;
 
+  /* --- Syntax Sky (Lexical Function / Selector Accent) --- */
+  --primitive-sky-300: #7dd3fc;
+  --primitive-sky-400: #38bdf8;
+  --primitive-sky-700: #0369a1;
+
   /* --- Alpha / Translucent Primitives --- */
   --primitive-white-a04: rgba(255, 255, 255, 0.04);
   --primitive-white-a08: rgba(255, 255, 255, 0.08);

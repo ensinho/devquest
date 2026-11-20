@@ -10,11 +10,11 @@ import { doc, setDoc, onSnapshot, updateDoc } from 'firebase/firestore';
 
 import Header from './components/Header.jsx';
 import QuestsPage from './pages/QuestsPage.jsx';
+import ArenaPage from './pages/ArenaPage.jsx';
 import GuidesPage from './pages/GuidesPage.jsx';
 import CharacterPage from './pages/CharacterPage.jsx';
 import CompanionMentorDock from './components/companion/CompanionMentorDock.jsx';
 import AuthModal from './components/modals/AuthModal.jsx';
-import ChallengeModal from './components/modals/ChallengeModal.jsx';
 import LevelUpModal from './components/modals/LevelUpModal.jsx';
 import MascotEvolutionModal from './components/modals/MascotEvolutionModal.jsx';
 import GuideModal from './components/modals/GuideModal.jsx';
@@ -38,15 +38,20 @@ import './styles/app.css';
 
 export default function App() {
   const [theme, setTheme] = useState(() => initTheme());
-  const [activePage, setActivePage] = useState('quests');
+  const [activePage, setActivePage] = useState(() => {
+    const pageParam = new URLSearchParams(window.location.search).get('page');
+    return ['quests', 'arena', 'guides', 'character'].includes(pageParam)
+      ? pageParam
+      : 'quests';
+  });
 
   const [currentUser, setCurrentUser] = useState(null);
   const [userProgress, setUserProgress] = useState(() => loadGuestProgress());
 
   const [selectedSkillId, setSelectedSkillId] = useState('html');
+  const [activeQuestId, setActiveQuestId] = useState('q1');
   const [previewStage, setPreviewStage] = useState(null);
 
-  const [activeChallenge, setActiveChallenge] = useState(null);
   const [activeGuide, setActiveGuide] = useState(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(() => {
@@ -338,6 +343,13 @@ export default function App() {
     ]
   );
 
+  const handleOpenQuestInArena = useCallback((quest) => {
+    setSelectedSkillId(quest.skillId);
+    setActiveQuestId(quest.id);
+    setActivePage('arena');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
   const handleSelectSkill = (skill) => {
     setSelectedSkillId(skill.id);
     setMentorSpeech({
@@ -517,7 +529,7 @@ export default function App() {
               onSelectSkill={handleSelectSkill}
               onHoverSkill={handleHoverSkill}
               quests={questsForSelectedSkill}
-              onStartQuest={setActiveChallenge}
+              onStartQuest={handleOpenQuestInArena}
               unlockedStage={unlockedStage}
               displayStage={displayStage}
               onPreviewStage={handlePreviewStage}
@@ -536,6 +548,26 @@ export default function App() {
               onPet={handlePet}
               onAskLesson={handleAskLesson}
               onAnswerQuiz={handleAnswerQuiz}
+            />
+          )}
+
+          {activePage === 'arena' && (
+            <ArenaPage
+              skills={skills}
+              quests={questsWithStatus}
+              activeQuestId={activeQuestId}
+              onSelectQuest={(questId) => {
+                setActiveQuestId(questId);
+                const found = INITIAL_QUESTS.find((q) => q.id === questId);
+                if (found) setSelectedSkillId(found.skillId);
+              }}
+              onCompleteQuest={handleCompleteQuest}
+              onBackToMap={() => setActivePage('quests')}
+              displayStage={displayStage}
+              accessoryId={userProgress.accessoryId ?? 'spark'}
+              companionName={userProgress.companionName}
+              theme={theme}
+              onSound={(kind) => playCompanionSound(kind, soundEnabled)}
             />
           )}
 
@@ -587,15 +619,11 @@ export default function App() {
         avatarMood={avatarMood}
         tipMessage={dockTip}
         recommendedQuest={recommendedQuest}
-        onLaunchRecommended={(quest) => {
-          setSelectedSkillId(quest.skillId);
-          setActivePage('quests');
-          setActiveChallenge(quest);
-        }}
+        onLaunchRecommended={handleOpenQuestInArena}
         onPet={handlePet}
         hidden={Boolean(
           showOnboarding ||
-            activeChallenge ||
+            activePage === 'arena' ||
             activeGuide ||
             evolutionInfo ||
             levelUpInfo ||
@@ -626,19 +654,6 @@ export default function App() {
           onSignUp={handleSignUp}
           onLogin={handleLogin}
           isFirebaseConfigured={isFirebaseConfigured}
-        />
-      )}
-
-      {activeChallenge && (
-        <ChallengeModal
-          quest={activeChallenge}
-          displayStage={displayStage}
-          accessoryId={userProgress.accessoryId ?? 'spark'}
-          companionName={userProgress.companionName}
-          theme={theme}
-          onClose={() => setActiveChallenge(null)}
-          onComplete={handleCompleteQuest}
-          onSound={(kind) => playCompanionSound(kind, soundEnabled)}
         />
       )}
 

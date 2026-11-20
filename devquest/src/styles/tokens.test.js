@@ -47,6 +47,13 @@ describe('3-layer CSS token architecture guardrails', () => {
       '--color-arcane',
       '--color-companion-ambient',
       '--focus-ring',
+      '--syntax-keyword',
+      '--syntax-tag',
+      '--syntax-attr',
+      '--syntax-string',
+      '--syntax-number',
+      '--syntax-function',
+      '--syntax-comment',
     ];
 
     for (const token of requiredTokens) {

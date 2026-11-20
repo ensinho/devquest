@@ -60,6 +60,16 @@
   --shadow-md: 0 10px 28px var(--primitive-black-a55);
   --shadow-lg: 0 20px 48px var(--primitive-black-a72);
   --focus-ring: 0 0 0 2px var(--color-bg), 0 0 0 4px var(--color-primary);
+
+  /* --- Lexical Syntax Highlighting (Dark) --- */
+  --syntax-keyword: var(--primitive-violet-300);
+  --syntax-tag: var(--primitive-crimson-300);
+  --syntax-attr: var(--primitive-ember-300);
+  --syntax-string: var(--primitive-teal-300);
+  --syntax-number: var(--primitive-gold-300);
+  --syntax-function: var(--primitive-sky-300);
+  --syntax-comment: var(--primitive-obsidian-400);
+  --syntax-punct: var(--primitive-obsidian-300);
 }
 
 /* --- Companion Stage Theme Synchronization (Dark Mode) --- */
@@ -145,6 +155,16 @@
   --shadow-md: 0 10px 24px var(--primitive-ink-a12);
   --shadow-lg: 0 18px 40px var(--primitive-ink-a18);
   --focus-ring: 0 0 0 2px var(--color-bg), 0 0 0 4px var(--color-primary);
+
+  /* --- Lexical Syntax Highlighting (Warm Vellum Light, AA/AAA) --- */
+  --syntax-keyword: var(--primitive-violet-700);
+  --syntax-tag: var(--primitive-crimson-700);
+  --syntax-attr: var(--primitive-ember-700);
+  --syntax-string: var(--primitive-teal-700);
+  --syntax-number: var(--primitive-gold-700);
+  --syntax-function: var(--primitive-sky-700);
+  --syntax-comment: var(--primitive-vellum-500);
+  --syntax-punct: var(--primitive-vellum-600);
 }
 
 /* --- Companion Stage Theme Synchronization (Light Mode) --- */

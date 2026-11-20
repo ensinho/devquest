@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { INITIAL_SKILLS, INITIAL_QUESTS } from './gameData.js';
+import { validateQuestCode } from '../utils/codeValidator.js';
 
 const CANONICAL_SOLUTIONS = {
   q1: '<h1>Welcome to DevQuest</h1>',
@@ -18,18 +19,21 @@ const CANONICAL_SOLUTIONS = {
   'boss-react': '<ul>{quests.map((q) => <li key={q.id}>{q.title}</li>)}</ul>',
   'q-node-get': 'app.get("/health", (req, res) => res.json({ ok: true }));',
   q19: 'app.post("/users", (req, res) => res.json({ name: req.body.name }));',
+  'q-a11y-label': '<button type="button" aria-label="Alternar tema">☀</button>',
+  'boss-vitest': 'function runTest() { expect(sum(2, 3)).toBe(5); }',
   'q-sql-where': 'SELECT name FROM users WHERE level >= 5 ORDER BY level DESC;',
   q20: 'SELECT u.name, p.title FROM users u JOIN posts p ON u.id = p.user_id;',
   'boss-sql': 'SELECT category, COUNT(*) FROM skills GROUP BY category;',
   'boss-fullstack': '// React frontend, Express API rota protegida com JWT e banco SQL',
 };
 
-describe('gameData quest integrity and live diagnostics', () => {
+describe('gameData quest integrity and lexical validation', () => {
   it('ensures every quest maps to a valid skill and has unique IDs, hints, and checks', () => {
     const skillIds = new Set(INITIAL_SKILLS.map((s) => s.id));
     const questIds = new Set();
 
-    expect(INITIAL_QUESTS.length).toBeGreaterThanOrEqual(20);
+    expect(INITIAL_SKILLS).toHaveLength(9);
+    expect(INITIAL_QUESTS).toHaveLength(22);
 
     for (const quest of INITIAL_QUESTS) {
       expect(questIds.has(quest.id), `Duplicate quest id: ${quest.id}`).toBe(false);
@@ -41,7 +45,7 @@ describe('gameData quest integrity and live diagnostics', () => {
     }
   });
 
-  it('rejects starterCode and passes canonical solutions + all live checks for every quest', () => {
+  it('rejects starterCode and passes validateQuestCode on canonical solutions for all 22 quests', () => {
     for (const quest of INITIAL_QUESTS) {
       expect(
         quest.solution(quest.starterCode),
@@ -50,14 +54,12 @@ describe('gameData quest integrity and live diagnostics', () => {
 
       const answer = CANONICAL_SOLUTIONS[quest.id];
       expect(answer, `Missing canonical solution for ${quest.id}`).toBeTruthy();
-      expect(quest.solution(answer), `Canonical solution failed for ${quest.id}`).toBe(true);
 
-      for (const check of quest.checks) {
-        expect(
-          check.test(answer),
-          `Check "${check.label}" failed canonical answer on ${quest.id}`
-        ).toBe(true);
-      }
+      const report = validateQuestCode(quest, answer);
+      expect(
+        report.isValid,
+        `Quest ${quest.id} failed validateQuestCode: ${JSON.stringify(report.diagnostics)}`
+      ).toBe(true);
     }
   });
 });

@@ -10,6 +10,7 @@ import {
   Crown,
   CheckCircle2,
   Lock,
+  ShieldCheck,
 } from 'lucide-react';
 
 const SKILL_ICONS = {
@@ -19,6 +20,7 @@ const SKILL_ICONS = {
   tailwind: Sparkles,
   react: Atom,
   nodejs: Server,
+  'a11y-tests': ShieldCheck,
   sql: Database,
   'mastery-fullstack': Crown,
 };
