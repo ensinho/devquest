@@ -1,26 +1,90 @@
 import React, { useMemo } from 'react';
-import SkillNode from './SkillNode';
+import SkillNode from './SkillNode.jsx';
 
-const SkillTree = ({ skills, onSelectSkill, selectedSkillId }) => {
-    const skillMap = useMemo(() => new Map(skills.map(s => [s.id, s])), [skills]);
-    return (
-        <div className="relative bg-parchment-dark/30 p-4 md:p-6 rounded-lg shadow-lg shadow-black/30 border-2 border-amber-800/20">
-            <div className="grid grid-cols-5 grid-rows-5 gap-x-4 gap-y-8 md:gap-x-8 md:gap-y-12">
-                {skills.map(skill => (<SkillNode key={skill.id} skill={skill} onSelect={onSelectSkill} isSelected={selectedSkillId === skill.id} />))}
-            </div>
-            <svg className="absolute top-0 left-0 w-full h-full" style={{ pointerEvents: 'none' }}>
-                <defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#F0A500" opacity="0.6" /></marker></defs>
-                {skills.map(skill => skill.dependencies.map(depId => {
-                    const depSkill = skillMap.get(depId);
-                    if (!depSkill) return null;
-                    const startX = (depSkill.position.col - 0.5) * (100 / 5) + '%';
-                    const startY = (depSkill.position.row - 0.5) * (100 / 5) + '%';
-                    const endX = (skill.position.col - 0.5) * (100 / 5) + '%';
-                    const endY = (skill.position.row - 0.5) * (100 / 5) + '%';
-                    return (<line key={`${depId}-${skill.id}`} x1={startX} y1={startY} x2={endX} y2={endY} stroke={skillMap.get(skill.id)?.status === 'locked' ? '#4A5568' : '#F0A500'} strokeWidth="2" strokeDasharray={skillMap.get(skill.id)?.status === 'locked' ? "4 4" : "none"} markerEnd="url(#arrow)" opacity="0.6" />);
-                }))}
-            </svg>
+const GRID_COLS = 4;
+const GRID_ROWS = 3;
+
+function getNodeCenter(pos) {
+  return {
+    x: ((pos.col - 0.5) / GRID_COLS) * 1000,
+    y: ((pos.row - 0.5) / GRID_ROWS) * 420,
+  };
+}
+
+export default function SkillTree({
+  skills,
+  selectedSkillId,
+  onSelectSkill,
+  onHoverSkill,
+}) {
+  const skillMap = useMemo(() => new Map(skills.map((s) => [s.id, s])), [skills]);
+
+  const edges = useMemo(() => {
+    const list = [];
+    for (const skill of skills) {
+      for (const depId of skill.dependencies) {
+        const dep = skillMap.get(depId);
+        if (!dep) continue;
+        const from = getNodeCenter(dep.position);
+        const to = getNodeCenter(skill.position);
+        const midX = (from.x + to.x) / 2;
+        const d = `M ${from.x} ${from.y} C ${midX} ${from.y}, ${midX} ${to.y}, ${to.x} ${to.y}`;
+        const state =
+          skill.status === 'completed'
+            ? 'completed'
+            : skill.status === 'available'
+              ? 'live'
+              : 'locked';
+        list.push({ id: `${depId}-${skill.id}`, d, state });
+      }
+    }
+    return list;
+  }, [skills, skillMap]);
+
+  const completedSkillsCount = skills.filter((s) => s.status === 'completed').length;
+
+  return (
+    <section className="dq-constellation" aria-label="Constellation Skill Map">
+      <div className="dq-section-header">
+        <div>
+          <h2 className="dq-h2">Constellation Skill Map</h2>
+          <p className="dq-section-sub">
+            Selecione uma constelação ativa para abrir suas quests e ouvir a dica do seu mascote.
+          </p>
         </div>
-    );
-};
-export default SkillTree;
+        <span className="dq-badge dq-badge-live dq-tabular">
+          {completedSkillsCount} / {skills.length} Skills
+        </span>
+      </div>
+
+      <div className="dq-map-canvas">
+        <svg
+          className="dq-map-edges"
+          viewBox="0 0 1000 420"
+          preserveAspectRatio="none"
+          aria-hidden="true"
+        >
+          {edges.map((edge) => (
+            <path
+              key={edge.id}
+              d={edge.d}
+              className={`dq-edge dq-edge--${edge.state}`}
+            />
+          ))}
+        </svg>
+
+        <div className="dq-map-grid">
+          {skills.map((skill) => (
+            <SkillNode
+              key={skill.id}
+              skill={skill}
+              isSelected={selectedSkillId === skill.id}
+              onSelect={onSelectSkill}
+              onHover={onHoverSkill}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}

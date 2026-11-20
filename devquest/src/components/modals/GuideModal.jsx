@@ -1,35 +1,115 @@
-import React, { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
+import React, { useEffect } from 'react';
+import { X, CheckCircle2 } from 'lucide-react';
+import CompanionAvatar from '../companion/CompanionAvatar.jsx';
+import { getCompanionStageData } from '../../data/companionAvatars.js';
 
-const GuideModal = ({ guide, onClose }) => {
-    const [isOpening, setIsOpening] = useState(true);
-    useEffect(() => {
-        const timer = setTimeout(() => setIsOpening(false), 10);
-        return () => clearTimeout(timer);
-    }, []);
+export default function GuideModal({
+  guide,
+  isStudied,
+  displayStage,
+  accessoryId,
+  companionName,
+  theme,
+  onFinishReading,
+  onClose,
+}) {
+  const stageData = getCompanionStageData(displayStage);
+  const displayName = companionName?.trim() || stageData.name;
 
-    const handleClose = () => {
-        setIsOpening(true);
-        setTimeout(onClose, 500);
+  useEffect(() => {
+    const onKeyDown = (event) => {
+      if (event.key === 'Escape') onClose();
     };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [onClose]);
 
-    return (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in" onClick={handleClose}>
-            <div className={`bg-parchment-dark border-2 border-amber-800/50 rounded-lg shadow-2xl w-full max-w-3xl text-white relative overflow-hidden transition-transform duration-500 ease-in-out ${isOpening ? 'transform scale-y-0' : 'transform scale-y-100'}`} style={{ transformOrigin: 'top' }} onClick={(e) => e.stopPropagation()}>
-                <button onClick={handleClose} className="absolute top-4 right-4 text-amber-100/70 hover:text-white transition-colors z-10"><X size={24} /></button>
-                <div className="p-8 max-h-[80vh] overflow-y-auto">
-                    <h2 className="text-3xl font-cinzel font-bold text-amber-300 mb-6 text-center">{guide.title}</h2>
-                    <div className="space-y-4 text-amber-100/90">
-                        {guide.content.map((item, index) => {
-                            if (item.type === 'h3') return <h3 key={index} className="font-cinzel text-xl text-amber-400 mt-6">{item.text}</h3>;
-                            if (item.type === 'p') return <p key={index} className="text-base leading-relaxed">{item.text}</p>;
-                            if (item.type === 'code') return <pre key={index} className="bg-black/30 p-4 rounded-md text-sm font-mono overflow-x-auto"><code>{item.text}</code></pre>;
-                            return null;
-                        })}
-                    </div>
-                </div>
-            </div>
+  const handleCompleteStudy = () => {
+    onFinishReading?.(guide);
+    onClose();
+  };
+
+  return (
+    <div
+      className="dq-modal-backdrop"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="guide-modal-title"
+      onClick={onClose}
+    >
+      <div className="dq-modal dq-modal--lg" onClick={(e) => e.stopPropagation()}>
+        <div className="dq-modal-head">
+          <div>
+            <span className="dq-badge dq-badge-primary">{guide.category}</span>
+            <h2 id="guide-modal-title" className="dq-h2">
+              {guide.title}
+            </h2>
+          </div>
+          <button
+            type="button"
+            className="dq-icon-btn"
+            onClick={onClose}
+            aria-label="Fechar grimório"
+          >
+            <X size={18} aria-hidden="true" />
+          </button>
         </div>
-    );
-};
-export default GuideModal;
+
+        <div className="dq-challenge-mentor">
+          <CompanionAvatar
+            stage={displayStage}
+            state="idle"
+            mood="happy"
+            theme={theme}
+            variant="dock"
+            accessoryId={accessoryId}
+            companionName={displayName}
+            followPointer
+          />
+          <div className="dq-challenge-mentor-copy">
+            <span className="dq-micro-label">Resumo de {displayName}</span>
+            <p>{guide.mentorSummary}</p>
+          </div>
+        </div>
+
+        <div className="dq-guide-body">
+          {guide.content.map((item, index) => {
+            if (item.type === 'h3') {
+              return (
+                <h3 key={index} className="dq-h3">
+                  {item.text}
+                </h3>
+              );
+            }
+            if (item.type === 'p') {
+              return (
+                <p key={index} className="dq-guide-p">
+                  {item.text}
+                </p>
+              );
+            }
+            if (item.type === 'code') {
+              return (
+                <pre key={index} className="dq-guide-code">
+                  <code>{item.text}</code>
+                </pre>
+              );
+            }
+            return null;
+          })}
+        </div>
+
+        <div className="dq-modal-foot dq-modal-foot--end">
+          <button type="button" className="dq-btn dq-btn-primary" onClick={handleCompleteStudy}>
+            <CheckCircle2 size={16} aria-hidden="true" />
+            <span>
+              {isStudied
+                ? 'Voltar para a Biblioteca'
+                : 'Concluir Leitura (+10 XP + Vínculo)'}
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}

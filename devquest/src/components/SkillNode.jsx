@@ -1,20 +1,73 @@
 import React from 'react';
-import { CheckCircle } from 'lucide-react';
+import {
+  Code2,
+  Palette,
+  Terminal,
+  Sparkles,
+  Atom,
+  Server,
+  Database,
+  Crown,
+  CheckCircle2,
+  Lock,
+} from 'lucide-react';
 
-const SkillNode = ({ skill, onSelect, isSelected }) => {
-    const statusStyles = {
-        locked: 'bg-black/50 text-gray-500 cursor-not-allowed border-gray-700',
-        available: `bg-black/30 text-white hover:bg-amber-800/50 hover:shadow-lg hover:shadow-amber-500/20 border-2 ${skill.color.replace('text-', 'border-')}/50 cursor-pointer animate-pulse-slow`,
-        completed: `bg-gradient-to-br from-gray-800/80 to-black/50 text-white border-2 ${skill.color.replace('text-', 'border-')} cursor-pointer shadow-lg ${skill.color.replace('text-', 'shadow-')}/20`,
-    };
-    const selectedStyle = isSelected ? 'ring-4 ring-offset-2 ring-offset-[#0D1117] ring-amber-400' : '';
-    const Icon = React.cloneElement(skill.icon, { className: `w-8 h-8 mb-2 ${skill.status === 'locked' ? 'text-gray-600' : skill.color}` });
-
-    return (
-        <div style={{ gridRow: skill.position.row, gridColumn: skill.position.col }} className={`flex flex-col items-center justify-center text-center p-2 md:p-4 rounded-lg transition-all duration-300 shadow-md ${statusStyles[skill.status]} ${selectedStyle}`} onClick={() => skill.status !== 'locked' && onSelect(skill)}>
-            {skill.status === 'completed' ? <CheckCircle className={`w-8 h-8 mb-2 ${skill.color}`} /> : Icon}
-            <h3 className="font-bold text-xs md:text-sm font-cinzel">{skill.name}</h3>
-        </div>
-    );
+const SKILL_ICONS = {
+  html: Code2,
+  css: Palette,
+  js: Terminal,
+  tailwind: Sparkles,
+  react: Atom,
+  nodejs: Server,
+  sql: Database,
+  'mastery-fullstack': Crown,
 };
-export default SkillNode;
+
+export default function SkillNode({ skill, isSelected, onSelect, onHover }) {
+  const Icon = SKILL_ICONS[skill.id] ?? Code2;
+  const isLocked = skill.status === 'locked';
+  const isCompleted = skill.status === 'completed';
+  const isMastery = skill.category === 'mastery';
+
+  return (
+    <button
+      type="button"
+      disabled={isLocked}
+      aria-pressed={isSelected}
+      aria-label={`${skill.name} — ${isCompleted ? 'Concluída' : isLocked ? 'Bloqueada' : 'Disponível'} (${skill.doneCount} de ${skill.totalCount} quests)`}
+      onClick={() => !isLocked && onSelect(skill)}
+      onMouseEnter={() => onHover?.(skill)}
+      onFocus={() => onHover?.(skill)}
+      style={{
+        '--node-col': skill.position.col,
+        '--node-row': skill.position.row,
+      }}
+      className={[
+        'dq-skill-node',
+        `dq-skill-node--${skill.status}`,
+        isSelected ? 'is-selected' : '',
+        isMastery ? 'is-mastery' : '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
+    >
+      <span className="dq-skill-node-top">
+        <span className="dq-skill-node-icon" aria-hidden="true">
+          {isCompleted ? (
+            <CheckCircle2 size={18} />
+          ) : isLocked ? (
+            <Lock size={16} />
+          ) : (
+            <Icon size={18} />
+          )}
+        </span>
+        <span className="dq-skill-node-count dq-tabular">
+          {skill.doneCount}/{skill.totalCount}
+        </span>
+      </span>
+
+      <span className="dq-skill-node-name">{skill.name}</span>
+      <span className="dq-skill-node-label">{skill.shortLabel}</span>
+    </button>
+  );
+}

@@ -1,17 +1,74 @@
 import React from 'react';
-import SkillTree from '../components/SkillTree';
-import SidePanel from '../components/SidePanel';
-import Mascot from '../components/Mascot';
+import CompanionCamp from '../components/companion/CompanionCamp.jsx';
+import SkillTree from '../components/SkillTree.jsx';
+import SidePanel from '../components/SidePanel.jsx';
 
-const QuestsPage = ({ skills, selectedSkill, onSelectSkill, quests, onStartQuest, mascotStage, mascotGifs }) => (
-    <div className="flex flex-col-reverse lg:grid lg:grid-cols-3 gap-8 mt-8">
-        <div className="lg:col-span-2">
-            <SkillTree skills={skills} onSelectSkill={onSelectSkill} selectedSkillId={selectedSkill?.id} />
+export default function QuestsPage({
+  skills,
+  selectedSkill,
+  onSelectSkill,
+  onHoverSkill,
+  quests,
+  onStartQuest,
+  unlockedStage,
+  displayStage,
+  onPreviewStage,
+  accessoryId,
+  onSelectAccessory,
+  companionName,
+  completedCount,
+  completedQuizzes,
+  bondInfo,
+  streak,
+  mentorMessage,
+  mentorTag,
+  avatarState,
+  avatarMood,
+  theme,
+  onPet,
+  onAskLesson,
+  onAnswerQuiz,
+}) {
+  return (
+    <div className="dq-page-stack">
+      <CompanionCamp
+        unlockedStage={unlockedStage}
+        displayStage={displayStage}
+        onPreviewStage={onPreviewStage}
+        accessoryId={accessoryId}
+        onSelectAccessory={onSelectAccessory}
+        companionName={companionName}
+        completedCount={completedCount}
+        completedQuizzes={completedQuizzes}
+        bondInfo={bondInfo}
+        streak={streak}
+        mentorMessage={mentorMessage}
+        mentorTag={mentorTag}
+        avatarState={avatarState}
+        avatarMood={avatarMood}
+        theme={theme}
+        onPet={onPet}
+        onAskLesson={onAskLesson}
+        onAnswerQuiz={onAnswerQuiz}
+      />
+
+      <div className="dq-quests-layout">
+        <div className="dq-quests-map-col">
+          <SkillTree
+            skills={skills}
+            selectedSkillId={selectedSkill?.id ?? null}
+            onSelectSkill={onSelectSkill}
+            onHoverSkill={onHoverSkill}
+          />
         </div>
-        <div className="lg:col-span-1">
-            <SidePanel skill={selectedSkill} quests={quests} onStartQuest={onStartQuest} />
+        <div className="dq-quests-side-col">
+          <SidePanel
+            skill={selectedSkill}
+            quests={quests}
+            onStartQuest={onStartQuest}
+          />
         </div>
-        <Mascot stage={mascotStage} mascotGifs={mascotGifs} />
+      </div>
     </div>
-);
-export default QuestsPage;
+  );
+}

@@ -1,0 +1,32 @@
+# Dependencies & builds
+node_modules/
+devquest/node_modules/
+dist/
+devquest/dist/
+devquest/dist-ssr/
+
+# Local environment & secrets
+.env
+.env.*
+*.local
+devquest/.env
+devquest/.env.*
+
+# Local UI reference vault & screenshots (Product Craft Playbook)
+design-references/
+
+# Verification & scratch visual captures
+.playwright/
+playwright-report/
+test-results/
+tmp-visual-checks/
+
+# Logs & editor artifacts
+logs/
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+.idea/

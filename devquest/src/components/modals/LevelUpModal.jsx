@@ -1,16 +1,46 @@
-import React from 'react';
-import { Star } from 'lucide-react';
+import React, { useEffect } from 'react';
+import { Award } from 'lucide-react';
+import CompanionAvatar from '../companion/CompanionAvatar.jsx';
 
-const LevelUpModal = ({ newLevel, onClose }) => (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-fade-in">
-        <div className="bg-gradient-to-br from-[#1A1A2E] to-[#16213E] border-2 border-[#F0A500] rounded-lg shadow-2xl w-full max-w-md text-white text-center p-8 relative overflow-hidden">
-            <div className="absolute -top-1/2 -left-1/2 w-[200%] h-[200%] bg-gradient-to-r from-transparent via-[#F0A500]/30 to-transparent animate-spin-slow"></div>
-            <Star className="w-24 h-24 text-[#F0A500] mx-auto mb-4 animate-pulse-fast" />
-            <h2 className="text-4xl font-bold text-white mb-2 font-cinzel">LEVEL UP!</h2>
-            <p className="text-6xl font-bold text-[#F0A500] mb-4 drop-shadow-lg">{newLevel}</p>
-            <p className="text-gray-300 mb-6">Your power grows, adventurer. New challenges await!</p>
-            <button onClick={onClose} className="bg-[#F0A500] text-[#1A1A2E] font-bold py-2 px-8 rounded-md shadow-md shadow-[#F0A500]/20 hover:bg-[#F0A500]/80 transition-all duration-200 font-cinzel">Continue</button>
-        </div>
+export default function LevelUpModal({ newLevel, displayStage, accessoryId, theme, onClose }) {
+  useEffect(() => {
+    const onKeyDown = (event) => {
+      if (event.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [onClose]);
+
+  return (
+    <div
+      className="dq-modal-backdrop"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="levelup-title"
+      onClick={onClose}
+    >
+      <div className="dq-modal dq-modal--sm dq-modal--celebrate" onClick={(e) => e.stopPropagation()}>
+        <span className="dq-badge dq-badge-gold">
+          <Award size={14} aria-hidden="true" /> Novo Nível Alcançado
+        </span>
+        <CompanionAvatar
+          stage={displayStage}
+          state="done"
+          mood="happy"
+          theme={theme}
+          variant="camp"
+          accessoryId={accessoryId}
+        />
+        <h2 id="levelup-title" className="dq-h1 dq-tabular">
+          Nível {newLevel}!
+        </h2>
+        <p className="dq-muted-text">
+          Seu domínio do Códice cresceu. Continue vencendo quests para desbloquear novas trilhas e evoluções!
+        </p>
+        <button type="button" className="dq-btn dq-btn-primary" onClick={onClose}>
+          Continuar Jornada
+        </button>
+      </div>
     </div>
-);
-export default LevelUpModal;
+  );
+}

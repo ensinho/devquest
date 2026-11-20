@@ -1,15 +1,55 @@
 import React from 'react';
+import { Skull, Check, Play } from 'lucide-react';
 
-const QuestItem = ({ quest, onStart, isLocked }) => (
-  <div className={`flex items-center justify-between p-3 rounded-md transition-all duration-300 ${quest.completed ? 'bg-green-800/20 text-gray-500' : 'bg-black/20 hover:bg-black/40'} ${quest.isBossFight ? 'border-l-4 border-red-500' : ''}`}>
-    <p className={`flex-grow ${quest.completed ? 'line-through' : ''}`}>{quest.title}</p>
-    <div className="flex items-center gap-3 ml-4">
-        <span className="text-sm font-bold text-amber-400">{quest.xp} XP</span>
-        <button onClick={() => onStart(quest)} disabled={quest.completed || isLocked} className={`font-bold py-1 px-3 rounded-md text-sm shadow-md transition-all duration-200 font-cinzel text-xs disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:bg-gray-600 ${quest.isBossFight ? 'bg-red-700 text-white hover:bg-red-800 shadow-red-900/20' : 'bg-amber-700 text-white hover:bg-amber-800 shadow-amber-900/20'}`}>
-            {quest.completed ? 'Done' : (quest.isBossFight ? 'Challenge' : 'Start')}
-        </button>
-    </div>
-  </div>
-);
+export default function QuestItem({ quest, onStart, isLocked, isPrimaryCta }) {
+  const isBoss = Boolean(quest.isBossFight);
 
-export default QuestItem;
+  const buttonClass = quest.completed
+    ? 'dq-btn dq-btn-ghost'
+    : isPrimaryCta
+      ? 'dq-btn dq-btn-primary'
+      : isBoss
+        ? 'dq-btn dq-btn-danger'
+        : 'dq-btn dq-btn-secondary';
+
+  return (
+    <li
+      className={[
+        'dq-quest-item',
+        quest.completed ? 'is-completed' : '',
+        isBoss ? 'is-boss' : '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
+    >
+      <div className="dq-quest-item-info">
+        <p className="dq-quest-item-title">
+          {isBoss && <Skull size={14} className="dq-boss-icon" aria-hidden="true" />}
+          <span>{quest.title}</span>
+        </p>
+        <span className="dq-quest-item-meta dq-tabular">
+          {isBoss ? 'Boss Fight' : 'Quest'} · +{quest.xp} XP
+        </span>
+      </div>
+
+      <button
+        type="button"
+        onClick={() => onStart(quest)}
+        disabled={quest.completed || isLocked}
+        className={buttonClass}
+      >
+        {quest.completed ? (
+          <>
+            <Check size={15} aria-hidden="true" />
+            <span>Feita</span>
+          </>
+        ) : (
+          <>
+            <Play size={14} aria-hidden="true" />
+            <span>{isBoss ? 'Enfrentar' : 'Iniciar'}</span>
+          </>
+        )}
+      </button>
+    </li>
+  );
+}

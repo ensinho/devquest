@@ -1,0 +1,46 @@
+/* ==========================================================================
+   DEVQUEST DESIGN SYSTEM ENTRYPOINT
+   Strict layer ordering: Primitives -> Semantic -> Components -> Base
+   ========================================================================== */
+
+@import './tokens.primitives.css';
+@import './tokens.semantic.css';
+@import './tokens.components.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  line-height: var(--leading-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  overflow-x: hidden;
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+@media (max-width: 640px) {
+  input,
+  textarea,
+  select {
+    font-size: var(--text-base);
+  }
+}

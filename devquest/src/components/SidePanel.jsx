@@ -1,34 +1,65 @@
 import React from 'react';
-import { Swords, Sparkles } from 'lucide-react';
-import QuestLog from './QuestLog';
+import { Swords, Sparkles, CheckCircle2 } from 'lucide-react';
+import QuestLog from './QuestLog.jsx';
 
-const SidePanel = ({ skill, quests, onStartQuest }) => (
-    <aside className="bg-parchment-dark/50 backdrop-blur-sm border-2 border-amber-800/30 p-4 md:p-6 rounded-lg shadow-lg shadow-black/30 h-full overflow-y-auto">
-        {skill ? (
-            <div>
-                <div className="flex items-center gap-4 mb-4">
-                    <div className={`p-2 bg-gradient-to-br from-gray-700/50 to-transparent rounded-md ${skill.color}`}>
-                        {React.cloneElement(skill.icon, { className: "w-8 h-8" })}
-                    </div>
-                    <div>
-                        <h2 className="text-xl md:text-2xl font-bold text-white font-cinzel">{skill.name}</h2>
-                        <p className="text-amber-100/80 text-sm">{skill.description}</p>
-                    </div>
-                </div>
-                <hr className="my-6 border-amber-800/20" />
-                <div className="flex items-center gap-2 mb-4">
-                    <Swords className="w-6 h-6 text-amber-400" />
-                    <h3 className="text-lg md:text-xl font-semibold text-amber-400 font-cinzel">Quests</h3>
-                </div>
-                <QuestLog quests={quests} onStartQuest={onStartQuest} skillStatus={skill.status} />
-            </div>
-        ) : (
-            <div className="flex flex-col items-center justify-center h-full text-center text-amber-100/70">
-                <Sparkles className="w-16 h-16 mb-4 text-amber-400/50" />
-                <h2 className="text-xl md:text-2xl font-bold font-cinzel">Welcome to DevQuest!</h2>
-                <p className="text-sm">Select a skill from the tree to view its details and associated quests.</p>
-            </div>
+export default function SidePanel({ skill, quests, onStartQuest }) {
+  if (!skill) {
+    return (
+      <aside className="dq-sidepanel dq-sidepanel--empty" aria-label="Detalhes da Skill">
+        <Sparkles size={32} className="dq-empty-icon" aria-hidden="true" />
+        <h2 className="dq-h3">Escolha uma constelação</h2>
+        <p className="dq-muted-text">
+          Clique em qualquer skill desbloqueada no mapa para inspecionar as quests e enfrentar o Boss da trilha.
+        </p>
+      </aside>
+    );
+  }
+
+  const nextPendingQuest = quests.find((q) => !q.completed) ?? null;
+
+  return (
+    <aside className="dq-sidepanel" aria-label={`Quests de ${skill.name}`}>
+      <div className="dq-sidepanel-head">
+        <div className="dq-sidepanel-badges">
+          <span
+            className={`dq-badge ${
+              skill.status === 'completed'
+                ? 'dq-badge-gold'
+                : skill.category === 'mastery'
+                  ? 'dq-badge-arcane'
+                  : 'dq-badge-live'
+            }`}
+          >
+            {skill.status === 'completed' ? 'Skill Dominada' : skill.shortLabel}
+          </span>
+          <span className="dq-tabular dq-muted-xs">
+            {skill.doneCount}/{skill.totalCount} concluídas
+          </span>
+        </div>
+        <h2 className="dq-h2">{skill.name}</h2>
+        <p className="dq-muted-text">{skill.description}</p>
+      </div>
+
+      <div className="dq-sidepanel-section">
+        <div className="dq-sidepanel-subhead">
+          <Swords size={16} aria-hidden="true" />
+          <h3>Quests da Trilha</h3>
+        </div>
+
+        <QuestLog
+          quests={quests}
+          onStartQuest={onStartQuest}
+          primaryQuestId={nextPendingQuest?.id ?? null}
+          skillLocked={skill.status === 'locked'}
+        />
+
+        {!nextPendingQuest && quests.length > 0 && (
+          <div className="dq-skill-done-banner">
+            <CheckCircle2 size={16} aria-hidden="true" />
+            <span>Todas as quests de {skill.name} foram concluídas!</span>
+          </div>
         )}
+      </div>
     </aside>
-);
-export default SidePanel;
+  );
+}

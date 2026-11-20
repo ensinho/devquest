@@ -1,13 +1,19 @@
 import React from 'react';
 
-const XPBar = ({ currentXp, nextLevelXp }) => {
-  const percentage = Math.min((currentXp / nextLevelXp) * 100, 100);
+export default function XPBar({ currentXp, nextLevelXp, compact = false }) {
+  const safeNext = nextLevelXp > 0 ? nextLevelXp : 100;
+  const percentage = Math.max(0, Math.min(100, Math.round((currentXp / safeNext) * 100)));
+
   return (
-    <div className="w-full bg-black/30 rounded-full h-4 border-2 border-amber-800/50 relative overflow-hidden">
-      <div className="bg-gradient-to-r from-amber-500 to-amber-400 h-full rounded-full transition-all duration-500 ease-out" style={{ width: `${percentage}%` }}></div>
-      <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white/90">{currentXp} / {nextLevelXp} XP</span>
+    <div
+      className={`dq-xpbar ${compact ? 'dq-xpbar--compact' : ''}`}
+      role="progressbar"
+      aria-valuenow={percentage}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-label={`Experiência: ${currentXp} de ${safeNext} XP`}
+    >
+      <div className="dq-xpbar-fill" style={{ width: `${percentage}%` }} />
     </div>
   );
-};
-
-export default XPBar;
+}
