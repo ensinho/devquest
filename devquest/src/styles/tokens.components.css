@@ -32,9 +32,9 @@
   --card-padding: var(--space-4);
 
   /* --- Skill Map Nodes --- */
-  --skill-node-bg-locked: var(--color-surface-sunken);
+  --skill-node-bg-locked: var(--color-node-locked-bg);
   --skill-node-ink-locked: var(--color-text-subtle);
-  --skill-node-bg-available: var(--color-surface-raised);
+  --skill-node-bg-available: var(--color-node-available-bg);
   --skill-node-accent-available: var(--color-live);
   --skill-node-bg-completed: var(--color-gold-soft);
   --skill-node-accent-completed: var(--color-gold);
@@ -100,6 +100,7 @@
   line-height: 1;
   cursor: pointer;
   user-select: none;
+  touch-action: manipulation;
   transition:
     transform var(--duration-press) var(--ease-out),
     background-color var(--duration-fast) var(--ease-out),

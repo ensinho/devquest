@@ -10,6 +10,7 @@ import {
   Cloud,
   Volume2,
   VolumeX,
+  ChevronRight,
 } from 'lucide-react';
 import XPBar from './XPBar.jsx';
 import { HERO_SIGILS } from '../data/gameData.js';
@@ -41,6 +42,7 @@ export default function Header({
 
   return (
     <header className="dq-header">
+      {/* Desktop Brand */}
       <div className="dq-header-brand">
         <span className="dq-brand-emblem" aria-hidden="true">
           <Shield size={20} />
@@ -53,6 +55,26 @@ export default function Header({
         </div>
       </div>
 
+      {/* Compact Native Mobile Identity Pill (< 768px) */}
+      <button
+        type="button"
+        className="dq-mobile-identity"
+        onClick={() => onNavClick('character')}
+        aria-label={`Perfil de ${user.name}, Nível ${user.level}`}
+      >
+        <span className="dq-mobile-identity-avatar" aria-hidden="true">
+          {sigil.glyph}
+        </span>
+        <span className="dq-mobile-identity-text">
+          <strong>{user.name}</strong>
+          <span className="dq-tabular">
+            Nv. {user.level} · {stageData.name}
+          </span>
+        </span>
+        <ChevronRight size={15} className="dq-mobile-identity-chevron" aria-hidden="true" />
+      </button>
+
+      {/* Desktop Navigation */}
       <nav className="dq-nav" aria-label="Navegação principal">
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
@@ -72,6 +94,7 @@ export default function Header({
         })}
       </nav>
 
+      {/* Right Status & Quick Utility Actions */}
       <div className="dq-header-status">
         <div className="dq-header-xp">
           <div className="dq-header-xp-top dq-tabular">
@@ -83,60 +106,62 @@ export default function Header({
           <XPBar currentXp={user.currentXp} nextLevelXp={user.nextLevelXp} compact />
         </div>
 
-        <button
-          type="button"
-          className="dq-icon-btn"
-          onClick={onToggleSound}
-          aria-pressed={soundEnabled}
-          aria-label={soundEnabled ? 'Desativar sons do mascote' : 'Ativar sons sutis do mascote'}
-          title={soundEnabled ? `Som ativo (${companionName})` : 'Ativar sons sutis'}
-        >
-          {soundEnabled ? (
-            <Volume2 size={17} aria-hidden="true" />
-          ) : (
-            <VolumeX size={17} aria-hidden="true" />
-          )}
-        </button>
-
-        <button
-          type="button"
-          className="dq-icon-btn"
-          onClick={onToggleTheme}
-          aria-label={
-            theme === 'dark'
-              ? 'Alternar para tema claro Warm Vellum'
-              : 'Alternar para tema escuro Obsidian'
-          }
-          title={theme === 'dark' ? 'Tema Claro (Warm Vellum)' : 'Tema Escuro (Obsidian)'}
-        >
-          {theme === 'dark' ? (
-            <Sun size={18} aria-hidden="true" />
-          ) : (
-            <Moon size={18} aria-hidden="true" />
-          )}
-        </button>
-
-        {isGuestMode ? (
+        <div className="dq-header-actions">
           <button
             type="button"
-            className="dq-btn dq-btn-secondary dq-sync-btn"
-            onClick={onOpenAuth}
-            aria-label="Modo Sandbox Local — detalhes de sincronização"
-            title="Progresso salvo localmente. Clique para detalhes de sincronização."
+            className="dq-icon-btn"
+            onClick={onToggleSound}
+            aria-pressed={soundEnabled}
+            aria-label={soundEnabled ? 'Desativar sons do mascote' : 'Ativar sons sutis do mascote'}
+            title={soundEnabled ? `Som ativo (${companionName})` : 'Ativar sons sutis'}
           >
-            <Cloud size={15} aria-hidden="true" />
-            <span>Sandbox</span>
+            {soundEnabled ? (
+              <Volume2 size={17} aria-hidden="true" />
+            ) : (
+              <VolumeX size={17} aria-hidden="true" />
+            )}
           </button>
-        ) : (
+
           <button
             type="button"
-            className="dq-sigil-btn"
-            onClick={() => onNavClick('character')}
-            aria-label={`Perfil de ${user.name}`}
+            className="dq-icon-btn"
+            onClick={onToggleTheme}
+            aria-label={
+              theme === 'dark'
+                ? 'Alternar para tema claro Warm Vellum'
+                : 'Alternar para tema escuro Obsidian'
+            }
+            title={theme === 'dark' ? 'Tema Claro (Warm Vellum)' : 'Tema Escuro (Obsidian)'}
           >
-            <span aria-hidden="true">{sigil.glyph}</span>
+            {theme === 'dark' ? (
+              <Sun size={18} aria-hidden="true" />
+            ) : (
+              <Moon size={18} aria-hidden="true" />
+            )}
           </button>
-        )}
+
+          {isGuestMode ? (
+            <button
+              type="button"
+              className="dq-btn dq-btn-secondary dq-sync-btn"
+              onClick={onOpenAuth}
+              aria-label="Modo Sandbox Local — detalhes de sincronização"
+              title="Progresso salvo localmente. Clique para detalhes de sincronização."
+            >
+              <Cloud size={16} aria-hidden="true" />
+              <span>Sandbox</span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="dq-sigil-btn"
+              onClick={() => onNavClick('character')}
+              aria-label={`Perfil de ${user.name}`}
+            >
+              <span aria-hidden="true">{sigil.glyph}</span>
+            </button>
+          )}
+        </div>
       </div>
     </header>
   );

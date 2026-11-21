@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Award, RotateCcw, LogOut, Heart, Sparkles } from 'lucide-react';
+import { Award, RotateCcw, LogOut, Heart, Sparkles, Lock } from 'lucide-react';
 import CompanionAvatar from '../components/companion/CompanionAvatar.jsx';
 import XPBar from '../components/XPBar.jsx';
 import {
@@ -141,7 +141,10 @@ export default function CharacterPage({
                       title={acc.description}
                       className={`dq-stage-pill ${accessoryId === acc.id ? 'is-active' : ''}`}
                     >
-                      {acc.symbol} {acc.label}
+                      <span aria-hidden="true">
+                        {unlocked ? acc.symbol : <Lock size={11} />}
+                      </span>{' '}
+                      {acc.label}
                     </button>
                   );
                 })}

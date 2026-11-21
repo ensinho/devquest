@@ -43,3 +43,13 @@
 - **Symptom:** On Desktop `1440×900`, the fixed bottom-right `CompanionMentorDock` sat directly on top of the second quest's "Iniciar" button while `CompanionCamp` was already visible at the top. Also `.dq-btn-secondary` blended into `.dq-quest-item` because both used `--color-surface-raised`.
 - **Root Cause:** Fixed dock rendered unconditionally on `QuestsPage` without checking scroll visibility of `CompanionCamp`, and secondary buttons shared the exact same surface token as their parent card.
 - **Prevention Rule:** Only show the floating dock when `CompanionCamp` is scrolled out of view (`scrollY > 260`) or on secondary pages, reserve bottom padding (`7rem`) for scroll clearance, and step secondary buttons inside raised cards back to `--color-surface` + `--shadow-sm`.
+
+### W-009 — Translucent `opacity < 1` on locked skill nodes leaking SVG edges underneath
+- **Symptom:** On Desktop `Constellation Skill Map` (especially Warm Vellum Light Mode), dashed SVG prerequisite paths visibly bled through locked skill node cards.
+- **Root Cause:** `.dq-skill-node--locked` used `opacity: 0.72` instead of an opaque recessed surface token, making the card semi-transparent over the SVG layer.
+- **Prevention Rule:** Keep node surfaces 100% opaque (`opacity: 1`) using dedicated semantic tokens (`--color-node-available-bg`, `--color-node-locked-bg`) and express locked state via solid tonal recess + muted ink (`--skill-node-ink-locked`).
+
+### W-010 — Mini companion accessories covering 36px avatars & onboarding orb overlapping stage selector
+- **Symptom:** On `variant="mini"` (`36px`) avatars in mobile hero/onboarding cards, the `</>` spark pill covered Kitsuby's face; on `390×844` onboarding Step 1, `.dq-onb-orb--c` (`bottom: 24%`) collided with the stage pill bar.
+- **Root Cause:** Accessory overlays assumed camp/altar dimensions (`108px+`), and decorative orbs used bottom-relative offsets overlapping bottom-anchored controls on compact screens.
+- **Prevention Rule:** Suppress floating accessory overlays on `variant="mini"` (`36px`), anchor decorative orbs strictly in upper/side clear zones, and visually inspect every real PNG at `390×844`.

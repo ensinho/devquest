@@ -13,6 +13,13 @@
   --color-surface: var(--primitive-obsidian-800);
   --color-surface-raised: var(--primitive-obsidian-700);
   --color-surface-sunken: var(--primitive-obsidian-950);
+  --color-surface-glass: var(--primitive-obsidian-glass);
+  --color-node-available-bg: var(--primitive-obsidian-700);
+  --color-node-locked-bg: var(--primitive-obsidian-850);
+  --color-hero-tray-bg: var(--primitive-obsidian-950);
+  --color-hero-tray-ink: var(--primitive-obsidian-100);
+  --color-hero-tray-muted: var(--primitive-obsidian-300);
+  --color-hero-tray-divider: var(--primitive-white-a14);
   --color-overlay: var(--primitive-black-a72);
 
   /* --- Typography / Ink --- */
@@ -34,6 +41,7 @@
   --color-primary-soft: var(--primitive-teal-dark-soft);
   --color-primary-ink: var(--primitive-obsidian-950);
   --color-companion-ambient: var(--primitive-teal-dark-soft);
+  --color-companion-hero: var(--primitive-teal-dark-hero);
 
   --color-gold: var(--primitive-gold-400);
   --color-gold-soft: var(--primitive-gold-dark-soft);
@@ -80,6 +88,7 @@
   --color-primary-soft: var(--primitive-teal-dark-soft);
   --color-primary-ink: var(--primitive-obsidian-950);
   --color-companion-ambient: var(--primitive-teal-dark-soft);
+  --color-companion-hero: var(--primitive-teal-dark-hero);
 }
 
 [data-theme='dark'][data-companion-stage='2'] {
@@ -89,6 +98,7 @@
   --color-primary-soft: var(--primitive-ember-dark-soft);
   --color-primary-ink: var(--primitive-obsidian-950);
   --color-companion-ambient: var(--primitive-ember-dark-soft);
+  --color-companion-hero: var(--primitive-ember-dark-hero);
 }
 
 [data-theme='dark'][data-companion-stage='3'] {
@@ -98,6 +108,7 @@
   --color-primary-soft: var(--primitive-violet-dark-soft);
   --color-primary-ink: var(--primitive-obsidian-950);
   --color-companion-ambient: var(--primitive-violet-dark-soft);
+  --color-companion-hero: var(--primitive-violet-dark-hero);
 }
 
 [data-theme='light'] {
@@ -108,6 +119,13 @@
   --color-surface: var(--primitive-vellum-50);
   --color-surface-raised: var(--primitive-vellum-200);
   --color-surface-sunken: var(--primitive-vellum-300);
+  --color-surface-glass: var(--primitive-vellum-glass);
+  --color-node-available-bg: var(--primitive-vellum-50);
+  --color-node-locked-bg: var(--primitive-vellum-100);
+  --color-hero-tray-bg: var(--primitive-vellum-900);
+  --color-hero-tray-ink: var(--primitive-vellum-50);
+  --color-hero-tray-muted: var(--primitive-vellum-300);
+  --color-hero-tray-divider: var(--primitive-white-a14);
   --color-overlay: var(--primitive-vellum-overlay);
 
   /* --- Typography / Ink --- */
@@ -129,6 +147,7 @@
   --color-primary-soft: var(--primitive-teal-light-soft);
   --color-primary-ink: var(--primitive-vellum-50);
   --color-companion-ambient: var(--primitive-teal-light-soft);
+  --color-companion-hero: var(--primitive-teal-light-hero);
 
   --color-gold: var(--primitive-gold-700);
   --color-gold-soft: var(--primitive-gold-light-soft);
@@ -175,6 +194,7 @@
   --color-primary-soft: var(--primitive-teal-light-soft);
   --color-primary-ink: var(--primitive-vellum-50);
   --color-companion-ambient: var(--primitive-teal-light-soft);
+  --color-companion-hero: var(--primitive-teal-light-hero);
 }
 
 [data-theme='light'][data-companion-stage='2'] {
@@ -184,6 +204,7 @@
   --color-primary-soft: var(--primitive-ember-light-soft);
   --color-primary-ink: var(--primitive-vellum-50);
   --color-companion-ambient: var(--primitive-ember-light-soft);
+  --color-companion-hero: var(--primitive-ember-light-hero);
 }
 
 [data-theme='light'][data-companion-stage='3'] {
@@ -193,4 +214,5 @@
   --color-primary-soft: var(--primitive-violet-light-soft);
   --color-primary-ink: var(--primitive-vellum-50);
   --color-companion-ambient: var(--primitive-violet-light-soft);
+  --color-companion-hero: var(--primitive-violet-light-hero);
 }

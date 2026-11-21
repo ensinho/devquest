@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef } from 'react';
 import SkillNode from './SkillNode.jsx';
 
 const GRID_COLS = 5;
@@ -17,6 +17,7 @@ export default function SkillTree({
   onSelectSkill,
   onHoverSkill,
 }) {
+  const gridRef = useRef(null);
   const skillMap = useMemo(() => new Map(skills.map((s) => [s.id, s])), [skills]);
 
   const edges = useMemo(() => {
@@ -42,6 +43,24 @@ export default function SkillTree({
   }, [skills, skillMap]);
 
   const completedSkillsCount = skills.filter((s) => s.status === 'completed').length;
+
+  const handleGridKeyDown = (event) => {
+    const navKeys = ['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp'];
+    if (!navKeys.includes(event.key)) return;
+
+    const buttons = Array.from(
+      gridRef.current?.querySelectorAll('button.dq-skill-node:not(:disabled)') ?? []
+    );
+    if (buttons.length <= 1) return;
+
+    const currentIdx = buttons.indexOf(document.activeElement);
+    if (currentIdx === -1) return;
+
+    event.preventDefault();
+    const delta = event.key === 'ArrowRight' || event.key === 'ArrowDown' ? 1 : -1;
+    const nextIdx = (currentIdx + delta + buttons.length) % buttons.length;
+    buttons[nextIdx]?.focus();
+  };
 
   return (
     <section className="dq-constellation" aria-label="Constellation Skill Map">
@@ -74,7 +93,11 @@ export default function SkillTree({
           ))}
         </svg>
 
-        <div className="dq-map-grid">
+        <div
+          ref={gridRef}
+          className="dq-map-grid"
+          onKeyDown={handleGridKeyDown}
+        >
           {skills.map((skill) => (
             <SkillNode
               key={skill.id}

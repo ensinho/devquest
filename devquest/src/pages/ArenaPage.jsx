@@ -11,6 +11,9 @@ import {
   Terminal,
   Eye,
   AlertTriangle,
+  ChevronDown,
+  ChevronUp,
+  ListChecks,
 } from 'lucide-react';
 import CompanionAvatar from '../components/companion/CompanionAvatar.jsx';
 import CodeEditor from '../components/CodeEditor.jsx';
@@ -37,6 +40,7 @@ export default function ArenaPage({
   onSound,
 }) {
   const [filter, setFilter] = useState('all'); // 'all' | 'pending' | 'boss'
+  const [mobileTrailOpen, setMobileTrailOpen] = useState(false);
   const [drafts, setDrafts] = useState({});
   const [hintLevel, setHintLevel] = useState(0);
   const [submitState, setSubmitState] = useState('idle'); // 'idle' | 'error' | 'success'
@@ -177,7 +181,38 @@ export default function ArenaPage({
 
   return (
     <div className="dq-arena-layout">
-      <aside className="dq-arena-sidebar" aria-label="Sidebar de Desafios">
+      <div className="dq-arena-mobile-bar">
+        <button
+          type="button"
+          className="dq-arena-mobile-toggle"
+          onClick={() => setMobileTrailOpen((prev) => !prev)}
+          aria-expanded={mobileTrailOpen}
+          aria-controls="dq-arena-trail-sidebar"
+        >
+          <span className="dq-arena-mobile-toggle-left">
+            <ListChecks size={16} aria-hidden="true" />
+            <span className="dq-arena-mobile-toggle-title">
+              Trilha · {activeSkill.name}
+            </span>
+          </span>
+          <span className="dq-arena-mobile-toggle-right dq-tabular">
+            <span className="dq-badge dq-badge-gold">
+              {completedTotal}/{quests.length}
+            </span>
+            {mobileTrailOpen ? (
+              <ChevronUp size={16} aria-hidden="true" />
+            ) : (
+              <ChevronDown size={16} aria-hidden="true" />
+            )}
+          </span>
+        </button>
+      </div>
+
+      <aside
+        id="dq-arena-trail-sidebar"
+        className={`dq-arena-sidebar ${mobileTrailOpen ? 'is-mobile-open' : ''}`}
+        aria-label="Sidebar de Desafios"
+      >
         <div className="dq-arena-sidebar-head">
           <div className="dq-arena-sidebar-top">
             <span className="dq-eyebrow">Trilha de Desafios</span>
@@ -240,7 +275,10 @@ export default function ArenaPage({
                         <button
                           type="button"
                           disabled={isSkillLocked}
-                          onClick={() => onSelectQuest(q.id)}
+                          onClick={() => {
+                            onSelectQuest(q.id);
+                            setMobileTrailOpen(false);
+                          }}
                           aria-current={isCurrent ? 'true' : undefined}
                           className={[
                             'dq-arena-quest-btn',

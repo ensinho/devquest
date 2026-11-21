@@ -9,6 +9,7 @@ import {
 import { doc, setDoc, onSnapshot, updateDoc } from 'firebase/firestore';
 
 import Header from './components/Header.jsx';
+import MobileBottomNav from './components/MobileBottomNav.jsx';
 import QuestsPage from './pages/QuestsPage.jsx';
 import ArenaPage from './pages/ArenaPage.jsx';
 import GuidesPage from './pages/GuidesPage.jsx';
@@ -524,11 +525,14 @@ export default function App() {
         <main className="dq-main">
           {activePage === 'quests' && (
             <QuestsPage
+              user={userProgress}
               skills={skills}
               selectedSkill={selectedSkill}
               onSelectSkill={handleSelectSkill}
               onHoverSkill={handleHoverSkill}
               quests={questsForSelectedSkill}
+              recommendedQuest={recommendedQuest}
+              totalQuests={INITIAL_QUESTS.length}
               onStartQuest={handleOpenQuestInArena}
               unlockedStage={unlockedStage}
               displayStage={displayStage}
@@ -627,9 +631,20 @@ export default function App() {
             activeGuide ||
             evolutionInfo ||
             levelUpInfo ||
-            (activePage === 'quests' && !scrolledPastCamp)
+            ((activePage === 'quests' || activePage === 'character' || activePage === 'guides') &&
+              !scrolledPastCamp)
         )}
       />
+
+      {!showOnboarding && (
+        <MobileBottomNav
+          activePage={activePage}
+          onNavClick={(page) => {
+            setActivePage(page);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+        />
+      )}
 
       {showOnboarding && (
         <OnboardingModal

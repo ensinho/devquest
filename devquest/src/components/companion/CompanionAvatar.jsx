@@ -89,29 +89,31 @@ export default function CompanionAvatar({
     window.setTimeout(() => setPetBurst(false), 1400);
   };
 
+  const showAccessories = variant !== 'mini';
+
   const inner = (
     <span
       className={`dq-avatar-frame dq-avatar-stage-${stage} ${petBurst ? 'is-petted' : ''} ${className}`}
       style={{ '--avatar-size': `${pixelSize}px` }}
     >
       <span className="dq-avatar-aura" aria-hidden="true" />
-      {accessoryId === 'glasses' && <span className="dq-acc-orbit" aria-hidden="true" />}
-      {accessoryId === 'crown' && (
+      {showAccessories && accessoryId === 'glasses' && <span className="dq-acc-orbit" aria-hidden="true" />}
+      {showAccessories && accessoryId === 'crown' && (
         <span className="dq-acc-crown" aria-hidden="true" title="Coroa Relíquia">
           ♛
         </span>
       )}
-      {accessoryId === 'spark' && (
+      {showAccessories && accessoryId === 'spark' && (
         <span className="dq-acc-spark" aria-hidden="true">
           &lt;/&gt;
         </span>
       )}
-      {accessoryId === 'scarf' && (
+      {showAccessories && accessoryId === 'scarf' && (
         <span className="dq-acc-scarf" aria-hidden="true" title="Lenço da Guilda">
           ❖
         </span>
       )}
-      {accessoryId === 'stars' && (
+      {showAccessories && accessoryId === 'stars' && (
         <span className="dq-acc-stars" aria-hidden="true" title="Halo Estelar">
           ✦ ✧
         </span>

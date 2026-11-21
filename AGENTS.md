@@ -19,6 +19,7 @@ devquest/ (git root)
 │   └── skills/
 │       ├── design-system/SKILL.md    # 3-layer tokens, 0-1-2 containment, visual identity
 │       ├── ux/SKILL.md               # Flows, latency, keyboard, a11y, mobile craft
+│       ├── mobile-craft/SKILL.md     # Native-grade mobile onboarding, thumb-zone, floating dock
 │       ├── visual-fixer/SKILL.md     # Full-stack UI debugging & Playwright verification
 │       └── reference-absorber/SKILL.md # Translating external UI references into tokens
 ├── design-references/                # Gitignored local vault of UI libraries & prints
@@ -42,10 +43,11 @@ All app commands (`npm run ...`) run inside `devquest/`.
 Before modifying CSS, layout, components, pages, or modals, you **MUST** read:
 1. `.agents/skills/design-system/SKILL.md`
 2. `.agents/skills/ux/SKILL.md`
-3. `.agents/skills/visual-fixer/SKILL.md`
-4. `.agents/skills/reference-absorber/SKILL.md`
-5. `docs/wounds.md` (to avoid re-introducing known regressions)
-6. Relevant catalogs in `design-references/` when introducing new interaction patterns.
+3. `.agents/skills/mobile-craft/SKILL.md`
+4. `.agents/skills/visual-fixer/SKILL.md`
+5. `.agents/skills/reference-absorber/SKILL.md`
+6. `docs/wounds.md` (to avoid re-introducing known regressions)
+7. Relevant catalogs in `design-references/` when introducing new interaction patterns.
 
 ---
 

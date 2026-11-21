@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Sparkles, Heart, BookOpen, Zap, Flame, CheckCircle2, XCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Sparkles, Heart, BookOpen, Zap, Flame, CheckCircle2, XCircle, Lock } from 'lucide-react';
 import CompanionAvatar from './CompanionAvatar.jsx';
 import {
   COMPANION_STAGES,
@@ -29,10 +29,18 @@ export default function CompanionCamp({
   onPet,
   onAskLesson,
   onAnswerQuiz,
+  quizTrigger = 0,
 }) {
   const [quizOpen, setQuizOpen] = useState(false);
   const [quizCursor, setQuizCursor] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
+
+  useEffect(() => {
+    if (quizTrigger > 0) {
+      setQuizOpen(true);
+      setSelectedOption(null);
+    }
+  }, [quizTrigger]);
 
   const stageData = getCompanionStageData(displayStage);
   const displayName = companionName?.trim() || stageData.name;
@@ -129,11 +137,11 @@ export default function CompanionCamp({
           <div className="dq-camp-actions">
             <button type="button" className="dq-btn dq-btn-secondary" onClick={onPet}>
               <Heart size={15} aria-hidden="true" />
-              <span>Fazer carinho</span>
+              <span>Carinho</span>
             </button>
             <button type="button" className="dq-btn dq-btn-secondary" onClick={handleToggleQuiz}>
               <Zap size={15} aria-hidden="true" />
-              <span>{quizOpen ? 'Fechar treino' : 'Desafio Relâmpago (+15 XP)'}</span>
+              <span>{quizOpen ? 'Fechar quiz' : 'Quiz (+15 XP)'}</span>
             </button>
             <button type="button" className="dq-btn dq-btn-ghost" onClick={onAskLesson}>
               <BookOpen size={15} aria-hidden="true" />
@@ -245,7 +253,10 @@ export default function CompanionCamp({
                   title={unlocked ? acc.description : acc.description}
                   className={`dq-stage-pill ${active ? 'is-active' : ''}`}
                 >
-                  <span aria-hidden="true">{acc.symbol}</span> {acc.label}
+                  <span aria-hidden="true">
+                    {unlocked ? acc.symbol : <Lock size={11} />}
+                  </span>{' '}
+                  {acc.label}
                 </button>
               );
             })}

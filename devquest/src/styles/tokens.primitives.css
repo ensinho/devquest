@@ -82,17 +82,25 @@
   --primitive-black-a55: rgba(5, 7, 10, 0.55);
   --primitive-black-a72: rgba(5, 7, 10, 0.72);
   --primitive-vellum-overlay: rgba(27, 25, 23, 0.45);
+  --primitive-obsidian-glass: rgba(22, 27, 35, 0.86);
+  --primitive-vellum-glass: rgba(253, 251, 247, 0.88);
 
   --primitive-ember-dark-soft: rgba(232, 155, 45, 0.14);
+  --primitive-ember-dark-hero: rgba(232, 155, 45, 0.22);
   --primitive-ember-light-soft: rgba(184, 107, 0, 0.11);
+  --primitive-ember-light-hero: rgba(184, 107, 0, 0.16);
   --primitive-gold-dark-soft: rgba(244, 201, 93, 0.14);
   --primitive-gold-light-soft: rgba(154, 107, 0, 0.11);
   --primitive-teal-dark-soft: rgba(45, 212, 191, 0.13);
+  --primitive-teal-dark-hero: rgba(45, 212, 191, 0.22);
   --primitive-teal-light-soft: rgba(15, 118, 110, 0.11);
+  --primitive-teal-light-hero: rgba(15, 118, 110, 0.16);
   --primitive-crimson-dark-soft: rgba(242, 92, 102, 0.14);
   --primitive-crimson-light-soft: rgba(200, 35, 51, 0.10);
   --primitive-violet-dark-soft: rgba(167, 139, 250, 0.14);
+  --primitive-violet-dark-hero: rgba(167, 139, 250, 0.24);
   --primitive-violet-light-soft: rgba(109, 40, 217, 0.10);
+  --primitive-violet-light-hero: rgba(109, 40, 217, 0.16);
 
   /* --- Spacing Scale (4px rhythm) --- */
   --space-1: 0.25rem;   /* 4px */
@@ -113,6 +121,7 @@
   --radius-md: 0.75rem;   /* 12px */
   --radius-lg: 1rem;      /* 16px */
   --radius-xl: 1.375rem;  /* 22px */
+  --radius-2xl: 1.75rem;  /* 28px */
   --radius-full: 9999px;
 
   /* --- Typography Families --- */

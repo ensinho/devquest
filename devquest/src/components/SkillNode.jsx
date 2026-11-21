@@ -11,6 +11,7 @@ import {
   CheckCircle2,
   Lock,
   ShieldCheck,
+  ChevronRight,
 } from 'lucide-react';
 
 const SKILL_ICONS = {
@@ -68,8 +69,17 @@ export default function SkillNode({ skill, isSelected, onSelect, onHover }) {
         </span>
       </span>
 
-      <span className="dq-skill-node-name">{skill.name}</span>
-      <span className="dq-skill-node-label">{skill.shortLabel}</span>
+      <span className="dq-skill-node-body">
+        <span className="dq-skill-node-name">{skill.name}</span>
+        <span className="dq-skill-node-label">{skill.shortLabel}</span>
+      </span>
+
+      <span className="dq-skill-node-mobile-meta dq-tabular" aria-hidden="true">
+        <span>
+          {skill.doneCount}/{skill.totalCount}
+        </span>
+        {!isLocked && <ChevronRight size={15} />}
+      </span>
     </button>
   );
 }

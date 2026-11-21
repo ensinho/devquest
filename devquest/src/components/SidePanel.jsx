@@ -1,5 +1,5 @@
 import React from 'react';
-import { Swords, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Swords, Sparkles, CheckCircle2, Compass } from 'lucide-react';
 import QuestLog from './QuestLog.jsx';
 
 export default function SidePanel({ skill, quests, onStartQuest }) {
@@ -16,6 +16,8 @@ export default function SidePanel({ skill, quests, onStartQuest }) {
   }
 
   const nextPendingQuest = quests.find((q) => !q.completed) ?? null;
+  const totalSkillXp = quests.reduce((sum, q) => sum + (q.xp ?? 0), 0);
+  const progressPct = Math.round((skill.doneCount / Math.max(1, skill.totalCount)) * 100);
 
   return (
     <aside className="dq-sidepanel" aria-label={`Quests de ${skill.name}`}>
@@ -38,12 +40,19 @@ export default function SidePanel({ skill, quests, onStartQuest }) {
         </div>
         <h2 className="dq-h2">{skill.name}</h2>
         <p className="dq-muted-text">{skill.description}</p>
+
+        <div className="dq-sidepanel-progress">
+          <div className="dq-bond-track" role="progressbar" aria-valuenow={progressPct} aria-valuemin={0} aria-valuemax={100} aria-label={`Progresso de ${skill.name}`}>
+            <div className="dq-bond-fill" style={{ width: `${progressPct}%` }} />
+          </div>
+        </div>
       </div>
 
       <div className="dq-sidepanel-section">
         <div className="dq-sidepanel-subhead">
           <Swords size={16} aria-hidden="true" />
           <h3>Quests da Trilha</h3>
+          <span className="dq-sidepanel-xp dq-tabular">+{totalSkillXp} XP total</span>
         </div>
 
         <QuestLog
@@ -53,10 +62,17 @@ export default function SidePanel({ skill, quests, onStartQuest }) {
           skillLocked={skill.status === 'locked'}
         />
 
-        {!nextPendingQuest && quests.length > 0 && (
+        {!nextPendingQuest && quests.length > 0 ? (
           <div className="dq-skill-done-banner">
             <CheckCircle2 size={16} aria-hidden="true" />
             <span>Todas as quests de {skill.name} foram concluídas!</span>
+          </div>
+        ) : (
+          <div className="dq-sidepanel-footnote">
+            <Compass size={15} aria-hidden="true" />
+            <span>
+              Conclua todas as quests de <strong>{skill.name}</strong> para iluminar novas constelações no mapa.
+            </span>
           </div>
         )}
       </div>
