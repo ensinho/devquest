@@ -2,7 +2,7 @@ import React from 'react';
 import { Swords, Sparkles, CheckCircle2, Compass } from 'lucide-react';
 import QuestLog from './QuestLog.jsx';
 
-export default function SidePanel({ skill, quests, onStartQuest }) {
+export default function SidePanel({ skill, quests, onStartQuest, useSecondaryCtas = false }) {
   if (!skill) {
     return (
       <aside className="dq-sidepanel dq-sidepanel--empty" aria-label="Detalhes da Skill">
@@ -58,7 +58,7 @@ export default function SidePanel({ skill, quests, onStartQuest }) {
         <QuestLog
           quests={quests}
           onStartQuest={onStartQuest}
-          primaryQuestId={nextPendingQuest?.id ?? null}
+          primaryQuestId={useSecondaryCtas ? null : (nextPendingQuest?.id ?? null)}
           skillLocked={skill.status === 'locked'}
         />
 

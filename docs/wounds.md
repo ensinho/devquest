@@ -53,3 +53,8 @@
 - **Symptom:** On `variant="mini"` (`36px`) avatars in mobile hero/onboarding cards, the `</>` spark pill covered Kitsuby's face; on `390×844` onboarding Step 1, `.dq-onb-orb--c` (`bottom: 24%`) collided with the stage pill bar.
 - **Root Cause:** Accessory overlays assumed camp/altar dimensions (`108px+`), and decorative orbs used bottom-relative offsets overlapping bottom-anchored controls on compact screens.
 - **Prevention Rule:** Suppress floating accessory overlays on `variant="mini"` (`36px`), anchor decorative orbs strictly in upper/side clear zones, and visually inspect every real PNG at `390×844`.
+
+### W-011 — CodeEditor caret drifting horizontally away from syntax-highlighted text
+- **Symptom:** Typing inside `CodeEditor` showed the blinking caret offset several pixels from the highlighted characters (`<h1>|</h1>` visually landed over `/`).
+- **Root Cause:** `<pre class="dq-ide-highlight"><code>` let browser UA `code { font-family: monospace }` override `JetBrains Mono` while `<textarea>` used `JetBrains Mono`; additionally `.dq-tok-tag`/`.dq-tok-keyword` applied `font-weight: 600` and ligatures/scrollbars differed between the two layers.
+- **Prevention Rule:** Explicitly inherit all font/box metrics onto `.dq-ide-code`, enforce uniform `font-weight: 400`, `font-variant-ligatures: none`, and matching `overflow-y: scroll; scrollbar-gutter: stable;` on both `.dq-ide-highlight` and `.dq-ide-textarea`.

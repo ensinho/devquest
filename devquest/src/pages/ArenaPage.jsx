@@ -14,6 +14,8 @@ import {
   ChevronDown,
   ChevronUp,
   ListChecks,
+  Search,
+  Sparkles,
 } from 'lucide-react';
 import CompanionAvatar from '../components/companion/CompanionAvatar.jsx';
 import CodeEditor from '../components/CodeEditor.jsx';
@@ -40,6 +42,7 @@ export default function ArenaPage({
   onSound,
 }) {
   const [filter, setFilter] = useState('all'); // 'all' | 'pending' | 'boss'
+  const [searchQuery, setSearchQuery] = useState('');
   const [mobileTrailOpen, setMobileTrailOpen] = useState(false);
   const [drafts, setDrafts] = useState({});
   const [hintLevel, setHintLevel] = useState(0);
@@ -98,6 +101,8 @@ export default function ArenaPage({
 
   const completedTotal = quests.filter((q) => q.completed).length;
   const progressPct = Math.round((completedTotal / Math.max(1, quests.length)) * 100);
+  const passedChecksCount = validation.checks.filter((c) => c.passed).length;
+  const checksPct = Math.round((passedChecksCount / Math.max(1, validation.checks.length)) * 100);
 
   const handleCodeChange = (nextCode) => {
     setDrafts((prev) => ({ ...prev, [activeQuest.id]: nextCode }));
@@ -145,32 +150,35 @@ export default function ArenaPage({
       ? 'happy'
       : 'neutral';
 
+  const mentorToneClass =
+    submitState === 'error' || !validation.lexical.ok
+      ? 'is-tone-danger'
+      : submitState === 'success' || validation.isValid || activeQuest.completed
+        ? 'is-tone-live'
+        : '';
+
   const mentorLine =
     submitState === 'success'
       ? `Incrível! Quest vencida (+${activeQuest.xp} XP). Prontos para o próximo desafio?`
       : activeQuest.completed
-        ? `Você já dominou esta quest! Pode treinar livremente ou avançar na sidebar.`
+        ? 'Você já dominou esta quest! Pode treinar livremente ou avançar para o próximo desafio.'
         : submitState === 'error' && validation.diagnostics[0]
           ? validation.diagnostics[0]
-          : hintLevel === 2
-            ? activeQuest.hint2
-            : hintLevel === 1
-              ? activeQuest.hint
-              : validation.isValid
-                ? 'Análise léxica e todos os requisitos passaram! Clique em Validar Código (ou Ctrl+Enter)!'
-                : !validation.lexical.ok
-                  ? validation.lexical.issues[0]
-                  : isTyping
-                    ? 'Lendo seus tokens em tempo real… olho no painel de diagnóstico à direita!'
-                    : isBoss
-                      ? 'Boss Fight! Resolva cada requisito do checklist com calma — estou aqui ao seu lado.'
-                      : 'Escreva no editor abaixo: o identificador léxico e o checklist respondem ao vivo!';
+          : validation.isValid
+            ? 'Análise léxica e todos os requisitos passaram! Clique em Validar Código (ou Ctrl+Enter)!'
+            : !validation.lexical.ok
+              ? validation.lexical.issues[0]
+              : isTyping
+                ? 'Lendo seus tokens em tempo real… olho no painel de diagnóstico à direita!'
+                : isBoss
+                  ? 'Boss Fight! Resolva cada requisito do checklist com calma — estou aqui ao seu lado.'
+                  : 'Escreva no editor abaixo: o analisador léxico e o checklist respondem ao vivo!';
 
   const hintBtnLabel =
     hintLevel === 0
-      ? 'Pedir dica (1/2)'
+      ? 'Dica (1/2)'
       : hintLevel === 1
-        ? 'Ver exemplo (2/2)'
+        ? 'Exemplo (2/2)'
         : 'Ocultar dica';
 
   const showHtmlPreview = validation.language === 'html' && activeQuest.skillId !== 'a11y-tests';
@@ -178,6 +186,8 @@ export default function ArenaPage({
     () => (showHtmlPreview ? sanitizePreviewHtml(code) : ''),
     [showHtmlPreview, code]
   );
+
+  const normalizedQuery = searchQuery.trim().toLowerCase();
 
   return (
     <div className="dq-arena-layout">
@@ -220,9 +230,28 @@ export default function ArenaPage({
               {completedTotal}/{quests.length}
             </span>
           </div>
-          <div className="dq-bond-track" role="progressbar" aria-valuenow={progressPct} aria-valuemin={0} aria-valuemax={100} aria-label="Progresso total das quests">
+          <div
+            className="dq-bond-track"
+            role="progressbar"
+            aria-valuenow={progressPct}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label="Progresso total das quests"
+          >
             <div className="dq-bond-fill" style={{ width: `${progressPct}%` }} />
           </div>
+
+          <label className="dq-arena-search">
+            <Search size={14} aria-hidden="true" />
+            <span className="dq-sr-only">Filtrar desafios por título ou skill</span>
+            <input
+              type="search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Buscar desafio..."
+            />
+          </label>
+
           <div className="dq-arena-filters" role="group" aria-label="Filtrar desafios">
             {[
               { id: 'all', label: 'Todas' },
@@ -248,8 +277,14 @@ export default function ArenaPage({
             const skillQuests = quests
               .filter((q) => q.skillId === skill.id)
               .filter((q) => {
-                if (filter === 'pending') return !q.completed;
-                if (filter === 'boss') return Boolean(q.isBossFight);
+                if (filter === 'pending' && q.completed) return false;
+                if (filter === 'boss' && !q.isBossFight) return false;
+                if (normalizedQuery) {
+                  return (
+                    q.title.toLowerCase().includes(normalizedQuery) ||
+                    skill.name.toLowerCase().includes(normalizedQuery)
+                  );
+                }
                 return true;
               });
 
@@ -331,12 +366,12 @@ export default function ArenaPage({
                 </span>
               )}
             </div>
-            <h1 className="dq-h1">{activeQuest.title}</h1>
+            <h1 className="dq-h1 dq-arena-title">{activeQuest.title}</h1>
             <p className="dq-challenge-desc">{activeQuest.challenge}</p>
           </div>
         </div>
 
-        <div className="dq-arena-mentor-strip" aria-live="polite">
+        <div className={`dq-arena-mentor-strip ${mentorToneClass}`} aria-live="polite">
           <CompanionAvatar
             stage={displayStage}
             state={mentorState}
@@ -368,6 +403,46 @@ export default function ArenaPage({
           </button>
         </div>
 
+        {hintLevel > 0 && (
+          <div className="dq-arena-hint-box" role="note" aria-label="Dica do desafio">
+            <div className="dq-arena-hint-head">
+              <span className="dq-badge dq-badge-gold">
+                <Lightbulb size={12} aria-hidden="true" />
+                {hintLevel === 1 ? 'Dica Conceitual (1/2)' : 'Padrão de Exemplo (2/2)'}
+              </span>
+              {hintLevel === 1 && (
+                <button
+                  type="button"
+                  className="dq-btn dq-btn-ghost dq-ide-reset"
+                  onClick={handleCycleHint}
+                >
+                  Ver exemplo (2/2)
+                </button>
+              )}
+            </div>
+            <p>{hintLevel === 1 ? activeQuest.hint : activeQuest.hint2}</p>
+          </div>
+        )}
+
+        {submitState === 'success' && nextUnlockedQuest && (
+          <div className="dq-arena-victory-bar" role="status">
+            <div className="dq-arena-victory-copy">
+              <Sparkles size={16} aria-hidden="true" />
+              <span>
+                <strong>Desafio vencido!</strong> Continue o ritmo no próximo desafio da trilha.
+              </span>
+            </div>
+            <button
+              type="button"
+              className="dq-btn dq-btn-secondary"
+              onClick={() => onSelectQuest(nextUnlockedQuest.id)}
+            >
+              <span>Ir para: {nextUnlockedQuest.title}</span>
+              <ArrowRight size={15} aria-hidden="true" />
+            </button>
+          </div>
+        )}
+
         <div className="dq-arena-split">
           <div className="dq-arena-editor-col">
             <CodeEditor
@@ -387,9 +462,20 @@ export default function ArenaPage({
                 <span className="dq-diag-title">
                   <Terminal size={15} aria-hidden="true" /> Diagnóstico &amp; Checklist
                 </span>
-                <span className="dq-muted-xs dq-tabular">
-                  {validation.checks.filter((c) => c.passed).length}/{validation.checks.length} OK
+                <span className="dq-badge dq-badge-live dq-tabular">
+                  {passedChecksCount}/{validation.checks.length} OK
                 </span>
+              </div>
+
+              <div
+                className="dq-bond-track"
+                role="progressbar"
+                aria-valuenow={checksPct}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-label="Requisitos atendidos"
+              >
+                <div className="dq-bond-fill" style={{ width: `${checksPct}%` }} />
               </div>
 
               <ul className="dq-diag-checklist" aria-label="Requisitos do desafio">

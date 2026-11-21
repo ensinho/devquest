@@ -526,6 +526,7 @@ export default function App() {
           {activePage === 'quests' && (
             <QuestsPage
               user={userProgress}
+              userClass={heroClass}
               skills={skills}
               selectedSkill={selectedSkill}
               onSelectSkill={handleSelectSkill}

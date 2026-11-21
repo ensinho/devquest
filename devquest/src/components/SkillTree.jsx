@@ -67,7 +67,7 @@ export default function SkillTree({
       <div className="dq-section-header">
         <div>
           <span className="dq-eyebrow">Mapa de Evolução Full-Stack</span>
-          <h1 className="dq-h1">Constellation Skill Map</h1>
+          <h2 className="dq-h2">Constellation Skill Map</h2>
           <p className="dq-section-sub">
             Trilha simétrica 1 → 2 → 3 → 2 → 1. Selecione qualquer constelação ativa para inspecionar e abrir a Arena de Código.
           </p>

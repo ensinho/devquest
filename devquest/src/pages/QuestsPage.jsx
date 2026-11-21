@@ -6,6 +6,7 @@ import SidePanel from '../components/SidePanel.jsx';
 
 export default function QuestsPage({
   user,
+  userClass,
   skills,
   selectedSkill,
   onSelectSkill,
@@ -37,6 +38,8 @@ export default function QuestsPage({
   const campRef = useRef(null);
   const sidePanelRef = useRef(null);
 
+  const completedSkillsCount = skills.filter((s) => s.status === 'completed').length;
+
   const handleOpenQuizFromHero = () => {
     setQuizTrigger((n) => n + 1);
     campRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -67,37 +70,44 @@ export default function QuestsPage({
         onOpenQuiz={handleOpenQuizFromHero}
       />
 
-      <div className="dq-quests-map-wrap">
-        <SkillTree
-          skills={skills}
-          selectedSkillId={selectedSkill?.id ?? null}
-          onSelectSkill={handleSelectSkillSmart}
-          onHoverSkill={onHoverSkill}
+      <div ref={campRef} className="dq-command-camp-wrap">
+        <CompanionCamp
+          user={user}
+          userClass={userClass}
+          recommendedQuest={recommendedQuest}
+          onStartQuest={onStartQuest}
+          totalQuests={totalQuests}
+          completedSkillsCount={completedSkillsCount}
+          totalSkillsCount={skills.length}
+          unlockedStage={unlockedStage}
+          displayStage={displayStage}
+          onPreviewStage={onPreviewStage}
+          accessoryId={accessoryId}
+          onSelectAccessory={onSelectAccessory}
+          companionName={companionName}
+          completedCount={completedCount}
+          completedQuizzes={completedQuizzes}
+          bondInfo={bondInfo}
+          streak={streak}
+          mentorMessage={mentorMessage}
+          mentorTag={mentorTag}
+          avatarState={avatarState}
+          avatarMood={avatarMood}
+          theme={theme}
+          onPet={onPet}
+          onAskLesson={onAskLesson}
+          onAnswerQuiz={onAnswerQuiz}
+          quizTrigger={quizTrigger}
         />
       </div>
 
-      <div className="dq-command-deck">
-        <div ref={campRef} className="dq-command-camp-wrap">
-          <CompanionCamp
-            unlockedStage={unlockedStage}
-            displayStage={displayStage}
-            onPreviewStage={onPreviewStage}
-            accessoryId={accessoryId}
-            onSelectAccessory={onSelectAccessory}
-            companionName={companionName}
-            completedCount={completedCount}
-            completedQuizzes={completedQuizzes}
-            bondInfo={bondInfo}
-            streak={streak}
-            mentorMessage={mentorMessage}
-            mentorTag={mentorTag}
-            avatarState={avatarState}
-            avatarMood={avatarMood}
-            theme={theme}
-            onPet={onPet}
-            onAskLesson={onAskLesson}
-            onAnswerQuiz={onAnswerQuiz}
-            quizTrigger={quizTrigger}
+      <div className="dq-map-workspace">
+        <div className="dq-quests-map-wrap">
+          <SkillTree
+            skills={skills}
+            selectedSkillId={selectedSkill?.id ?? null}
+            onSelectSkill={handleSelectSkillSmart}
+            onHoverSkill={onHoverSkill}
           />
         </div>
 
@@ -106,6 +116,7 @@ export default function QuestsPage({
             skill={selectedSkill}
             quests={quests}
             onStartQuest={onStartQuest}
+            useSecondaryCtas
           />
         </div>
       </div>

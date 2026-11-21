@@ -21,6 +21,7 @@ export default function MobileQuestHero({
 }) {
   const stageData = getCompanionStageData(displayStage);
   const displayName = companionName?.trim() || stageData.name;
+  const heroName = user.name?.trim() || 'Aventureiro';
   const pct = Math.round((completedCount / Math.max(1, totalQuests)) * 100);
 
   return (
@@ -31,7 +32,7 @@ export default function MobileQuestHero({
             <div className="dq-mhero-realm">
               <span className="dq-mhero-pill">
                 <Sparkles size={12} aria-hidden="true" />
-                <span>{stageData.realmName}</span>
+                <span>Olá, {heroName}</span>
               </span>
               <span className="dq-mhero-level dq-tabular">Nível {user.level}</span>
             </div>
