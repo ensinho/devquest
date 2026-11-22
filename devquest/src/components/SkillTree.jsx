@@ -66,14 +66,13 @@ export default function SkillTree({
     <section className="dq-constellation" aria-label="Constellation Skill Map">
       <div className="dq-section-header">
         <div>
-          <span className="dq-eyebrow">Mapa de Evolução Full-Stack</span>
-          <h2 className="dq-h2">Constellation Skill Map</h2>
+          <h2 className="dq-h2">Mapa Full-Stack</h2>
           <p className="dq-section-sub">
-            Trilha simétrica 1 → 2 → 3 → 2 → 1. Selecione qualquer constelação ativa para inspecionar e abrir a Arena de Código.
+            Selecione uma constelação ativa para ver suas missões ao lado.
           </p>
         </div>
         <span className="dq-badge dq-badge-live dq-tabular">
-          {completedSkillsCount} / {skills.length} Skills Dominadas
+          {completedSkillsCount} / {skills.length} dominadas
         </span>
       </div>
 

@@ -1,52 +1,37 @@
 import React, { useState, useEffect } from 'react';
 import {
   Sparkles,
-  Heart,
-  BookOpen,
   Zap,
-  Flame,
   CheckCircle2,
   XCircle,
-  Lock,
   ArrowRight,
   Skull,
+  SlidersHorizontal,
 } from 'lucide-react';
 import CompanionAvatar from './CompanionAvatar.jsx';
-import XPBar from '../XPBar.jsx';
 import {
-  COMPANION_STAGES,
-  COMPANION_ACCESSORIES,
   COMPANION_QUIZZES,
-  isAccessoryUnlocked,
   getCompanionStageData,
-  getNextEvolutionRequirement,
 } from '../../data/companionAvatars.js';
 
 export default function CompanionCamp({
   user,
-  userClass,
+  skills = [],
   recommendedQuest,
   onStartQuest,
+  onOpenCharacter,
   totalQuests,
-  completedSkillsCount,
-  totalSkillsCount,
-  unlockedStage,
   displayStage,
-  onPreviewStage,
   accessoryId,
-  onSelectAccessory,
   companionName,
   completedCount,
   completedQuizzes,
   bondInfo,
-  streak,
   mentorMessage,
-  mentorTag,
   avatarState,
   avatarMood,
   theme,
   onPet,
-  onAskLesson,
   onAnswerQuiz,
   quizTrigger = 0,
 }) {
@@ -63,17 +48,23 @@ export default function CompanionCamp({
 
   const stageData = getCompanionStageData(displayStage);
   const displayName = companionName?.trim() || stageData.name;
-  const nextEvo = getNextEvolutionRequirement(unlockedStage, completedCount);
-  const isPreviewing = displayStage !== unlockedStage;
+  const heroName = user?.name?.trim() || 'Aventureiro';
 
   const activeQuiz = COMPANION_QUIZZES[quizCursor % COMPANION_QUIZZES.length];
   const quizAlreadyDone = completedQuizzes.includes(activeQuiz.id);
 
-  const heroName = user?.name?.trim() || 'Aventureiro';
+  const recommendedSkill = recommendedQuest
+    ? skills.find((s) => s.id === recommendedQuest.skillId) ?? null
+    : null;
+
+  const stepLabel = recommendedSkill
+    ? `Passo ${Math.min(recommendedSkill.doneCount + 1, recommendedSkill.totalCount)} de ${recommendedSkill.totalCount} · ${recommendedSkill.name}`
+    : 'Próximo passo';
+
   const greetingTitle =
     completedCount === 0
-      ? `Bem-vindo ao Códice, ${heroName}!`
-      : `De volta à trilha, ${heroName}!`;
+      ? `Olá, ${heroName}!`
+      : `Bom te ver de volta, ${heroName}!`;
 
   const handleToggleQuiz = () => {
     setQuizOpen((prev) => !prev);
@@ -93,11 +84,11 @@ export default function CompanionCamp({
   };
 
   return (
-    <section className="dq-welcome-hero" aria-label={`Boas-vindas e Companion Camp — ${stageData.realmName}`}>
+    <section className="dq-welcome-hero" aria-label={`Boas-vindas e próximo passo — ${stageData.realmName}`}>
       <div className="dq-welcome-grid">
-        {/* Left: Warm Personal Greeting + Living Companion Habitat */}
+        {/* Left: Calm Personal Greeting + Living Companion */}
         <div className="dq-welcome-main">
-          <div className="dq-camp-pedestal">
+          <div className="dq-welcome-avatar-col">
             <CompanionAvatar
               stage={displayStage}
               state={quizOpen && selectedOption === null ? 'waiting' : avatarState}
@@ -115,118 +106,66 @@ export default function CompanionCamp({
               interactive
               onPet={onPet}
             />
-            <div className="dq-camp-identity">
-              <div className="dq-camp-title-row">
-                <span className={`dq-badge ${stageData.badgeClass}`}>
-                  Estágio {stageData.stage} · {displayName}
-                </span>
-                {isPreviewing && <span className="dq-badge dq-badge-gold">Prévia</span>}
-              </div>
-              <p className="dq-camp-subtitle">
-                {stageData.title} · {stageData.realmName}
-              </p>
-            </div>
+            <span className="dq-welcome-pet-hint">Clique em {displayName}</span>
           </div>
 
           <div className="dq-welcome-copy" aria-live="polite">
-            <div className="dq-camp-speech-top">
+            <div className="dq-welcome-meta dq-tabular">
               <span className="dq-eyebrow">
                 <Sparkles size={13} aria-hidden="true" />
-                {stageData.realmName} · {userClass}
+                {stageData.realmName}
               </span>
-
-              <div className="dq-camp-telemetry dq-tabular">
-                <span className="dq-badge dq-badge-primary">
-                  ♥ Vínculo Nv.{bondInfo.bondLevel} · {bondInfo.bondTitle}
-                </span>
-                {streak > 0 && (
-                  <span className="dq-badge dq-badge-gold">
-                    <Flame size={12} aria-hidden="true" /> {streak} em sequência
-                  </span>
-                )}
-              </div>
+              <span className="dq-welcome-dot" aria-hidden="true">·</span>
+              <span className="dq-muted-xs">
+                {completedCount}/{totalQuests} quests
+              </span>
+              <span className="dq-welcome-dot" aria-hidden="true">·</span>
+              <span className="dq-muted-xs">
+                Vínculo Nv.{bondInfo.bondLevel}
+              </span>
             </div>
 
             <h1 className="dq-welcome-heading">{greetingTitle}</h1>
-
-            <div className="dq-welcome-speech-bubble">
-              <span className="dq-micro-label">{mentorTag}</span>
-              <p className="dq-welcome-quote">{mentorMessage}</p>
-            </div>
+            <p className="dq-welcome-quote">{mentorMessage}</p>
 
             <div className="dq-camp-actions">
-              <button type="button" className="dq-btn dq-btn-secondary" onClick={onPet}>
-                <Heart size={15} aria-hidden="true" />
-                <span>Carinho</span>
-              </button>
               <button type="button" className="dq-btn dq-btn-secondary" onClick={handleToggleQuiz}>
                 <Zap size={15} aria-hidden="true" />
-                <span>{quizOpen ? 'Fechar quiz' : 'Quiz (+15 XP)'}</span>
+                <span>{quizOpen ? 'Fechar quiz' : 'Quiz rápido (+15 XP)'}</span>
               </button>
-              <button type="button" className="dq-btn dq-btn-ghost" onClick={onAskLesson}>
-                <BookOpen size={15} aria-hidden="true" />
-                <span>Dica da skill</span>
+              <button type="button" className="dq-btn dq-btn-ghost" onClick={onOpenCharacter}>
+                <SlidersHorizontal size={15} aria-hidden="true" />
+                <span>Personalizar {displayName}</span>
               </button>
             </div>
           </div>
         </div>
 
-        {/* Right: Receptive Next-Mission Spotlight Card (Single Primary CTA) */}
+        {/* Right: Single Guided Next-Step Card (1 Primary CTA) */}
         <div className="dq-welcome-mission">
-          <div className="dq-welcome-stats dq-tabular">
-            <div className="dq-welcome-stat">
-              <span>Quests</span>
-              <strong>
-                {completedCount}/{totalQuests}
-              </strong>
-            </div>
-            <div className="dq-welcome-stat">
-              <span>Skills</span>
-              <strong>
-                {completedSkillsCount}/{totalSkillsCount}
-              </strong>
-            </div>
-            <div className="dq-welcome-stat">
-              <span>Afinidade</span>
-              <strong>
-                {bondInfo.currentInLevel}/{bondInfo.nextStepPoints}
-              </strong>
-            </div>
-          </div>
-
-          <div className="dq-welcome-xp">
-            <div className="dq-header-xp-top dq-tabular">
-              <span className="dq-muted-xs">Nível {user?.level ?? 1}</span>
-              <span className="dq-xp-numbers">
-                {user?.currentXp ?? 0} / {user?.nextLevelXp ?? 100} XP
-              </span>
-            </div>
-            <XPBar currentXp={user?.currentXp ?? 0} nextLevelXp={user?.nextLevelXp ?? 100} compact />
-          </div>
-
           {recommendedQuest ? (
             <div className="dq-mission-spotlight">
               <div className="dq-mission-spotlight-top">
                 <span className="dq-eyebrow">
                   {recommendedQuest.isBossFight ? (
                     <>
-                      <Skull size={12} aria-hidden="true" /> Próximo Boss Fight
+                      <Skull size={12} aria-hidden="true" /> Boss · {recommendedSkill?.name ?? 'Desafio'}
                     </>
                   ) : (
-                    'Sua Próxima Missão'
+                    stepLabel
                   )}
                 </span>
                 <span className="dq-badge dq-badge-gold dq-tabular">+{recommendedQuest.xp} XP</span>
               </div>
               <h2 className="dq-h3">{recommendedQuest.title}</h2>
-              <p className="dq-muted-xs">{recommendedQuest.challenge}</p>
+              <p className="dq-muted-text">{recommendedQuest.challenge}</p>
               <button
                 type="button"
                 className="dq-btn dq-btn-primary dq-mission-cta"
                 onClick={() => onStartQuest(recommendedQuest)}
               >
                 <span>
-                  {completedCount === 0 ? 'Começar Primeira Quest' : 'Continuar na Arena'}
+                  {completedCount === 0 ? 'Começar Primeira Quest' : 'Continuar Jornada'}
                 </span>
                 <ArrowRight size={16} aria-hidden="true" />
               </button>
@@ -235,8 +174,8 @@ export default function CompanionCamp({
             <div className="dq-mission-spotlight">
               <span className="dq-badge dq-badge-gold">Códice Completo</span>
               <h2 className="dq-h3">Todas as constelações dominadas!</h2>
-              <p className="dq-muted-xs">
-                Você completou todas as quests disponíveis. Pratique livremente na Arena ou nos Grimórios.
+              <p className="dq-muted-text">
+                Explore os Grimórios ou pratique livremente na Arena de Código.
               </p>
             </div>
           )}
@@ -247,10 +186,10 @@ export default function CompanionCamp({
         <div className="dq-quiz-card" role="region" aria-label="Desafio Relâmpago do Mascote">
           <div className="dq-quiz-head">
             <span className="dq-badge dq-badge-primary">
-              <Zap size={12} aria-hidden="true" /> Treino com {displayName} · {activeQuiz.skill}
+              <Zap size={12} aria-hidden="true" /> Quiz com {displayName} · {activeQuiz.skill}
             </span>
             <span className="dq-muted-xs dq-tabular">
-              {quizAlreadyDone ? 'Já completado (treino livre)' : `+${activeQuiz.xp} XP + Vínculo`}
+              {quizAlreadyDone ? 'Treino livre' : `+${activeQuiz.xp} XP + Vínculo`}
             </span>
           </div>
 
@@ -296,65 +235,6 @@ export default function CompanionCamp({
           )}
         </div>
       )}
-
-      <div className="dq-camp-footer">
-        <div className="dq-evo-track">
-          <span className="dq-micro-label">
-            Linha Evolutiva &amp; Tema do Sistema
-          </span>
-          <div className="dq-pill-group" role="group" aria-label="Estágios evolutivos do mascote">
-            {COMPANION_STAGES.map((item) => {
-              const unlocked = item.stage <= unlockedStage;
-              const active = item.stage === displayStage;
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => onPreviewStage(item.stage)}
-                  aria-pressed={active}
-                  className={`dq-stage-pill ${active ? 'is-active' : ''} ${unlocked ? 'is-unlocked' : ''}`}
-                >
-                  <span className="dq-tabular">{item.stage}.</span> {item.name}
-                  <span className="dq-stage-pill-tag">
-                    {unlocked ? item.elementLabel : 'Prévia'}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-          <p className="dq-evo-caption dq-tabular">
-            {nextEvo
-              ? `Faltam ${nextEvo.remainingQuests} ${nextEvo.remainingQuests === 1 ? 'quest' : 'quests'} para evoluir para ${nextEvo.nextStage.name} (${nextEvo.nextStage.realmName}).`
-              : `Evolução máxima alcançada — ${displayName} ilumina todo o Observatório Arcano!`}
-          </p>
-        </div>
-
-        <div className="dq-acc-track">
-          <span className="dq-micro-label">Acessórios de {displayName}</span>
-          <div className="dq-pill-group" role="group" aria-label="Acessórios do mascote">
-            {COMPANION_ACCESSORIES.map((acc) => {
-              const unlocked = isAccessoryUnlocked(acc, completedCount, bondInfo.bondLevel);
-              const active = accessoryId === acc.id;
-              return (
-                <button
-                  key={acc.id}
-                  type="button"
-                  disabled={!unlocked}
-                  onClick={() => onSelectAccessory(acc.id)}
-                  aria-pressed={active}
-                  title={acc.description}
-                  className={`dq-stage-pill ${active ? 'is-active' : ''}`}
-                >
-                  <span aria-hidden="true">
-                    {unlocked ? acc.symbol : <Lock size={11} />}
-                  </span>{' '}
-                  {acc.label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </div>
     </section>
   );
 }

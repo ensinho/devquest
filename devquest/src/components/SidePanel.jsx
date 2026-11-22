@@ -59,6 +59,7 @@ export default function SidePanel({ skill, quests, onStartQuest, useSecondaryCta
           quests={quests}
           onStartQuest={onStartQuest}
           primaryQuestId={useSecondaryCtas ? null : (nextPendingQuest?.id ?? null)}
+          nextPendingQuestId={nextPendingQuest?.id ?? null}
           skillLocked={skill.status === 'locked'}
         />
 

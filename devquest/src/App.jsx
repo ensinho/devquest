@@ -398,16 +398,6 @@ export default function App() {
     }
   };
 
-  const handleAskLesson = () => {
-    if (!selectedSkill) return;
-    playCompanionSound('check', soundEnabled);
-    setMentorSpeech({
-      tag: `Aula rápida · ${selectedSkill.name}`,
-      text: selectedSkill.mentorLesson,
-    });
-    pulseCompanion('waiting', 'happy', 2400);
-  };
-
   const handlePreviewStage = (stageNum) => {
     setPreviewStage(stageNum);
     const target = getCompanionStageData(stageNum);
@@ -526,7 +516,6 @@ export default function App() {
           {activePage === 'quests' && (
             <QuestsPage
               user={userProgress}
-              userClass={heroClass}
               skills={skills}
               selectedSkill={selectedSkill}
               onSelectSkill={handleSelectSkill}
@@ -535,23 +524,21 @@ export default function App() {
               recommendedQuest={recommendedQuest}
               totalQuests={INITIAL_QUESTS.length}
               onStartQuest={handleOpenQuestInArena}
-              unlockedStage={unlockedStage}
+              onOpenCharacter={() => {
+                setActivePage('character');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
               displayStage={displayStage}
-              onPreviewStage={handlePreviewStage}
               accessoryId={userProgress.accessoryId ?? 'spark'}
-              onSelectAccessory={handleSelectAccessory}
               companionName={userProgress.companionName}
               completedCount={userProgress.completedQuests.length}
               completedQuizzes={userProgress.completedQuizzes ?? []}
               bondInfo={bondInfo}
-              streak={userProgress.streak ?? 0}
               mentorMessage={defaultMentorMessage.text}
-              mentorTag={defaultMentorMessage.tag}
               avatarState={avatarState}
               avatarMood={avatarMood}
               theme={theme}
               onPet={handlePet}
-              onAskLesson={handleAskLesson}
               onAnswerQuiz={handleAnswerQuiz}
             />
           )}

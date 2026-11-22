@@ -44,6 +44,7 @@ export default function ArenaPage({
 }) {
   const [filter, setFilter] = useState('all'); // 'all' | 'pending' | 'boss'
   const [searchQuery, setSearchQuery] = useState('');
+  const [showLockedTrails, setShowLockedTrails] = useState(false);
   const [mobileTrailOpen, setMobileTrailOpen] = useState(false);
   const [drafts, setDrafts] = useState({});
   const [hintLevel, setHintLevel] = useState(0);
@@ -273,79 +274,121 @@ export default function ArenaPage({
         </div>
 
         <div className="dq-arena-groups">
-          {skills.map((skill) => {
-            const isSkillLocked = skill.status === 'locked';
-            const skillQuests = quests
-              .filter((q) => q.skillId === skill.id)
-              .filter((q) => {
-                if (filter === 'pending' && q.completed) return false;
-                if (filter === 'boss' && !q.isBossFight) return false;
-                if (normalizedQuery) {
-                  return (
-                    q.title.toLowerCase().includes(normalizedQuery) ||
-                    skill.name.toLowerCase().includes(normalizedQuery)
-                  );
-                }
-                return true;
-              });
+          {(() => {
+            const filterSkillQuests = (skill) =>
+              quests
+                .filter((q) => q.skillId === skill.id)
+                .filter((q) => {
+                  if (filter === 'pending' && q.completed) return false;
+                  if (filter === 'boss' && !q.isBossFight) return false;
+                  if (normalizedQuery) {
+                    return (
+                      q.title.toLowerCase().includes(normalizedQuery) ||
+                      skill.name.toLowerCase().includes(normalizedQuery)
+                    );
+                  }
+                  return true;
+                });
 
-            if (skillQuests.length === 0) return null;
+            const renderGroup = (skill) => {
+              const isSkillLocked = skill.status === 'locked';
+              const skillQuests = filterSkillQuests(skill);
+              if (skillQuests.length === 0) return null;
+
+              return (
+                <div key={skill.id} className="dq-arena-group">
+                  <div className="dq-arena-group-head">
+                    <span className="dq-arena-group-name">
+                      {isSkillLocked && <Lock size={12} aria-hidden="true" />}
+                      {skill.name}
+                    </span>
+                    <span className="dq-muted-xs dq-tabular">
+                      {skill.doneCount}/{skill.totalCount}
+                    </span>
+                  </div>
+
+                  <ul className="dq-arena-quest-list">
+                    {skillQuests.map((q) => {
+                      const isCurrent = q.id === activeQuest.id;
+                      return (
+                        <li key={q.id}>
+                          <button
+                            type="button"
+                            disabled={isSkillLocked}
+                            onClick={() => {
+                              onSelectQuest(q.id);
+                              setMobileTrailOpen(false);
+                            }}
+                            aria-current={isCurrent ? 'true' : undefined}
+                            className={[
+                              'dq-arena-quest-btn',
+                              isCurrent ? 'is-current' : '',
+                              q.completed ? 'is-done' : '',
+                              q.isBossFight ? 'is-boss' : '',
+                            ]
+                              .filter(Boolean)
+                              .join(' ')}
+                          >
+                            <span className="dq-arena-quest-icon" aria-hidden="true">
+                              {isSkillLocked ? (
+                                <Lock size={14} />
+                              ) : q.completed ? (
+                                <CheckCircle2 size={14} />
+                              ) : q.isBossFight ? (
+                                <Skull size={14} />
+                              ) : (
+                                <Circle size={14} />
+                              )}
+                            </span>
+                            <span className="dq-arena-quest-label">{q.title}</span>
+                            <span className="dq-arena-quest-xp dq-tabular">+{q.xp}</span>
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              );
+            };
+
+            const unlockedSkills = skills.filter((s) => s.status !== 'locked');
+            const lockedSkills = skills.filter((s) => s.status === 'locked');
+            const lockedWithMatches = lockedSkills.filter((s) => filterSkillQuests(s).length > 0);
+            const expandLocked = showLockedTrails || Boolean(normalizedQuery);
 
             return (
-              <div key={skill.id} className="dq-arena-group">
-                <div className="dq-arena-group-head">
-                  <span className="dq-arena-group-name">
-                    {isSkillLocked && <Lock size={12} aria-hidden="true" />}
-                    {skill.name}
-                  </span>
-                  <span className="dq-muted-xs dq-tabular">
-                    {skill.doneCount}/{skill.totalCount}
-                  </span>
-                </div>
+              <>
+                {unlockedSkills.map(renderGroup)}
 
-                <ul className="dq-arena-quest-list">
-                  {skillQuests.map((q) => {
-                    const isCurrent = q.id === activeQuest.id;
-                    return (
-                      <li key={q.id}>
-                        <button
-                          type="button"
-                          disabled={isSkillLocked}
-                          onClick={() => {
-                            onSelectQuest(q.id);
-                            setMobileTrailOpen(false);
-                          }}
-                          aria-current={isCurrent ? 'true' : undefined}
-                          className={[
-                            'dq-arena-quest-btn',
-                            isCurrent ? 'is-current' : '',
-                            q.completed ? 'is-done' : '',
-                            q.isBossFight ? 'is-boss' : '',
-                          ]
-                            .filter(Boolean)
-                            .join(' ')}
-                        >
-                          <span className="dq-arena-quest-icon" aria-hidden="true">
-                            {isSkillLocked ? (
-                              <Lock size={14} />
-                            ) : q.completed ? (
-                              <CheckCircle2 size={14} />
-                            ) : q.isBossFight ? (
-                              <Skull size={14} />
-                            ) : (
-                              <Circle size={14} />
-                            )}
-                          </span>
-                          <span className="dq-arena-quest-label">{q.title}</span>
-                          <span className="dq-arena-quest-xp dq-tabular">+{q.xp}</span>
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
+                {lockedWithMatches.length > 0 && (
+                  <div className="dq-arena-locked-wrap">
+                    <button
+                      type="button"
+                      className="dq-arena-locked-toggle"
+                      onClick={() => setShowLockedTrails((prev) => !prev)}
+                      aria-expanded={expandLocked}
+                    >
+                      <span className="dq-arena-locked-toggle-left">
+                        <Lock size={13} aria-hidden="true" />
+                        <span>Trilhas futuras ({lockedWithMatches.length})</span>
+                      </span>
+                      {expandLocked ? (
+                        <ChevronUp size={15} aria-hidden="true" />
+                      ) : (
+                        <ChevronDown size={15} aria-hidden="true" />
+                      )}
+                    </button>
+
+                    {expandLocked && (
+                      <div className="dq-arena-locked-list">
+                        {lockedWithMatches.map(renderGroup)}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </>
             );
-          })}
+          })()}
         </div>
       </aside>
 
@@ -492,11 +535,10 @@ export default function ArenaPage({
               </ul>
 
               <div className="dq-diag-lexical">
-                <span className="dq-micro-label">Analisador Léxico ({validation.language.toUpperCase()})</span>
                 {validation.diagnostics.length === 0 ? (
                   <p className="dq-diag-ok">
                     <CheckCircle2 size={15} aria-hidden="true" />
-                    <span>Estrutura léxica limpa e pronta para validação!</span>
+                    <span>Tudo pronto! Clique em Validar Código (ou Ctrl+Enter).</span>
                   </p>
                 ) : (
                   <ul className="dq-diag-issues">
@@ -509,12 +551,17 @@ export default function ArenaPage({
                   </ul>
                 )}
 
-                <div className="dq-token-pills dq-tabular">
-                  <span>Tokens: {validation.lexical.counts.total}</span>
-                  <span>Keywords: {validation.lexical.counts.keywords}</span>
-                  <span>Tags: {validation.lexical.counts.tags}</span>
-                  <span>Strings: {validation.lexical.counts.strings}</span>
-                </div>
+                <details className="dq-diag-details">
+                  <summary>
+                    Detalhes do analisador léxico ({validation.language.toUpperCase()})
+                  </summary>
+                  <div className="dq-token-pills dq-tabular">
+                    <span>Tokens: {validation.lexical.counts.total}</span>
+                    <span>Keywords: {validation.lexical.counts.keywords}</span>
+                    <span>Tags: {validation.lexical.counts.tags}</span>
+                    <span>Strings: {validation.lexical.counts.strings}</span>
+                  </div>
+                </details>
               </div>
             </div>
 
@@ -522,14 +569,20 @@ export default function ArenaPage({
               <div className="dq-diag-panel">
                 <div className="dq-diag-head">
                   <span className="dq-diag-title">
-                    <Eye size={15} aria-hidden="true" /> Prévia Segura ao Vivo
+                    <Eye size={15} aria-hidden="true" /> Prévia ao Vivo
                   </span>
-                  <span className="dq-muted-xs">HTML renderizado</span>
+                  <span className="dq-muted-xs">HTML seguro</span>
                 </div>
-                <div
-                  className="dq-live-preview-box"
-                  dangerouslySetInnerHTML={{ __html: safeHtmlPreview }}
-                />
+                {safeHtmlPreview.replace(/<[^>]+>/g, '').trim() ? (
+                  <div
+                    className="dq-live-preview-box"
+                    dangerouslySetInnerHTML={{ __html: safeHtmlPreview }}
+                  />
+                ) : (
+                  <div className="dq-live-preview-box dq-live-preview-empty">
+                    <span>O resultado HTML aparece aqui conforme você digita.</span>
+                  </div>
+                )}
               </div>
             )}
           </div>

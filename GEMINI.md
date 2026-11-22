@@ -3,10 +3,11 @@
 Read `AGENTS.md` in full at the start of any non-trivial session. This file is the quick-reference checklist for Gemini/Antigravity runs in **DevQuest**.
 
 ## Mandatory Pre-Flight (UI & Product Tasks)
-Before writing or editing any UI/CSS/component code, read all five project skills:
+Before writing or editing any UI/CSS/component code, read all six project skills:
 - `.agents/skills/design-system/SKILL.md`
 - `.agents/skills/ux/SKILL.md`
 - `.agents/skills/mobile-craft/SKILL.md`
+- `.agents/skills/guided-clarity/SKILL.md`
 - `.agents/skills/visual-fixer/SKILL.md`
 - `.agents/skills/reference-absorber/SKILL.md`
 - Plus `docs/wounds.md` for known traps.

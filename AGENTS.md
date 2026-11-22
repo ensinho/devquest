@@ -20,6 +20,7 @@ devquest/ (git root)
 │       ├── design-system/SKILL.md    # 3-layer tokens, 0-1-2 containment, visual identity
 │       ├── ux/SKILL.md               # Flows, latency, keyboard, a11y, mobile craft
 │       ├── mobile-craft/SKILL.md     # Native-grade mobile onboarding, thumb-zone, floating dock
+│       ├── guided-clarity/SKILL.md   # Progressive disclosure, cognitive load & guided flows
 │       ├── visual-fixer/SKILL.md     # Full-stack UI debugging & Playwright verification
 │       └── reference-absorber/SKILL.md # Translating external UI references into tokens
 ├── design-references/                # Gitignored local vault of UI libraries & prints
@@ -44,10 +45,11 @@ Before modifying CSS, layout, components, pages, or modals, you **MUST** read:
 1. `.agents/skills/design-system/SKILL.md`
 2. `.agents/skills/ux/SKILL.md`
 3. `.agents/skills/mobile-craft/SKILL.md`
-4. `.agents/skills/visual-fixer/SKILL.md`
-5. `.agents/skills/reference-absorber/SKILL.md`
-6. `docs/wounds.md` (to avoid re-introducing known regressions)
-7. Relevant catalogs in `design-references/` when introducing new interaction patterns.
+4. `.agents/skills/guided-clarity/SKILL.md`
+5. `.agents/skills/visual-fixer/SKILL.md`
+6. `.agents/skills/reference-absorber/SKILL.md`
+7. `docs/wounds.md` (to avoid re-introducing known regressions)
+8. Relevant catalogs in `design-references/` when introducing new interaction patterns.
 
 ---
 

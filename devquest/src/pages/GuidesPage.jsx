@@ -1,5 +1,5 @@
-import React from 'react';
-import { BookOpen, Clock, ArrowRight, CheckCircle2 } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { BookOpen, Clock, ArrowRight, CheckCircle2, Sparkles } from 'lucide-react';
 import CompanionAvatar from '../components/companion/CompanionAvatar.jsx';
 import { getCompanionStageData } from '../data/companionAvatars.js';
 
@@ -13,50 +13,96 @@ export default function GuidesPage({
   theme,
   onPet,
 }) {
+  const [activeCategory, setActiveCategory] = useState('Todos');
   const stageData = getCompanionStageData(displayStage);
   const displayName = companionName?.trim() || stageData.name;
-  const firstUnreadIndex = guides.findIndex((g) => !studiedGuides.includes(g.id));
-  const primaryIndex = firstUnreadIndex === -1 ? 0 : firstUnreadIndex;
+
+  const categories = useMemo(
+    () => ['Todos', ...Array.from(new Set(guides.map((g) => g.category)))],
+    [guides]
+  );
+
+  const filteredGuides = useMemo(
+    () =>
+      activeCategory === 'Todos'
+        ? guides
+        : guides.filter((g) => g.category === activeCategory),
+    [guides, activeCategory]
+  );
+
+  const recommendedGuideId = useMemo(() => {
+    const firstUnread = filteredGuides.find((g) => !studiedGuides.includes(g.id));
+    return firstUnread?.id ?? filteredGuides[0]?.id ?? null;
+  }, [filteredGuides, studiedGuides]);
 
   return (
     <div className="dq-page-stack">
-      <section className="dq-library-banner" aria-label="Introdução da Biblioteca Arcana">
+      <section className="dq-library-banner dq-library-banner--compact" aria-label="Introdução da Biblioteca Arcana">
         <div className="dq-library-banner-copy">
-          <span className="dq-eyebrow">
-            <BookOpen size={14} aria-hidden="true" />
-            Biblioteca Arcana · {stageData.realmName}
-          </span>
-          <h1 className="dq-h1">Grimórios técnicos estudados com {displayName}.</h1>
+          <div className="dq-welcome-meta dq-tabular">
+            <span className="dq-eyebrow">
+              <BookOpen size={14} aria-hidden="true" />
+              Biblioteca Arcana
+            </span>
+            <span className="dq-welcome-dot" aria-hidden="true">·</span>
+            <span className="dq-muted-xs">
+              {studiedGuides.length}/{guides.length} estudados
+            </span>
+            <span className="dq-welcome-dot" aria-hidden="true">·</span>
+            <span className="dq-muted-xs">+10 XP por leitura</span>
+          </div>
+          <h1 className="dq-h1">Grimórios rápidos antes da Arena</h1>
           <p className="dq-muted-text">
-            Cada grimório lido pela primeira vez rende <strong>+10 XP</strong> e fortalece seu Vínculo com {displayName}.
+            Leituras curtas de 2–3 minutos com resumo guiado por {displayName}.
           </p>
         </div>
 
-        <div className="dq-library-mentor">
-          <CompanionAvatar
-            stage={displayStage}
-            state="idle"
-            mood="happy"
-            theme={theme}
-            variant="modal"
-            accessoryId={accessoryId}
-            companionName={displayName}
-            interactive
-            onPet={onPet}
-          />
-          <p className="dq-library-mentor-tip">
-            &ldquo;Você já estudou <strong>{studiedGuides.length}/{guides.length}</strong> grimórios comigo! Abra um antes do próximo Boss Fight.&rdquo;
-          </p>
+        <div className="dq-library-right">
+          <div className="dq-pill-group" role="group" aria-label="Filtrar grimórios por tema">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => setActiveCategory(cat)}
+                aria-pressed={activeCategory === cat}
+                className={`dq-stage-pill ${activeCategory === cat ? 'is-active' : ''}`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+
+          <div className="dq-library-mini-mentor">
+            <CompanionAvatar
+              stage={displayStage}
+              state="idle"
+              mood="happy"
+              theme={theme}
+              variant="dock"
+              accessoryId={accessoryId}
+              companionName={displayName}
+              interactive
+              onPet={onPet}
+            />
+          </div>
         </div>
       </section>
 
       <section className="dq-guides-grid" aria-label="Lista de Grimórios">
-        {guides.map((guide, index) => {
+        {filteredGuides.map((guide) => {
           const isStudied = studiedGuides.includes(guide.id);
+          const isRecommended = guide.id === recommendedGuideId;
           return (
             <article key={guide.id} className="dq-guide-card">
               <div className="dq-guide-card-top">
-                <span className="dq-badge dq-badge-primary">{guide.category}</span>
+                <div className="dq-guide-badges">
+                  <span className="dq-badge dq-badge-primary">{guide.category}</span>
+                  {isRecommended && !isStudied && (
+                    <span className="dq-badge dq-badge-live">
+                      <Sparkles size={11} aria-hidden="true" /> Recomendado agora
+                    </span>
+                  )}
+                </div>
                 <span className="dq-muted-xs dq-guide-time dq-tabular">
                   {isStudied ? (
                     <span className="dq-badge dq-badge-gold">
@@ -75,9 +121,9 @@ export default function GuidesPage({
                 <button
                   type="button"
                   onClick={() => onOpenGuide(guide)}
-                  className={index === primaryIndex ? 'dq-btn dq-btn-primary' : 'dq-btn dq-btn-secondary'}
+                  className={isRecommended ? 'dq-btn dq-btn-primary' : 'dq-btn dq-btn-secondary'}
                 >
-                  <span>{isStudied ? 'Revisar Grimório' : 'Estudar Junto'}</span>
+                  <span>{isStudied ? 'Revisar Grimório' : 'Estudar Agora'}</span>
                   <ArrowRight size={15} aria-hidden="true" />
                 </button>
               </div>

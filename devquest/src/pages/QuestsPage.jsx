@@ -6,7 +6,6 @@ import SidePanel from '../components/SidePanel.jsx';
 
 export default function QuestsPage({
   user,
-  userClass,
   skills,
   selectedSkill,
   onSelectSkill,
@@ -15,30 +14,23 @@ export default function QuestsPage({
   recommendedQuest,
   totalQuests,
   onStartQuest,
-  unlockedStage,
+  onOpenCharacter,
   displayStage,
-  onPreviewStage,
   accessoryId,
-  onSelectAccessory,
   companionName,
   completedCount,
   completedQuizzes,
   bondInfo,
-  streak,
   mentorMessage,
-  mentorTag,
   avatarState,
   avatarMood,
   theme,
   onPet,
-  onAskLesson,
   onAnswerQuiz,
 }) {
   const [quizTrigger, setQuizTrigger] = useState(0);
   const campRef = useRef(null);
   const sidePanelRef = useRef(null);
-
-  const completedSkillsCount = skills.filter((s) => s.status === 'completed').length;
 
   const handleOpenQuizFromHero = () => {
     setQuizTrigger((n) => n + 1);
@@ -73,29 +65,22 @@ export default function QuestsPage({
       <div ref={campRef} className="dq-command-camp-wrap">
         <CompanionCamp
           user={user}
-          userClass={userClass}
+          skills={skills}
           recommendedQuest={recommendedQuest}
           onStartQuest={onStartQuest}
+          onOpenCharacter={onOpenCharacter}
           totalQuests={totalQuests}
-          completedSkillsCount={completedSkillsCount}
-          totalSkillsCount={skills.length}
-          unlockedStage={unlockedStage}
           displayStage={displayStage}
-          onPreviewStage={onPreviewStage}
           accessoryId={accessoryId}
-          onSelectAccessory={onSelectAccessory}
           companionName={companionName}
           completedCount={completedCount}
           completedQuizzes={completedQuizzes}
           bondInfo={bondInfo}
-          streak={streak}
           mentorMessage={mentorMessage}
-          mentorTag={mentorTag}
           avatarState={avatarState}
           avatarMood={avatarMood}
           theme={theme}
           onPet={onPet}
-          onAskLesson={onAskLesson}
           onAnswerQuiz={onAnswerQuiz}
           quizTrigger={quizTrigger}
         />
