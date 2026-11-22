@@ -353,6 +353,78 @@
   background-color: var(--companion-aura-stage3);
 }
 
+/* Spatial 2.5D floor grounding shadow (Tripo3D discipline, zero WebGL overhead) */
+@keyframes dq-floor-breathe {
+  0%,
+  100% {
+    transform: translateX(-50%) scaleX(1);
+    opacity: 0.45;
+  }
+  50% {
+    transform: translateX(-50%) scaleX(0.9);
+    opacity: 0.3;
+  }
+}
+
+.dq-avatar-floor-shadow {
+  position: absolute;
+  left: 50%;
+  bottom: -4px;
+  width: 66%;
+  height: 12px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-overlay);
+  filter: blur(7px);
+  pointer-events: none;
+  animation: dq-floor-breathe 3.8s ease-in-out infinite;
+}
+
+/* Zero-JS Animated SVG Checkmark + Codex Stamp Pop (ThinkUI + PaperAnimation) */
+@keyframes dq-stamp-pop {
+  0% {
+    transform: scale(0.94);
+  }
+  55% {
+    transform: scale(1.03);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.dq-anim-check {
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+.dq-anim-check-ring {
+  opacity: 0.55;
+  transition: opacity var(--duration-fast) var(--ease-out);
+}
+
+.dq-anim-check-mark {
+  stroke-dasharray: 20;
+  stroke-dashoffset: 20;
+  opacity: 0;
+  transition:
+    stroke-dashoffset var(--duration-base) var(--ease-out),
+    opacity var(--duration-fast) var(--ease-out);
+}
+
+.dq-anim-check.is-checked .dq-anim-check-ring {
+  opacity: 1;
+}
+
+.dq-anim-check.is-checked .dq-anim-check-mark {
+  stroke-dashoffset: 0;
+  opacity: 1;
+}
+
+.dq-diag-item.is-passed,
+.dq-onb-check.is-passed {
+  animation: dq-stamp-pop var(--duration-base) var(--ease-pop) both;
+}
+
 .dq-acc-orbit {
   position: absolute;
   inset: -4px;
@@ -976,8 +1048,19 @@
   stroke: var(--color-gold);
 }
 
+@keyframes dq-constellation-flow {
+  from {
+    stroke-dashoffset: 28;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
 .dq-edge--live {
   stroke: var(--color-live);
+  stroke-dasharray: 9 5;
+  animation: dq-constellation-flow 2.8s linear infinite;
 }
 
 .dq-edge--locked {
@@ -2924,10 +3007,39 @@
   max-width: calc(100vw - 2rem);
 }
 
-/* --- Hover Guards (Desktop Pointer Only) --- */
+/* --- Hover Guards (Desktop Pointer Only — Tactile Paper Lift & Zero-JS Icon Micro-Motion) --- */
 @media (hover: hover) and (pointer: fine) {
+  .dq-nav-tab svg,
+  .dq-btn svg {
+    transition: transform var(--duration-fast) var(--ease-out);
+  }
   .dq-nav-tab:hover:not(.is-active) {
     color: var(--color-text);
+  }
+  .dq-nav-tab:hover svg {
+    transform: translateY(-1px) scale(1.06);
+  }
+  .dq-mission-cta:hover svg,
+  .dq-guide-card .dq-btn:hover svg {
+    transform: translateX(3px);
+  }
+  .dq-guide-card {
+    transition:
+      transform var(--duration-fast) var(--ease-out),
+      box-shadow var(--duration-fast) var(--ease-out);
+  }
+  .dq-guide-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+  .dq-quest-item {
+    transition:
+      transform var(--duration-fast) var(--ease-out),
+      box-shadow var(--duration-fast) var(--ease-out);
+  }
+  .dq-quest-item:hover:not(.is-completed) {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
   }
   .dq-icon-btn:hover,
   .dq-onb-mini-icon:hover {

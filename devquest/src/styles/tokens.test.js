@@ -1,14 +1,33 @@
 import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'node:fs';
-import { resolve, dirname } from 'node:path';
+import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const stylesDir = dirname(fileURLToPath(import.meta.url));
+const srcDir = resolve(stylesDir, '..');
+const appRoot = resolve(srcDir, '..');
+
 const readStyle = (filename) => readFileSync(resolve(stylesDir, filename), 'utf8');
 
-const RAW_COLOR_PATTERN = /#[0-9a-fA-F]{3,8}\b|\brgba?\s*\(|\bhsla?\s*\(/;
+function collectJsxFiles(dir) {
+  const results = [];
+  for (const entry of readdirSync(dir)) {
+    const full = join(dir, entry);
+    if (statSync(full).isDirectory()) {
+      results.push(...collectJsxFiles(full));
+    } else if (entry.endsWith('.jsx')) {
+      results.push(full);
+    }
+  }
+  return results;
+}
 
-describe('3-layer CSS token architecture guardrails', () => {
+const RAW_COLOR_PATTERN = /#[0-9a-fA-F]{3,8}\b|\brgba?\s*\(|\bhsla?\s*\(/;
+const PRIMITIVE_TOKEN_PATTERN = /var\(--primitive-/;
+const IMPORTANT_PATTERN = /!important\b/;
+const INLINE_STYLE_TAG_PATTERN = /<style[\s>]/i;
+
+describe('3-layer CSS token architecture & Anti-Slop Design Gate (UIZZE / pen.dev)', () => {
   it('imports layers in strict order: primitives -> semantic -> components', () => {
     const entry = readStyle('tokens.css');
     const pIdx = entry.indexOf('./tokens.primitives.css');
@@ -27,6 +46,37 @@ describe('3-layer CSS token architecture guardrails', () => {
     }
   });
 
+  it('prevents Layer 1 --primitive-* leaks in component, app, and showcase CSS', () => {
+    for (const file of ['tokens.components.css', 'app.css', 'showcase.css']) {
+      const css = readStyle(file);
+      expect(css, `${file} must reference semantic/component tokens only, never --primitive-*`).not.toMatch(
+        PRIMITIVE_TOKEN_PATTERN
+      );
+    }
+  });
+
+  it('forbids !important specificity hacks in app.css and showcase.css', () => {
+    for (const file of ['app.css', 'showcase.css']) {
+      const css = readStyle(file);
+      expect(css, `${file} must not use !important hacks`).not.toMatch(IMPORTANT_PATTERN);
+    }
+  });
+
+  it('forbids inline <style> injections in JSX and runtime CDN scripts in index.html', () => {
+    const indexHtml = readFileSync(resolve(appRoot, 'index.html'), 'utf8');
+    expect(indexHtml).not.toMatch(/cdn\.tailwindcss\.com/i);
+    expect(indexHtml).toContain('viewport-fit=cover');
+
+    const jsxFiles = collectJsxFiles(srcDir);
+    expect(jsxFiles.length).toBeGreaterThan(0);
+    for (const filePath of jsxFiles) {
+      const source = readFileSync(filePath, 'utf8');
+      expect(source, `${filePath} must not inject inline <style> tags`).not.toMatch(
+        INLINE_STYLE_TAG_PATTERN
+      );
+    }
+  });
+
   it('defines matching core semantic tokens and companion-stage harmonies in both Dark and Light themes', () => {
     const semantic = readStyle('tokens.semantic.css');
     const [darkSection, lightSection] = semantic.split("[data-theme='light'] {");
@@ -38,6 +88,11 @@ describe('3-layer CSS token architecture guardrails', () => {
       '--color-bg',
       '--color-surface',
       '--color-surface-raised',
+      '--color-surface-glass',
+      '--color-node-available-bg',
+      '--color-node-locked-bg',
+      '--color-hero-tray-bg',
+      '--color-hero-tray-divider',
       '--color-text',
       '--color-text-muted',
       '--color-primary',
@@ -46,6 +101,7 @@ describe('3-layer CSS token architecture guardrails', () => {
       '--color-danger',
       '--color-arcane',
       '--color-companion-ambient',
+      '--color-companion-hero',
       '--focus-ring',
       '--syntax-keyword',
       '--syntax-tag',

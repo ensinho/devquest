@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import CompanionAvatar from '../components/companion/CompanionAvatar.jsx';
 import CodeEditor from '../components/CodeEditor.jsx';
+import AnimatedCheckIcon from '../components/AnimatedCheckIcon.jsx';
 import { getCompanionStageData } from '../data/companionAvatars.js';
 import { validateQuestCode } from '../utils/codeValidator.js';
 
@@ -484,11 +485,7 @@ export default function ArenaPage({
                     key={item.label}
                     className={`dq-diag-item ${item.passed ? 'is-passed' : ''}`}
                   >
-                    {item.passed ? (
-                      <CheckCircle2 size={15} aria-hidden="true" />
-                    ) : (
-                      <Circle size={15} aria-hidden="true" />
-                    )}
+                    <AnimatedCheckIcon checked={item.passed} size={16} />
                     <span>{item.label}</span>
                   </li>
                 ))}

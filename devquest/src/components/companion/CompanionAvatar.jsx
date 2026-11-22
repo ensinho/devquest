@@ -90,6 +90,7 @@ export default function CompanionAvatar({
   };
 
   const showAccessories = variant !== 'mini';
+  const showFloorShadow = variant === 'camp' || variant === 'altar';
 
   const inner = (
     <span
@@ -97,6 +98,7 @@ export default function CompanionAvatar({
       style={{ '--avatar-size': `${pixelSize}px` }}
     >
       <span className="dq-avatar-aura" aria-hidden="true" />
+      {showFloorShadow && <span className="dq-avatar-floor-shadow" aria-hidden="true" />}
       {showAccessories && accessoryId === 'glasses' && <span className="dq-acc-orbit" aria-hidden="true" />}
       {showAccessories && accessoryId === 'crown' && (
         <span className="dq-acc-crown" aria-hidden="true" title="Coroa Relíquia">

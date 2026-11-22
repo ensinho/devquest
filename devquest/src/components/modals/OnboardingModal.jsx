@@ -1,7 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
-  CheckCircle2,
-  Circle,
   Sun,
   Moon,
   Volume2,
@@ -13,6 +11,7 @@ import {
   Zap,
 } from 'lucide-react';
 import CompanionAvatar from '../companion/CompanionAvatar.jsx';
+import AnimatedCheckIcon from '../AnimatedCheckIcon.jsx';
 import { COMPANION_STAGES, getCompanionStageData } from '../../data/companionAvatars.js';
 import { HERO_SIGILS } from '../../data/gameData.js';
 
@@ -275,11 +274,7 @@ export default function OnboardingModal({
                       key={check.label}
                       className={`dq-onb-check ${check.passed ? 'is-passed' : ''}`}
                     >
-                      {check.passed ? (
-                        <CheckCircle2 size={14} aria-hidden="true" />
-                      ) : (
-                        <Circle size={14} aria-hidden="true" />
-                      )}
+                      <AnimatedCheckIcon checked={check.passed} size={15} />
                       <span>{check.label}</span>
                     </li>
                   ))}

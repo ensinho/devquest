@@ -29,4 +29,12 @@ When the user shares a screenshot, URL, or UI library component to take inspirat
    - *Visual Hierarchy:* How the single primary CTA stands out; how secondary metadata stays quiet.
    - *What to Reject (Anti-Slop):* Excess blur, neon glow, nested borders, or unreadable light-mode shortcuts.
 3. **Translate to DevQuest Tokens:** Explicitly map the pattern onto `--color-bg`, `--color-surface`, `--color-surface-raised`, `--color-primary`, `--color-gold`, `--color-live`, `--space-*`, and `--duration-*`.
-4. **Verify Visually:** When implementing the translated pattern, validate in Playwright across Desktop Dark (`1440×900`), Desktop Light (`1440×900`), and Mobile (`390×844`).
+4. **Verify Visually & Through the Anti-Slop Gate:** Run `npm test` (including `tokens.test.js` Anti-Slop Gate: zero raw hex, zero `--primitive-*` leaks, zero `!important` hacks, zero CDN/inline `<style>` slop) and validate in Playwright across Desktop Dark (`1440×900`), Desktop Light (`1440×900`), and Mobile (`390×844`).
+
+---
+
+## 4. Absorbed Craft Patterns (Always Prefer These Over Heavy Libraries)
+- **Automated Anti-Slop Gate (UIZZE / pen.dev pattern):** Keep design rules executable inside `devquest/src/styles/tokens.test.js` so regressions fail deterministically before commit.
+- **Zero-JS Animated SVG Micro-Icons (ThinkUI pattern):** Prefer lightweight inline SVG + CSS `stroke-dashoffset` / `transform` micro-motions (`AnimatedCheckIcon`, subtle icon hover tilt, CTA arrow glide) over heavy icon animation runtimes.
+- **Tactile Codex Paper Motion (PaperAnimation pattern):** Use subtle composite-only (`transform`/`opacity`) parchment card lifts and passing-check stamp pops that honor DevQuest's *Warm Vellum* & *Obsidian Scriptorium* codex identity while respecting `prefers-reduced-motion: reduce`.
+- **Spatial Grounding Without WebGL Bloat (Tripo3D discipline):** Ground 2.5D companions with soft directional floor shadows and optical depth rather than shipping multi-megabyte WebGL scenes on mobile.
