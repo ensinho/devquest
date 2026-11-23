@@ -1,23 +1,24 @@
 import React from 'react';
 import {
-  Shield,
-  Compass,
+  Map as MapIcon,
   Swords,
   BookOpen,
   User,
   Sun,
   Moon,
-  Cloud,
+  HardDriveDownload,
   Volume2,
   VolumeX,
   ChevronRight,
 } from 'lucide-react';
 import XPBar from './XPBar.jsx';
-import { HERO_SIGILS } from '../data/gameData.js';
+import BrandMark from './BrandMark.jsx';
+import SigilIcon from './SigilIcon.jsx';
+import RollingNumber from './RollingNumber.jsx';
 import { getCompanionStageData } from '../data/companionAvatars.js';
 
 const NAV_ITEMS = [
-  { id: 'quests', label: 'Mapa', icon: Compass },
+  { id: 'quests', label: 'Mapa', icon: MapIcon },
   { id: 'arena', label: 'Arena', icon: Swords },
   { id: 'guides', label: 'Grimórios', icon: BookOpen },
   { id: 'character', label: 'Herói & Mascote', icon: User },
@@ -34,28 +35,28 @@ export default function Header({
   soundEnabled,
   onToggleSound,
   isGuestMode,
+  syncState = 'idle',
   onOpenAuth,
 }) {
-  const sigil = HERO_SIGILS.find((s) => s.id === user.avatarId) ?? HERO_SIGILS[0];
   const stageData = getCompanionStageData(displayStage);
   const companionName = user.companionName?.trim() || stageData.name;
 
   return (
     <header className="dq-header">
-      {/* Desktop Brand */}
-      <div className="dq-header-brand">
-        <span className="dq-brand-emblem" aria-hidden="true">
-          <Shield size={20} />
-        </span>
-        <div>
+      <button
+        type="button"
+        className="dq-header-brand"
+        onClick={() => onNavClick('quests')}
+        aria-label="DevQuest — voltar ao mapa"
+      >
+        <BrandMark size={34} />
+        <span className="dq-brand-text">
           <span className="dq-brand-name">DevQuest</span>
-          <span className="dq-brand-role">
-            {stageData.realmName} · {userClass}
-          </span>
-        </div>
-      </div>
+          <span className="dq-brand-role">{userClass}</span>
+        </span>
+      </button>
 
-      {/* Compact Native Mobile Identity Pill (< 768px) */}
+      {/* Compact mobile identity (< 768px) */}
       <button
         type="button"
         className="dq-mobile-identity"
@@ -63,18 +64,17 @@ export default function Header({
         aria-label={`Perfil de ${user.name}, Nível ${user.level}`}
       >
         <span className="dq-mobile-identity-avatar" aria-hidden="true">
-          {sigil.glyph}
+          <SigilIcon id={user.avatarId} size={18} />
         </span>
         <span className="dq-mobile-identity-text">
           <strong>{user.name}</strong>
           <span className="dq-tabular">
-            Nv. {user.level} · {stageData.name}
+            Nv. {user.level} · {companionName}
           </span>
         </span>
         <ChevronRight size={15} className="dq-mobile-identity-chevron" aria-hidden="true" />
       </button>
 
-      {/* Desktop Navigation */}
       <nav className="dq-nav" aria-label="Navegação principal">
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
@@ -94,16 +94,19 @@ export default function Header({
         })}
       </nav>
 
-      {/* Right Status & Quick Utility Actions */}
       <div className="dq-header-status">
-        <div className="dq-header-xp">
-          <div className="dq-header-xp-top dq-tabular">
-            <span className="dq-badge dq-badge-gold">Nível {user.level}</span>
-            <span className="dq-xp-numbers">
-              {user.currentXp} / {user.nextLevelXp} XP
+        <div className="dq-header-xp" title={`${user.currentXp} de ${user.nextLevelXp} XP para o próximo nível`}>
+          <span className="dq-level-chip">
+            <span className="dq-level-chip-label">Nv</span>
+            <RollingNumber value={user.level} className="dq-level-chip-value" />
+          </span>
+          <span className="dq-header-xp-col">
+            <span className="dq-xp-numbers dq-tabular">
+              <RollingNumber value={user.currentXp} />
+              <span className="dq-xp-of">/ {user.nextLevelXp} XP</span>
             </span>
-          </div>
-          <XPBar currentXp={user.currentXp} nextLevelXp={user.nextLevelXp} compact />
+            <XPBar currentXp={user.currentXp} nextLevelXp={user.nextLevelXp} compact />
+          </span>
         </div>
 
         <div className="dq-header-actions">
@@ -112,32 +115,20 @@ export default function Header({
             className="dq-icon-btn"
             onClick={onToggleSound}
             aria-pressed={soundEnabled}
-            aria-label={soundEnabled ? 'Desativar sons do mascote' : 'Ativar sons sutis do mascote'}
-            title={soundEnabled ? `Som ativo (${companionName})` : 'Ativar sons sutis'}
+            aria-label={soundEnabled ? 'Desativar sons do mascote' : 'Ativar sons do mascote'}
+            title={soundEnabled ? `Sons de ${companionName} ligados` : 'Sons desligados'}
           >
-            {soundEnabled ? (
-              <Volume2 size={17} aria-hidden="true" />
-            ) : (
-              <VolumeX size={17} aria-hidden="true" />
-            )}
+            {soundEnabled ? <Volume2 size={17} aria-hidden="true" /> : <VolumeX size={17} aria-hidden="true" />}
           </button>
 
           <button
             type="button"
             className="dq-icon-btn"
             onClick={onToggleTheme}
-            aria-label={
-              theme === 'dark'
-                ? 'Alternar para tema claro Warm Vellum'
-                : 'Alternar para tema escuro Obsidian'
-            }
-            title={theme === 'dark' ? 'Tema Claro (Warm Vellum)' : 'Tema Escuro (Obsidian)'}
+            aria-label={theme === 'dark' ? 'Mudar para tema claro' : 'Mudar para tema escuro'}
+            title={theme === 'dark' ? 'Tema claro' : 'Tema escuro'}
           >
-            {theme === 'dark' ? (
-              <Sun size={18} aria-hidden="true" />
-            ) : (
-              <Moon size={18} aria-hidden="true" />
-            )}
+            {theme === 'dark' ? <Sun size={18} aria-hidden="true" /> : <Moon size={18} aria-hidden="true" />}
           </button>
 
           {isGuestMode ? (
@@ -145,20 +136,22 @@ export default function Header({
               type="button"
               className="dq-btn dq-btn-secondary dq-sync-btn"
               onClick={onOpenAuth}
-              aria-label="Modo Sandbox Local — detalhes de sincronização"
-              title="Progresso salvo localmente. Clique para detalhes de sincronização."
+              title="Seu progresso fica salvo neste navegador. Clique para sincronizar com uma conta."
             >
-              <Cloud size={16} aria-hidden="true" />
-              <span>Sandbox</span>
+              <HardDriveDownload size={16} aria-hidden="true" />
+              <span>Salvo local</span>
             </button>
           ) : (
             <button
               type="button"
-              className="dq-sigil-btn"
+              className={`dq-sigil-btn ${syncState === 'syncing' ? 'is-syncing' : ''} ${syncState === 'error' ? 'is-error' : ''}`}
               onClick={() => onNavClick('character')}
-              aria-label={`Perfil de ${user.name}`}
+              aria-label={`Perfil de ${user.name}. ${
+                syncState === 'error' ? 'Falha ao sincronizar' : syncState === 'syncing' ? 'Sincronizando' : 'Progresso salvo na nuvem'
+              }`}
+              title={syncState === 'error' ? 'Falha ao sincronizar' : syncState === 'syncing' ? 'Sincronizando…' : 'Salvo na nuvem'}
             >
-              <span aria-hidden="true">{sigil.glyph}</span>
+              <SigilIcon id={user.avatarId} size={18} />
             </button>
           )}
         </div>

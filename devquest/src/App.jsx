@@ -5,8 +5,14 @@ import {
   signInWithEmailAndPassword,
   onAuthStateChanged,
   signOut,
+  sendEmailVerification,
+  sendPasswordResetEmail,
+  reauthenticateWithCredential,
+  EmailAuthProvider,
 } from 'firebase/auth';
-import { doc, setDoc, onSnapshot, updateDoc } from 'firebase/firestore';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { api } from './api/client.js';
+import { collectClientInfo } from './utils/clientInfo.js';
 
 import Header from './components/Header.jsx';
 import MobileBottomNav from './components/MobileBottomNav.jsx';
@@ -36,6 +42,12 @@ import { initTheme, persistTheme, toggleThemeValue } from './utils/theme.js';
 import { playCompanionSound } from './utils/sound.js';
 
 import './styles/app.css';
+import './styles/binder.css';
+import './styles/toca.css';
+import './styles/onboarding.css';
+import './styles/account.css';
+import './styles/grimoire.css';
+import './styles/motion.css';
 
 export default function App() {
   const [theme, setTheme] = useState(() => initTheme());
@@ -47,9 +59,11 @@ export default function App() {
   });
 
   const [currentUser, setCurrentUser] = useState(null);
+  const [account, setAccount] = useState(null);
+  const [syncState, setSyncState] = useState('idle');
   const [userProgress, setUserProgress] = useState(() => loadGuestProgress());
 
-  const [selectedSkillId, setSelectedSkillId] = useState('html');
+  const [selectedSkillId, setSelectedSkillId] = useState(null);
   const [activeQuestId, setActiveQuestId] = useState('q1');
   const [previewStage, setPreviewStage] = useState(null);
 
@@ -75,6 +89,16 @@ export default function App() {
   const toastTimerRef = useRef(null);
   const petIndexRef = useRef(0);
   const lastPetRewardRef = useRef(0);
+  const themeRef = useRef(theme);
+  const serverProgressRef = useRef(null);
+  const sessionReadyRef = useRef(Promise.resolve());
+  const inFlightRef = useRef(0);
+  const profileTimerRef = useRef(null);
+  const pendingProfileRef = useRef({});
+
+  useEffect(() => {
+    themeRef.current = theme;
+  }, [theme]);
 
   const isGuestMode = !currentUser;
   const soundEnabled = Boolean(userProgress.soundEnabled);
@@ -119,7 +143,22 @@ export default function App() {
     };
   }, []);
 
-  // Optional Firebase sync — never blocks Guest Sandbox visitors
+  /** Server documents → the progress shape the UI uses. */
+  const applyServerUser = useCallback((data) => {
+    if (!data) return;
+    const next = {
+      ...createDefaultProgress(data.name),
+      ...data,
+      completedQuests: Array.isArray(data.completedQuests) ? data.completedQuests : [],
+      studiedGuides: Array.isArray(data.studiedGuides) ? data.studiedGuides : [],
+      completedQuizzes: Array.isArray(data.completedQuizzes) ? data.completedQuizzes : [],
+    };
+    serverProgressRef.current = next;
+    setUserProgress(next);
+  }, []);
+
+  // Accounts: Firebase Auth + the DevQuest API (all writes) + a live Firestore read.
+  // Guests never touch the network: their progress stays in localStorage.
   useEffect(() => {
     if (!isFirebaseConfigured || !auth || !db) {
       return undefined;
@@ -127,34 +166,59 @@ export default function App() {
 
     let unsubscribeFromFirestore = () => {};
     const unsubscribeFromAuth = onAuthStateChanged(auth, (userAuth) => {
-      if (userAuth) {
-        setCurrentUser(userAuth);
-        setShowAuthModal(false);
-        const userDocRef = doc(db, 'users', userAuth.uid);
-        unsubscribeFromFirestore = onSnapshot(userDocRef, (snapshot) => {
-          if (snapshot.exists()) {
-            const data = snapshot.data();
-            setUserProgress({
-              ...createDefaultProgress(data.name),
-              ...data,
-              completedQuests: Array.isArray(data.completedQuests) ? data.completedQuests : [],
-              studiedGuides: Array.isArray(data.studiedGuides) ? data.studiedGuides : [],
-              completedQuizzes: Array.isArray(data.completedQuizzes) ? data.completedQuizzes : [],
-            });
-          }
-        });
-      } else {
+      unsubscribeFromFirestore();
+      unsubscribeFromFirestore = () => {};
+      if (!userAuth) {
         setCurrentUser(null);
+        setAccount(null);
+        setSyncState('idle');
+        serverProgressRef.current = null;
+        sessionReadyRef.current = Promise.resolve();
         setUserProgress(loadGuestProgress());
-        unsubscribeFromFirestore();
+        return;
       }
+
+      setCurrentUser(userAuth);
+      setShowAuthModal(false);
+      setSyncState('syncing');
+      const guest = loadGuestProgress();
+      const hasGuestProgress =
+        guest.completedQuests.length > 0 ||
+        (guest.studiedGuides ?? []).length > 0 ||
+        (guest.completedQuizzes ?? []).length > 0 ||
+        guest.onboardingCompleted;
+
+      const ready = api
+        .session({
+          client: collectClientInfo(themeRef.current),
+          guestProgress: hasGuestProgress ? guest : undefined,
+        })
+        .then((res) => {
+          applyServerUser(res.user);
+          setAccount(res.account);
+          setSyncState('idle');
+          if (res.user?.onboardingCompleted) setShowOnboarding(false);
+          if (res.imported) showToast('Seu progresso deste navegador agora está salvo na sua conta.');
+          unsubscribeFromFirestore = onSnapshot(
+            doc(db, 'users', userAuth.uid),
+            (snapshot) => {
+              if (snapshot.exists() && inFlightRef.current === 0) applyServerUser(snapshot.data());
+            },
+            () => setSyncState('error')
+          );
+        })
+        .catch((err) => {
+          setSyncState('error');
+          showToast(err.message);
+        });
+      sessionReadyRef.current = ready;
     });
 
     return () => {
       unsubscribeFromAuth();
       unsubscribeFromFirestore();
     };
-  }, []);
+  }, [applyServerUser, showToast]);
 
   // Derived skills & hero class (pure useMemo, zero infinite useEffect)
   const { skills, heroClass } = useMemo(
@@ -167,15 +231,6 @@ export default function App() {
     return INITIAL_QUESTS.map((q) => ({ ...q, completed: doneSet.has(q.id) }));
   }, [userProgress.completedQuests]);
 
-  const selectedSkill = useMemo(() => {
-    return skills.find((s) => s.id === selectedSkillId) ?? skills[0];
-  }, [skills, selectedSkillId]);
-
-  const questsForSelectedSkill = useMemo(() => {
-    if (!selectedSkill) return [];
-    return questsWithStatus.filter((q) => q.skillId === selectedSkill.id);
-  }, [questsWithStatus, selectedSkill]);
-
   const recommendedQuest = useMemo(() => {
     const unlockedIds = new Set(
       skills.filter((s) => s.status !== 'locked').map((s) => s.id)
@@ -185,16 +240,75 @@ export default function App() {
     );
   }, [skills, questsWithStatus]);
 
-  const persistProgress = useCallback(
-    async (nextProgress) => {
+  // Until the player picks a card, the map opens on the skill of their next quest.
+  const selectedSkill = useMemo(() => {
+    return (
+      skills.find((s) => s.id === selectedSkillId) ??
+      skills.find((s) => s.id === recommendedQuest?.skillId) ??
+      skills[0]
+    );
+  }, [skills, selectedSkillId, recommendedQuest]);
+
+  const questsForSelectedSkill = useMemo(() => {
+    if (!selectedSkill) return [];
+    return questsWithStatus.filter((q) => q.skillId === selectedSkill.id);
+  }, [questsWithStatus, selectedSkill]);
+
+  /**
+   * Optimistic update. Guests persist to localStorage; signed-in players send
+   * the action to the API, which recomputes everything and is the source of
+   * truth (its answer and the Firestore snapshot overwrite the guess).
+   */
+  const commitProgress = useCallback(
+    (nextProgress, serverCall) => {
       setUserProgress(nextProgress);
-      if (currentUser && db) {
-        await updateDoc(doc(db, 'users', currentUser.uid), nextProgress);
-      } else {
+      if (!currentUser) {
         saveGuestProgress(nextProgress);
+        return Promise.resolve(null);
       }
+      if (!serverCall) return Promise.resolve(null);
+      inFlightRef.current += 1;
+      setSyncState('syncing');
+      return sessionReadyRef.current
+        .then(serverCall)
+        .then((res) => {
+          inFlightRef.current -= 1;
+          if (inFlightRef.current === 0) {
+            if (res?.user) applyServerUser(res.user);
+            setSyncState('idle');
+          }
+          return res;
+        })
+        .catch((err) => {
+          inFlightRef.current -= 1;
+          setSyncState('error');
+          if (serverProgressRef.current) setUserProgress(serverProgressRef.current);
+          showToast(err.message);
+          return null;
+        });
     },
-    [currentUser]
+    [currentUser, applyServerUser, showToast]
+  );
+
+  /** Text fields (names) are debounced so typing doesn't flood the API. */
+  const queueProfilePatch = useCallback(
+    (patch) => {
+      if (!currentUser) return;
+      pendingProfileRef.current = { ...pendingProfileRef.current, ...patch };
+      if (profileTimerRef.current) window.clearTimeout(profileTimerRef.current);
+      profileTimerRef.current = window.setTimeout(() => {
+        const body = pendingProfileRef.current;
+        pendingProfileRef.current = {};
+        inFlightRef.current += 1;
+        sessionReadyRef.current
+          .then(() => api.updateProfile(body))
+          .catch((err) => showToast(err.message))
+          .finally(() => {
+            inFlightRef.current -= 1;
+          });
+      }, 600);
+    },
+    [currentUser, showToast]
   );
 
   const triggerProgressionModals = useCallback(
@@ -215,17 +329,16 @@ export default function App() {
     const next = toggleThemeValue(theme);
     persistTheme(next);
     setTheme(next);
+    if (currentUser) api.updateProfile({ theme: next }).catch(() => {});
     playCompanionSound('check', soundEnabled);
-    showToast(
-      next === 'light'
-        ? `Warm Vellum Claro · ${stageData.realmName}`
-        : `Obsidian Escuro · ${stageData.realmName}`
-    );
+    showToast(next === 'light' ? 'Tema claro ativado' : 'Tema escuro ativado');
   };
 
   const handleToggleSound = () => {
     const nextEnabled = !soundEnabled;
-    persistProgress({ ...userProgress, soundEnabled: nextEnabled });
+    commitProgress({ ...userProgress, soundEnabled: nextEnabled }, () =>
+      api.updateProfile({ soundEnabled: nextEnabled })
+    );
     if (nextEnabled) {
       playCompanionSound('pet', true);
       showToast(`Sons sutis de ${companionDisplayName} ativados.`);
@@ -235,10 +348,12 @@ export default function App() {
   };
 
   const handleSignUp = async (email, password) => {
-    if (!auth || !db) return;
+    if (!auth) return;
+    // onAuthStateChanged → POST /api/session creates the account documents
+    // and imports this browser's guest progress.
     const cred = await createUserWithEmailAndPassword(auth, email, password);
-    const fresh = createDefaultProgress(email.split('@')[0]);
-    await setDoc(doc(db, 'users', cred.user.uid), fresh);
+    sendEmailVerification(cred.user).catch(() => {});
+    showToast('Conta criada! Enviamos um link de confirmação para o seu e-mail.');
   };
 
   const handleLogin = async (email, password) => {
@@ -246,18 +361,60 @@ export default function App() {
     await signInWithEmailAndPassword(auth, email, password);
   };
 
+  const handlePasswordReset = async (email) => {
+    if (!auth) return;
+    await sendPasswordResetEmail(auth, email);
+  };
+
   const handleLogout = async () => {
     if (!auth) return;
     await signOut(auth);
-    showToast('Sessão encerrada. Você voltou ao Modo Sandbox local.');
+    showToast('Sessão encerrada. Você voltou ao progresso deste navegador.');
+  };
+
+  const handleResendVerification = async () => {
+    if (!auth?.currentUser) return;
+    try {
+      await sendEmailVerification(auth.currentUser);
+      showToast('Link de confirmação reenviado. Confira sua caixa de entrada.');
+    } catch {
+      showToast('Não deu para reenviar agora. Tente em alguns minutos.');
+    }
+  };
+
+  const handleExportData = async () => {
+    try {
+      const data = await api.exportData();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `devquest-dados-${new Date().toISOString().slice(0, 10)}.json`;
+      link.click();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      showToast('Seus dados foram baixados.');
+    } catch (err) {
+      showToast(err.message);
+    }
+  };
+
+  /** Re-auth with the password (fresh auth_time), then the API erases everything. */
+  const handleDeleteAccount = async (password) => {
+    const user = auth?.currentUser;
+    if (!user?.email) return;
+    await reauthenticateWithCredential(user, EmailAuthProvider.credential(user.email, password));
+    await user.getIdToken(true);
+    await api.deleteAccount();
+    await signOut(auth).catch(() => {});
+    showToast('Conta excluída. Todos os seus dados foram apagados.');
   };
 
   const handleCompleteQuest = useCallback(
-    async (questId) => {
+    async (questId, code) => {
       const outcome = applyQuestCompletion(userProgress, questId, INITIAL_QUESTS);
       if (!outcome.xpGained) return;
 
-      await persistProgress(outcome.nextProgress);
+      commitProgress(outcome.nextProgress, () => api.progress({ action: 'quest', questId, code }));
       setPreviewStage(null);
       pulseCompanion('done', 'happy', 3200);
       setMentorSpeech({
@@ -269,7 +426,7 @@ export default function App() {
     },
     [
       userProgress,
-      persistProgress,
+      commitProgress,
       pulseCompanion,
       showToast,
       companionDisplayName,
@@ -278,7 +435,8 @@ export default function App() {
   );
 
   const handleAnswerQuiz = useCallback(
-    async (quiz, isCorrect) => {
+    async (quiz, isCorrect, answerIndex) => {
+      const report = () => api.progress({ action: 'quiz', quizId: quiz.id, answerIndex });
       if (isCorrect) {
         playCompanionSound('win', soundEnabled);
         const outcome = applyBonusActivity(userProgress, {
@@ -286,7 +444,7 @@ export default function App() {
           bondGain: 15,
           quizId: quiz.id,
         });
-        await persistProgress(outcome.nextProgress);
+        commitProgress(outcome.nextProgress, report);
         pulseCompanion('done', 'happy', 2600);
         setMentorSpeech({
           tag: `Desafio Relâmpago · Acertou!`,
@@ -299,6 +457,9 @@ export default function App() {
         );
         triggerProgressionModals(outcome);
       } else {
+        if (currentUser && Number.isInteger(answerIndex)) {
+          sessionReadyRef.current.then(report).catch(() => {});
+        }
         playCompanionSound('error', soundEnabled);
         pulseCompanion('blocked', 'neutral', 2000);
         setMentorSpeech({
@@ -308,8 +469,9 @@ export default function App() {
       }
     },
     [
+      currentUser,
       userProgress,
-      persistProgress,
+      commitProgress,
       pulseCompanion,
       showToast,
       companionDisplayName,
@@ -326,7 +488,7 @@ export default function App() {
         guideId: guide.id,
       });
       if (outcome.xpGained > 0) {
-        await persistProgress(outcome.nextProgress);
+        commitProgress(outcome.nextProgress, () => api.progress({ action: 'guide', guideId: guide.id }));
         playCompanionSound('win', soundEnabled);
         pulseCompanion('done', 'happy', 2400);
         showToast(`Grimório estudado com ${companionDisplayName}! +10 XP · +12 Vínculo`);
@@ -335,7 +497,7 @@ export default function App() {
     },
     [
       userProgress,
-      persistProgress,
+      commitProgress,
       pulseCompanion,
       showToast,
       companionDisplayName,
@@ -360,12 +522,25 @@ export default function App() {
     pulseCompanion('waiting', 'happy', 1800);
   };
 
+  const describeLock = (skill) => {
+    const missing = skill.dependencies
+      .map((id) => skills.find((s) => s.id === id))
+      .filter((dep) => dep && dep.status !== 'completed')
+      .map((dep) => dep.name);
+    return missing.length
+      ? `${skill.name} ainda está virada. Termine ${missing.join(' e ')} e ela vira pra cima.`
+      : `${skill.name} ainda está virada.`;
+  };
+
+  const handleLockedSkill = (skill) => {
+    playCompanionSound('error', soundEnabled);
+    pulseCompanion('blocked', 'neutral', 1600);
+    setMentorSpeech({ tag: `${skill.name} bloqueada`, text: describeLock(skill) });
+  };
+
   const handleHoverSkill = (skill) => {
     if (skill.status === 'locked') {
-      setMentorSpeech({
-        tag: `${skill.name} bloqueada`,
-        text: `Conclua as dependências anteriores no mapa para desbloquear ${skill.name} e novos desafios!`,
-      });
+      setMentorSpeech({ tag: `${skill.name} bloqueada`, text: describeLock(skill) });
       setAvatarState('waiting');
       return;
     }
@@ -391,7 +566,7 @@ export default function App() {
       const nextBond = (userProgress.bondPoints ?? 0) + 10;
       const prevLevel = getBondInfo(userProgress.bondPoints).bondLevel;
       const nextLevel = getBondInfo(nextBond).bondLevel;
-      persistProgress({ ...userProgress, bondPoints: nextBond });
+      commitProgress({ ...userProgress, bondPoints: nextBond }, () => api.progress({ action: 'pet' }));
       if (nextLevel > prevLevel) {
         showToast(`Vínculo subiu para Nível ${nextLevel}! Novo acessório pode estar liberado.`);
       }
@@ -410,30 +585,32 @@ export default function App() {
   };
 
   const handleSelectAccessory = (accessoryId) => {
-    persistProgress({ ...userProgress, accessoryId });
+    commitProgress({ ...userProgress, accessoryId }, () => api.updateProfile({ accessoryId }));
     playCompanionSound('pet', soundEnabled);
     pulseCompanion('done', 'happy', 1800);
     showToast(`Acessório equipado em ${companionDisplayName}!`);
   };
 
   const handleAvatarSelect = (avatarId) => {
-    persistProgress({ ...userProgress, avatarId });
+    commitProgress({ ...userProgress, avatarId }, () => api.updateProfile({ avatarId }));
     showToast('Selo da classe atualizado.');
   };
 
   const handleUpdateName = (name) => {
-    persistProgress({ ...userProgress, name: name || 'Aventureiro' });
+    commitProgress({ ...userProgress, name: name || 'Aventureiro' });
+    queueProfilePatch({ name });
   };
 
   const handleUpdateCompanionName = (companionName) => {
-    persistProgress({ ...userProgress, companionName });
+    commitProgress({ ...userProgress, companionName });
+    queueProfilePatch({ companionName });
   };
 
   const handleResetSandbox = () => {
     const fresh = createDefaultProgress('Aventureiro');
     setPreviewStage(null);
-    setSelectedSkillId('html');
-    persistProgress(fresh);
+    setSelectedSkillId(null);
+    commitProgress(fresh, () => api.progress({ action: 'reset' }));
     setShowOnboarding(true);
     setMentorSpeech({
       tag: 'Nova jornada iniciada',
@@ -442,7 +619,7 @@ export default function App() {
     showToast('Progresso local reiniciado.');
   };
 
-  const handleFinishOnboarding = ({ name, companionName, avatarId, spellPassed, petBonus }) => {
+  const handleFinishOnboarding = ({ name, companionName, avatarId, spellPassed, spellCode, petBonus }) => {
     const base = {
       ...userProgress,
       name,
@@ -454,7 +631,16 @@ export default function App() {
       xp: spellPassed ? 25 : 0,
       bondGain: (spellPassed ? 20 : 5) + (petBonus ?? 0),
     });
-    persistProgress(outcome.nextProgress);
+    commitProgress(outcome.nextProgress, () =>
+      api.progress({
+        action: 'onboarding',
+        name,
+        companionName,
+        avatarId,
+        spellCode,
+        petted: (petBonus ?? 0) > 0,
+      })
+    );
     setPreviewStage(null);
     setShowOnboarding(false);
     pulseCompanion('done', 'happy', 2600);
@@ -466,7 +652,9 @@ export default function App() {
   };
 
   const handleSkipOnboarding = () => {
-    persistProgress({ ...userProgress, onboardingCompleted: true });
+    commitProgress({ ...userProgress, onboardingCompleted: true }, () =>
+      api.progress({ action: 'skipOnboarding' })
+    );
     setPreviewStage(null);
     setShowOnboarding(false);
   };
@@ -475,13 +663,13 @@ export default function App() {
     if (mentorSpeech) return mentorSpeech;
     if (selectedSkill) {
       return {
-        tag: `Mentor ao vivo · ${selectedSkill.name}`,
+        tag: `${companionDisplayName} · ${selectedSkill.name}`,
         text: selectedSkill.mentorLesson,
       };
     }
     return {
       tag: `${companionDisplayName} pronto para codar`,
-      text: 'Clique em qualquer constelação do mapa ou experimente o Desafio Relâmpago comigo!',
+      text: 'Escolha uma carta aberta no mapa ou faça o quiz rápido comigo.',
     };
   }, [mentorSpeech, selectedSkill, companionDisplayName]);
 
@@ -495,8 +683,19 @@ export default function App() {
     return defaultMentorMessage.text;
   }, [activePage, defaultMentorMessage.text]);
 
+  // Per-page document title (tabs, history and search snippets read it).
+  useEffect(() => {
+    const titles = {
+      quests: 'DevQuest · Aprenda programação full-stack com um fox de estimação',
+      arena: 'Arena · DevQuest',
+      guides: 'Grimórios · DevQuest',
+      character: 'Herói & Mascote · DevQuest',
+    };
+    document.title = titles[activePage] ?? titles.quests;
+  }, [activePage]);
+
   return (
-    <div className="dq-app">
+    <div className={`dq-app dq-app--${activePage}`}>
       <div className="dq-shell">
         <Header
           user={userProgress}
@@ -509,10 +708,11 @@ export default function App() {
           soundEnabled={soundEnabled}
           onToggleSound={handleToggleSound}
           isGuestMode={isGuestMode}
+          syncState={syncState}
           onOpenAuth={() => setShowAuthModal(true)}
         />
 
-        <main className="dq-main">
+        <main key={activePage} className="dq-main dq-main--enter">
           {activePage === 'quests' && (
             <QuestsPage
               user={userProgress}
@@ -520,7 +720,9 @@ export default function App() {
               selectedSkill={selectedSkill}
               onSelectSkill={handleSelectSkill}
               onHoverSkill={handleHoverSkill}
+              onLockedSkill={handleLockedSkill}
               quests={questsForSelectedSkill}
+              allQuests={questsWithStatus}
               recommendedQuest={recommendedQuest}
               totalQuests={INITIAL_QUESTS.length}
               onStartQuest={handleOpenQuestInArena}
@@ -528,6 +730,7 @@ export default function App() {
                 setActivePage('character');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
+              onToggleTheme={handleToggleTheme}
               displayStage={displayStage}
               accessoryId={userProgress.accessoryId ?? 'spark'}
               companionName={userProgress.companionName}
@@ -567,6 +770,9 @@ export default function App() {
             <GuidesPage
               guides={INITIAL_GUIDES}
               studiedGuides={userProgress.studiedGuides ?? []}
+              quests={questsWithStatus}
+              skills={skills}
+              focusSkillId={recommendedQuest?.skillId}
               onOpenGuide={setActiveGuide}
               displayStage={displayStage}
               accessoryId={userProgress.accessoryId ?? 'spark'}
@@ -595,6 +801,11 @@ export default function App() {
               onResetSandbox={handleResetSandbox}
               onLogout={handleLogout}
               isGuestMode={isGuestMode}
+              account={account}
+              onOpenAuth={() => setShowAuthModal(true)}
+              onResendVerification={handleResendVerification}
+              onExportData={handleExportData}
+              onDeleteAccount={handleDeleteAccount}
               theme={theme}
               onPet={handlePet}
             />
@@ -656,6 +867,7 @@ export default function App() {
           onClose={() => setShowAuthModal(false)}
           onSignUp={handleSignUp}
           onLogin={handleLogin}
+          onPasswordReset={handlePasswordReset}
           isFirebaseConfigured={isFirebaseConfigured}
         />
       )}
@@ -664,6 +876,9 @@ export default function App() {
         <GuideModal
           guide={activeGuide}
           isStudied={(userProgress.studiedGuides ?? []).includes(activeGuide.id)}
+          quests={questsWithStatus}
+          skills={skills}
+          onPractice={handleOpenQuestInArena}
           displayStage={displayStage}
           accessoryId={userProgress.accessoryId ?? 'spark'}
           companionName={userProgress.companionName}

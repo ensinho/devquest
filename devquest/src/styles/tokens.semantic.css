@@ -1,6 +1,8 @@
 /* ==========================================================================
-   LAYER 2 — SEMANTIC TOKENS (Obsidian Scriptorium Dark & Warm Vellum Light)
-   + Companion-Harmonized Stage Themes (Stage 1 Teal, Stage 2 Ember, Stage 3 Arcane)
+   LAYER 2 — SEMANTIC TOKENS ("Toca": Night Den Dark & Sunny Meadow Light)
+   + Companion Stage Harmonies (Stage 1 Cobalt Spark, Stage 2 Ember Forge,
+     Stage 3 Magenta Arcane). The stage tints the companion, the shell stripe
+     and ambient light; Signal Yellow stays reserved for "your next step".
    RULE: Zero raw hex/rgb/rgba values. Reference only --primitive-* tokens.
    ========================================================================== */
 
@@ -9,210 +11,328 @@
   color-scheme: dark;
 
   /* --- 0-1-2 Tonal Elevation Surfaces --- */
-  --color-bg: var(--primitive-obsidian-900);
-  --color-surface: var(--primitive-obsidian-800);
-  --color-surface-raised: var(--primitive-obsidian-700);
-  --color-surface-sunken: var(--primitive-obsidian-950);
-  --color-surface-glass: var(--primitive-obsidian-glass);
-  --color-node-available-bg: var(--primitive-obsidian-700);
-  --color-node-locked-bg: var(--primitive-obsidian-850);
-  --color-hero-tray-bg: var(--primitive-obsidian-950);
-  --color-hero-tray-ink: var(--primitive-obsidian-100);
-  --color-hero-tray-muted: var(--primitive-obsidian-300);
+  --color-bg: var(--primitive-ink-900);
+  --color-surface: var(--primitive-ink-800);
+  --color-surface-raised: var(--primitive-ink-700);
+  --color-surface-sunken: var(--primitive-ink-950);
+  --color-surface-glass: var(--primitive-ink-glass);
+  --color-node-available-bg: var(--primitive-ink-700);
+  --color-node-locked-bg: var(--primitive-ink-850);
+  --color-hero-tray-bg: var(--primitive-ink-950);
+  --color-hero-tray-ink: var(--primitive-ink-100);
+  --color-hero-tray-muted: var(--primitive-ink-300);
   --color-hero-tray-divider: var(--primitive-white-a14);
-  --color-overlay: var(--primitive-black-a72);
+  --color-overlay: var(--primitive-black-a70);
 
   /* --- Typography / Ink --- */
-  --color-text: var(--primitive-obsidian-100);
-  --color-text-secondary: var(--primitive-obsidian-200);
-  --color-text-muted: var(--primitive-obsidian-300);
-  --color-text-subtle: var(--primitive-obsidian-400);
-  --color-text-inverse: var(--primitive-obsidian-950);
+  --color-text: var(--primitive-ink-100);
+  --color-text-secondary: var(--primitive-ink-200);
+  --color-text-muted: var(--primitive-ink-300);
+  --color-text-subtle: var(--primitive-ink-400);
+  --color-text-inverse: var(--primitive-ink-950);
 
   /* --- Hairlines (sparingly used — never nested!) --- */
   --color-border-subtle: var(--primitive-white-a08);
   --color-border-strong: var(--primitive-white-a14);
   --color-hairline-muted: var(--primitive-white-a04);
 
-  /* --- Default Semantic Accents (Stage 1 Kitsuby Teal Harmony) --- */
-  --color-primary: var(--primitive-teal-400);
-  --color-primary-hover: var(--primitive-teal-300);
-  --color-primary-active: var(--primitive-teal-500);
-  --color-primary-soft: var(--primitive-teal-dark-soft);
-  --color-primary-ink: var(--primitive-obsidian-950);
-  --color-companion-ambient: var(--primitive-teal-dark-soft);
-  --color-companion-hero: var(--primitive-teal-dark-hero);
+  /* --- Signal Yellow: the next step (fill + readable accent ink) --- */
+  --color-primary: var(--primitive-signal-400);
+  --color-primary-hover: var(--primitive-signal-300);
+  --color-primary-active: var(--primitive-signal-500);
+  --color-primary-soft: var(--primitive-signal-a14);
+  --color-primary-ink: var(--primitive-signal-900);
+  --color-primary-fill: var(--primitive-signal-400);
+  --color-primary-fill-hover: var(--primitive-signal-300);
+  --color-primary-edge: var(--primitive-signal-600);
 
-  --color-gold: var(--primitive-gold-400);
-  --color-gold-soft: var(--primitive-gold-dark-soft);
-  --color-gold-ink: var(--primitive-gold-300);
+  /* --- Companion stage harmony (default: Stage 1 Cobalt Spark) --- */
+  --color-stage: var(--primitive-cobalt-400);
+  --color-stage-ink: var(--primitive-cobalt-300);
+  --color-stage-soft: var(--primitive-cobalt-a14);
+  --color-companion-ambient: var(--primitive-cobalt-a14);
+  --color-companion-hero: var(--primitive-cobalt-a26);
 
-  --color-live: var(--primitive-teal-400);
-  --color-live-soft: var(--primitive-teal-dark-soft);
-  --color-live-ink: var(--primitive-teal-300);
+  /* --- Earned (legacy name "gold"): Mint for XP, completed cards, passing --- */
+  --color-gold: var(--primitive-mint-400);
+  --color-gold-soft: var(--primitive-mint-a14);
+  --color-gold-ink: var(--primitive-mint-300);
 
-  --color-ember: var(--primitive-ember-500);
-  --color-ember-soft: var(--primitive-ember-dark-soft);
+  /* --- Live: Cobalt for available / unlocked / active paths --- */
+  --color-live: var(--primitive-cobalt-400);
+  --color-live-soft: var(--primitive-cobalt-a14);
+  --color-live-ink: var(--primitive-cobalt-300);
 
-  --color-danger: var(--primitive-crimson-400);
-  --color-danger-hover: var(--primitive-crimson-500);
-  --color-danger-soft: var(--primitive-crimson-dark-soft);
-  --color-danger-ink: var(--primitive-crimson-300);
+  --color-ember: var(--primitive-ember-400);
+  --color-ember-soft: var(--primitive-ember-a14);
 
-  --color-arcane: var(--primitive-violet-400);
-  --color-arcane-soft: var(--primitive-violet-dark-soft);
-  --color-arcane-ink: var(--primitive-violet-300);
+  --color-danger: var(--primitive-coral-400);
+  --color-danger-hover: var(--primitive-coral-500);
+  --color-danger-soft: var(--primitive-coral-a14);
+  --color-danger-ink: var(--primitive-coral-300);
+
+  --color-arcane: var(--primitive-magenta-400);
+  --color-arcane-soft: var(--primitive-magenta-a14);
+  --color-arcane-ink: var(--primitive-magenta-300);
+
+  /* --- Card world: backs, frames, foil --- */
+  --color-card-back: var(--primitive-ink-850);
+  --color-card-back-line: var(--primitive-white-a08);
+  --color-card-back-mark: var(--primitive-ink-600);
+  --color-card-back-ink: var(--primitive-ink-300);
+  --color-card-face: var(--primitive-ink-750);
+  --color-card-art: var(--primitive-ink-950);
+  --color-foil-1: var(--primitive-foil-mint);
+  --color-foil-2: var(--primitive-foil-cobalt);
+  --color-foil-3: var(--primitive-foil-magenta);
+  --color-foil-4: var(--primitive-foil-signal);
+  --color-foil-clear: var(--primitive-foil-clear);
+  --color-foil-sheen: var(--primitive-white-a24);
+
+
+  /* --- Habitat scene (night) --- */
+  --scene-sky-top: var(--primitive-sky-night-top);
+  --scene-sky-bottom: var(--primitive-sky-night-bottom);
+  --scene-hill: var(--primitive-hill-night);
+  --scene-hill-shade: var(--primitive-hill-night-shade);
+  --scene-grass: var(--primitive-grass-night);
+  --scene-den: var(--primitive-den-night);
+  --scene-den-rim: var(--primitive-den-rim-night);
+  --scene-cloud: var(--primitive-cloud-night);
+  --scene-light: var(--primitive-moon);
+  --scene-light-rim: var(--primitive-moon-crater);
+  --scene-star: var(--primitive-star);
+  --scene-firefly: var(--primitive-firefly);
+  --scene-flower-a: var(--primitive-flower-a);
+  --scene-flower-b: var(--primitive-flower-b);
+  --scene-cookie: var(--primitive-cookie);
+  --scene-cookie-chip: var(--primitive-cookie-chip);
+  --scene-heart: var(--primitive-heart);
+  --scene-ink: var(--primitive-ink-100);
 
   /* --- Depth & Focus --- */
-  --shadow-sm: 0 2px 8px var(--primitive-black-a35);
-  --shadow-md: 0 10px 28px var(--primitive-black-a55);
-  --shadow-lg: 0 20px 48px var(--primitive-black-a72);
-  --focus-ring: 0 0 0 2px var(--color-bg), 0 0 0 4px var(--color-primary);
+  --shadow-sm: 0 2px 8px var(--primitive-black-a30);
+  --shadow-md: 0 10px 28px var(--primitive-black-a50);
+  --shadow-lg: 0 22px 52px var(--primitive-black-a70);
+  --shadow-card: 0 1px 0 var(--primitive-white-a08) inset, 0 8px 22px var(--primitive-black-a50);
+  --focus-ring: 0 0 0 2px var(--color-bg), 0 0 0 4px var(--primitive-signal-400);
 
   /* --- Lexical Syntax Highlighting (Dark) --- */
-  --syntax-keyword: var(--primitive-violet-300);
-  --syntax-tag: var(--primitive-crimson-300);
+  --syntax-keyword: var(--primitive-magenta-300);
+  --syntax-tag: var(--primitive-coral-300);
   --syntax-attr: var(--primitive-ember-300);
-  --syntax-string: var(--primitive-teal-300);
-  --syntax-number: var(--primitive-gold-300);
-  --syntax-function: var(--primitive-sky-300);
-  --syntax-comment: var(--primitive-obsidian-400);
-  --syntax-punct: var(--primitive-obsidian-300);
+  --syntax-string: var(--primitive-mint-300);
+  --syntax-number: var(--primitive-signal-300);
+  --syntax-function: var(--primitive-cobalt-300);
+  --syntax-comment: var(--primitive-ink-400);
+  --syntax-punct: var(--primitive-ink-300);
 }
 
-/* --- Companion Stage Theme Synchronization (Dark Mode) --- */
+/* --- Companion Stage Harmony (Dark Mode) --- */
 [data-theme='dark'][data-companion-stage='1'] {
-  --color-primary: var(--primitive-teal-400);
-  --color-primary-hover: var(--primitive-teal-300);
-  --color-primary-active: var(--primitive-teal-500);
-  --color-primary-soft: var(--primitive-teal-dark-soft);
-  --color-primary-ink: var(--primitive-obsidian-950);
-  --color-companion-ambient: var(--primitive-teal-dark-soft);
-  --color-companion-hero: var(--primitive-teal-dark-hero);
+  --color-stage: var(--primitive-cobalt-400);
+  --color-stage-ink: var(--primitive-cobalt-300);
+  --color-stage-soft: var(--primitive-cobalt-a14);
+  --color-companion-ambient: var(--primitive-cobalt-a14);
+  --color-companion-hero: var(--primitive-cobalt-a26);
 }
 
 [data-theme='dark'][data-companion-stage='2'] {
-  --color-primary: var(--primitive-ember-500);
-  --color-primary-hover: var(--primitive-ember-400);
-  --color-primary-active: var(--primitive-ember-600);
-  --color-primary-soft: var(--primitive-ember-dark-soft);
-  --color-primary-ink: var(--primitive-obsidian-950);
-  --color-companion-ambient: var(--primitive-ember-dark-soft);
-  --color-companion-hero: var(--primitive-ember-dark-hero);
+  --color-stage: var(--primitive-ember-400);
+  --color-stage-ink: var(--primitive-ember-300);
+  --color-stage-soft: var(--primitive-ember-a14);
+  --color-companion-ambient: var(--primitive-ember-a14);
+  --color-companion-hero: var(--primitive-ember-a26);
 }
 
 [data-theme='dark'][data-companion-stage='3'] {
-  --color-primary: var(--primitive-violet-400);
-  --color-primary-hover: var(--primitive-violet-300);
-  --color-primary-active: var(--primitive-violet-600);
-  --color-primary-soft: var(--primitive-violet-dark-soft);
-  --color-primary-ink: var(--primitive-obsidian-950);
-  --color-companion-ambient: var(--primitive-violet-dark-soft);
-  --color-companion-hero: var(--primitive-violet-dark-hero);
+  --color-stage: var(--primitive-magenta-400);
+  --color-stage-ink: var(--primitive-magenta-300);
+  --color-stage-soft: var(--primitive-magenta-a14);
+  --color-companion-ambient: var(--primitive-magenta-a14);
+  --color-companion-hero: var(--primitive-magenta-a26);
 }
 
 [data-theme='light'] {
   color-scheme: light;
 
-  /* --- 0-1-2 Tonal Elevation Surfaces (Warm Vellum) --- */
-  --color-bg: var(--primitive-vellum-100);
-  --color-surface: var(--primitive-vellum-50);
-  --color-surface-raised: var(--primitive-vellum-200);
-  --color-surface-sunken: var(--primitive-vellum-300);
-  --color-surface-glass: var(--primitive-vellum-glass);
-  --color-node-available-bg: var(--primitive-vellum-50);
-  --color-node-locked-bg: var(--primitive-vellum-100);
-  --color-hero-tray-bg: var(--primitive-vellum-900);
-  --color-hero-tray-ink: var(--primitive-vellum-50);
-  --color-hero-tray-muted: var(--primitive-vellum-300);
+  /* --- 0-1-2 Tonal Elevation Surfaces (Card Stock) --- */
+  --color-bg: var(--primitive-paper-100);
+  --color-surface: var(--primitive-paper-0);
+  --color-surface-raised: var(--primitive-paper-50);
+  --color-surface-sunken: var(--primitive-paper-200);
+  --color-surface-glass: var(--primitive-paper-glass);
+  --color-node-available-bg: var(--primitive-paper-0);
+  --color-node-locked-bg: var(--primitive-paper-200);
+  --color-hero-tray-bg: var(--primitive-paper-900);
+  --color-hero-tray-ink: var(--primitive-paper-50);
+  --color-hero-tray-muted: var(--primitive-paper-300);
   --color-hero-tray-divider: var(--primitive-white-a14);
-  --color-overlay: var(--primitive-vellum-overlay);
+  --color-overlay: var(--primitive-paper-overlay);
 
   /* --- Typography / Ink --- */
-  --color-text: var(--primitive-vellum-900);
-  --color-text-secondary: var(--primitive-vellum-700);
-  --color-text-muted: var(--primitive-vellum-600);
-  --color-text-subtle: var(--primitive-vellum-500);
-  --color-text-inverse: var(--primitive-vellum-50);
+  --color-text: var(--primitive-paper-900);
+  --color-text-secondary: var(--primitive-paper-700);
+  --color-text-muted: var(--primitive-paper-600);
+  --color-text-subtle: var(--primitive-paper-500);
+  --color-text-inverse: var(--primitive-paper-0);
 
   /* --- Hairlines --- */
-  --color-border-subtle: var(--primitive-ink-a06);
-  --color-border-strong: var(--primitive-ink-a18);
-  --color-hairline-muted: var(--primitive-ink-a06);
+  --color-border-subtle: var(--primitive-inkline-a10);
+  --color-border-strong: var(--primitive-inkline-a24);
+  --color-hairline-muted: var(--primitive-inkline-a06);
 
-  /* --- Default Semantic Accents (Stage 1 Kitsuby Teal Harmony, AA/AAA on Warm Vellum) --- */
-  --color-primary: var(--primitive-teal-700);
-  --color-primary-hover: var(--primitive-teal-800);
-  --color-primary-active: var(--primitive-teal-800);
-  --color-primary-soft: var(--primitive-teal-light-soft);
-  --color-primary-ink: var(--primitive-vellum-50);
-  --color-companion-ambient: var(--primitive-teal-light-soft);
-  --color-companion-hero: var(--primitive-teal-light-hero);
+  /* --- Signal Yellow: fill stays yellow; text accent deepens for AA --- */
+  --color-primary: var(--primitive-signal-800);
+  --color-primary-hover: var(--primitive-signal-900);
+  --color-primary-active: var(--primitive-signal-900);
+  --color-primary-soft: var(--primitive-signal-deep-a12);
+  --color-primary-ink: var(--primitive-signal-900);
+  --color-primary-fill: var(--primitive-signal-400);
+  --color-primary-fill-hover: var(--primitive-signal-500);
+  --color-primary-edge: var(--primitive-signal-600);
 
-  --color-gold: var(--primitive-gold-700);
-  --color-gold-soft: var(--primitive-gold-light-soft);
-  --color-gold-ink: var(--primitive-gold-800);
+  /* --- Companion stage harmony (default: Stage 1 Cobalt Spark) --- */
+  --color-stage: var(--primitive-cobalt-600);
+  --color-stage-ink: var(--primitive-cobalt-700);
+  --color-stage-soft: var(--primitive-cobalt-deep-a10);
+  --color-companion-ambient: var(--primitive-cobalt-deep-a10);
+  --color-companion-hero: var(--primitive-cobalt-deep-a18);
 
-  --color-live: var(--primitive-teal-700);
-  --color-live-soft: var(--primitive-teal-light-soft);
-  --color-live-ink: var(--primitive-teal-800);
+  --color-gold: var(--primitive-mint-700);
+  --color-gold-soft: var(--primitive-mint-deep-a10);
+  --color-gold-ink: var(--primitive-mint-800);
+
+  --color-live: var(--primitive-cobalt-700);
+  --color-live-soft: var(--primitive-cobalt-deep-a10);
+  --color-live-ink: var(--primitive-cobalt-800);
 
   --color-ember: var(--primitive-ember-700);
-  --color-ember-soft: var(--primitive-ember-light-soft);
+  --color-ember-soft: var(--primitive-ember-deep-a10);
 
-  --color-danger: var(--primitive-crimson-700);
-  --color-danger-hover: var(--primitive-crimson-800);
-  --color-danger-soft: var(--primitive-crimson-light-soft);
-  --color-danger-ink: var(--primitive-crimson-800);
+  --color-danger: var(--primitive-coral-700);
+  --color-danger-hover: var(--primitive-coral-800);
+  --color-danger-soft: var(--primitive-coral-deep-a10);
+  --color-danger-ink: var(--primitive-coral-800);
 
-  --color-arcane: var(--primitive-violet-700);
-  --color-arcane-soft: var(--primitive-violet-light-soft);
-  --color-arcane-ink: var(--primitive-violet-700);
+  --color-arcane: var(--primitive-magenta-700);
+  --color-arcane-soft: var(--primitive-magenta-deep-a10);
+  --color-arcane-ink: var(--primitive-magenta-800);
+
+  /* --- Card world --- */
+  --color-card-back: var(--primitive-paper-900);
+  --color-card-back-line: var(--primitive-white-a08);
+  --color-card-back-mark: var(--primitive-paper-600);
+  --color-card-back-ink: var(--primitive-paper-300);
+  --color-card-face: var(--primitive-paper-0);
+  --color-card-art: var(--primitive-paper-200);
+  --color-foil-1: var(--primitive-foil-mint);
+  --color-foil-2: var(--primitive-foil-cobalt);
+  --color-foil-3: var(--primitive-foil-magenta);
+  --color-foil-4: var(--primitive-foil-signal);
+  --color-foil-clear: var(--primitive-foil-clear);
+  --color-foil-sheen: var(--primitive-white-a55);
+
+
+  /* --- Habitat scene (day) --- */
+  --scene-sky-top: var(--primitive-sky-day-top);
+  --scene-sky-bottom: var(--primitive-sky-day-bottom);
+  --scene-hill: var(--primitive-hill-day);
+  --scene-hill-shade: var(--primitive-hill-day-shade);
+  --scene-grass: var(--primitive-grass-day);
+  --scene-den: var(--primitive-den-day);
+  --scene-den-rim: var(--primitive-den-rim-day);
+  --scene-cloud: var(--primitive-cloud-day);
+  --scene-light: var(--primitive-sun);
+  --scene-light-rim: var(--primitive-sun-rim);
+  --scene-star: var(--primitive-star);
+  --scene-firefly: var(--primitive-firefly);
+  --scene-flower-a: var(--primitive-flower-a);
+  --scene-flower-b: var(--primitive-flower-b);
+  --scene-cookie: var(--primitive-cookie);
+  --scene-cookie-chip: var(--primitive-cookie-chip);
+  --scene-heart: var(--primitive-heart);
+  --scene-ink: var(--primitive-paper-900);
 
   /* --- Depth & Focus --- */
-  --shadow-sm: 0 2px 6px var(--primitive-ink-a06);
-  --shadow-md: 0 10px 24px var(--primitive-ink-a12);
-  --shadow-lg: 0 18px 40px var(--primitive-ink-a18);
-  --focus-ring: 0 0 0 2px var(--color-bg), 0 0 0 4px var(--color-primary);
+  --shadow-sm: 0 1px 3px var(--primitive-inkline-a10);
+  --shadow-md: 0 8px 22px var(--primitive-inkline-a10);
+  --shadow-lg: 0 18px 44px var(--primitive-inkline-a16);
+  --shadow-card: 0 0 0 1px var(--primitive-inkline-a06), 0 6px 18px var(--primitive-inkline-a10);
+  --focus-ring: 0 0 0 2px var(--color-bg), 0 0 0 4px var(--primitive-paper-900);
 
-  /* --- Lexical Syntax Highlighting (Warm Vellum Light, AA/AAA) --- */
-  --syntax-keyword: var(--primitive-violet-700);
-  --syntax-tag: var(--primitive-crimson-700);
+  /* --- Lexical Syntax Highlighting (Card Stock Light, AA) --- */
+  --syntax-keyword: var(--primitive-magenta-700);
+  --syntax-tag: var(--primitive-coral-700);
   --syntax-attr: var(--primitive-ember-700);
-  --syntax-string: var(--primitive-teal-700);
-  --syntax-number: var(--primitive-gold-700);
-  --syntax-function: var(--primitive-sky-700);
-  --syntax-comment: var(--primitive-vellum-500);
-  --syntax-punct: var(--primitive-vellum-600);
+  --syntax-string: var(--primitive-mint-700);
+  --syntax-number: var(--primitive-signal-800);
+  --syntax-function: var(--primitive-cobalt-700);
+  --syntax-comment: var(--primitive-paper-500);
+  --syntax-punct: var(--primitive-paper-600);
 }
 
-/* --- Companion Stage Theme Synchronization (Light Mode) --- */
+/* --- Companion Stage Harmony (Light Mode) --- */
 [data-theme='light'][data-companion-stage='1'] {
-  --color-primary: var(--primitive-teal-700);
-  --color-primary-hover: var(--primitive-teal-800);
-  --color-primary-active: var(--primitive-teal-800);
-  --color-primary-soft: var(--primitive-teal-light-soft);
-  --color-primary-ink: var(--primitive-vellum-50);
-  --color-companion-ambient: var(--primitive-teal-light-soft);
-  --color-companion-hero: var(--primitive-teal-light-hero);
+  --color-stage: var(--primitive-cobalt-600);
+  --color-stage-ink: var(--primitive-cobalt-700);
+  --color-stage-soft: var(--primitive-cobalt-deep-a10);
+  --color-companion-ambient: var(--primitive-cobalt-deep-a10);
+  --color-companion-hero: var(--primitive-cobalt-deep-a18);
 }
 
 [data-theme='light'][data-companion-stage='2'] {
-  --color-primary: var(--primitive-ember-700);
-  --color-primary-hover: var(--primitive-ember-800);
-  --color-primary-active: var(--primitive-ember-800);
-  --color-primary-soft: var(--primitive-ember-light-soft);
-  --color-primary-ink: var(--primitive-vellum-50);
-  --color-companion-ambient: var(--primitive-ember-light-soft);
-  --color-companion-hero: var(--primitive-ember-light-hero);
+  --color-stage: var(--primitive-ember-500);
+  --color-stage-ink: var(--primitive-ember-700);
+  --color-stage-soft: var(--primitive-ember-deep-a10);
+  --color-companion-ambient: var(--primitive-ember-deep-a10);
+  --color-companion-hero: var(--primitive-ember-deep-a18);
 }
 
 [data-theme='light'][data-companion-stage='3'] {
-  --color-primary: var(--primitive-violet-700);
-  --color-primary-hover: var(--primitive-violet-600);
-  --color-primary-active: var(--primitive-violet-700);
-  --color-primary-soft: var(--primitive-violet-light-soft);
-  --color-primary-ink: var(--primitive-vellum-50);
-  --color-companion-ambient: var(--primitive-violet-light-soft);
-  --color-companion-hero: var(--primitive-violet-light-hero);
+  --color-stage: var(--primitive-magenta-500);
+  --color-stage-ink: var(--primitive-magenta-700);
+  --color-stage-soft: var(--primitive-magenta-deep-a10);
+  --color-companion-ambient: var(--primitive-magenta-deep-a10);
+  --color-companion-hero: var(--primitive-magenta-deep-a18);
+}
+
+/* --- Companion Sprite Palettes (characters keep their colours in both themes) --- */
+:root {
+  /* Stage 1 · Kitsuby — cobalt spark kit */
+  --pixel-s1-outline: var(--primitive-px-s1-outline);
+  --pixel-s1-shade: var(--primitive-cobalt-700);
+  --pixel-s1-body: var(--primitive-cobalt-500);
+  --pixel-s1-light: var(--primitive-cobalt-300);
+  --pixel-s1-belly: var(--primitive-px-snow);
+  --pixel-s1-eye: var(--primitive-px-night);
+  --pixel-s1-shine: var(--primitive-px-white);
+  --pixel-s1-blush: var(--primitive-magenta-400);
+  --pixel-s1-accent: var(--primitive-signal-400);
+  --pixel-s1-accent2: var(--primitive-signal-200);
+
+  /* Stage 2 · Pyrokit — ember forge fox */
+  --pixel-s2-outline: var(--primitive-px-s2-outline);
+  --pixel-s2-shade: var(--primitive-ember-700);
+  --pixel-s2-body: var(--primitive-ember-500);
+  --pixel-s2-light: var(--primitive-ember-300);
+  --pixel-s2-belly: var(--primitive-px-cream);
+  --pixel-s2-eye: var(--primitive-px-night);
+  --pixel-s2-shine: var(--primitive-px-white);
+  --pixel-s2-blush: var(--primitive-coral-400);
+  --pixel-s2-accent: var(--primitive-signal-400);
+  --pixel-s2-accent2: var(--primitive-coral-500);
+
+  /* Stage 3 · Archkits — arcane grand master */
+  --pixel-s3-outline: var(--primitive-px-s3-outline);
+  --pixel-s3-shade: var(--primitive-magenta-700);
+  --pixel-s3-body: var(--primitive-magenta-500);
+  --pixel-s3-light: var(--primitive-magenta-300);
+  --pixel-s3-belly: var(--primitive-px-snow);
+  --pixel-s3-eye: var(--primitive-px-night);
+  --pixel-s3-shine: var(--primitive-px-white);
+  --pixel-s3-blush: var(--primitive-coral-300);
+  --pixel-s3-accent: var(--primitive-px-s3-hat);
+  --pixel-s3-accent2: var(--primitive-signal-400);
+  --pixel-s3-hat-light: var(--primitive-px-s3-hat-light);
 }

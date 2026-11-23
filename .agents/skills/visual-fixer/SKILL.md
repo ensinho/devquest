@@ -26,7 +26,7 @@ Before completing any UI change, capture and **visually inspect** all 3 baseline
 | Target | Viewport | Theme Attribute | Key Checks |
 | :--- | :--- | :--- | :--- |
 | **Desktop Dark** | `1440×900` | `data-theme="dark"` | Visual hierarchy, 0-1-2 elevation, zero nested borders, 1 primary CTA, balanced 2-column density |
-| **Desktop Light** | `1440×900` | `data-theme="light"` | Warm Vellum legibility, AA/AAA contrast on muted text, SVG paths visible, shadows not muddy |
+| **Desktop Light** | `1440×900` | `data-theme="light"` | Dia na Toca legibility, AA/AAA contrast on muted text, SVG paths visible, shadows not muddy |
 | **Mobile** | `390×844` | `dark` (and `light` on layout changes) | Zero horizontal scroll (`scrollWidth <= innerWidth`), `>=44px` tap targets, readable `>=16px` inputs, Companion Camp & Skill Map usable |
 
 ---

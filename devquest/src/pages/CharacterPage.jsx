@@ -1,13 +1,18 @@
 import React, { useState } from 'react';
 import {
-  RotateCcw,
-  LogOut,
   Heart,
   Sparkles,
   Lock,
   User,
   SlidersHorizontal,
+  Circle,
+  Code2,
+  Ribbon,
+  Orbit,
+  Crown,
 } from 'lucide-react';
+import SigilIcon from '../components/SigilIcon.jsx';
+import AccountPanel from '../components/AccountPanel.jsx';
 import CompanionAvatar from '../components/companion/CompanionAvatar.jsx';
 import XPBar from '../components/XPBar.jsx';
 import {
@@ -26,10 +31,19 @@ const MOOD_TESTS = [
   { id: 'blocked', label: 'Alerta', state: 'blocked', mood: 'neutral' },
 ];
 
+const ACCESSORY_ICONS = {
+  none: Circle,
+  spark: Code2,
+  scarf: Ribbon,
+  glasses: Orbit,
+  crown: Crown,
+  stars: Sparkles,
+};
+
 const PANEL_TABS = [
   { id: 'companion', label: 'Mascote', icon: Sparkles },
   { id: 'hero', label: 'Herói', icon: User },
-  { id: 'session', label: 'Sessão', icon: SlidersHorizontal },
+  { id: 'session', label: 'Conta', icon: SlidersHorizontal },
 ];
 
 export default function CharacterPage({
@@ -50,6 +64,11 @@ export default function CharacterPage({
   onResetSandbox,
   onLogout,
   isGuestMode,
+  account,
+  onOpenAuth,
+  onResendVerification,
+  onExportData,
+  onDeleteAccount,
   theme,
   onPet,
 }) {
@@ -64,21 +83,17 @@ export default function CharacterPage({
     <div className="dq-page-stack">
       <div className="dq-character-grid">
         {/* Left: Focused Visual Altar */}
-        <section className="dq-altar-panel" aria-label="Altar Evolutivo do Mascote">
-          <div className="dq-section-header">
-            <div>
-              <span className="dq-eyebrow">
-                <Sparkles size={13} aria-hidden="true" />
-                {stageData.realmName}
-              </span>
-              <h1 className="dq-h1">
-                {displayName} — {stageData.title}
-              </h1>
-            </div>
-            <span className={`dq-badge ${stageData.badgeClass}`}>
-              Estágio {stageData.stage} / 3
-            </span>
+        <section className="dq-altar-panel" aria-labelledby="altar-title">
+          <div className="dq-ccard-plate dq-altar-plate">
+            <h1 id="altar-title" className="dq-ccard-name">
+              {displayName}
+            </h1>
+            <span className="dq-ccard-stage dq-tabular">{stageData.stage}/3</span>
           </div>
+          <p className="dq-ccard-type">
+            <Sparkles size={13} aria-hidden="true" />
+            {stageData.title} · {stageData.realmName}
+          </p>
 
           <div className="dq-altar-stage">
             <CompanionAvatar
@@ -109,7 +124,7 @@ export default function CharacterPage({
             </div>
           </div>
 
-          <button type="button" className="dq-btn dq-btn-primary" onClick={onPet}>
+          <button type="button" className="dq-btn dq-btn-secondary" onClick={onPet}>
             <Heart size={16} aria-hidden="true" />
             <span>Celebrar com {displayName}</span>
           </button>
@@ -141,7 +156,7 @@ export default function CharacterPage({
             {activeTab === 'companion' && (
               <div className="dq-char-tab-pane" role="tabpanel" aria-label="Personalizar Mascote">
                 <label className="dq-field">
-                  <span>Apelido do Mascote (opcional)</span>
+                  <span>Apelido do mascote (opcional)</span>
                   <input
                     type="text"
                     value={user.companionName ?? ''}
@@ -153,7 +168,7 @@ export default function CharacterPage({
                 </label>
 
                 <div>
-                  <span className="dq-micro-label">Evolução &amp; Tema Harmonizado</span>
+                  <span className="dq-micro-label">Formas (a cor do app acompanha)</span>
                   <div className="dq-pill-group">
                     {COMPANION_STAGES.map((s) => (
                       <button
@@ -187,10 +202,11 @@ export default function CharacterPage({
                           title={acc.description}
                           className={`dq-stage-pill ${accessoryId === acc.id ? 'is-active' : ''}`}
                         >
-                          <span aria-hidden="true">
-                            {unlocked ? acc.symbol : <Lock size={11} />}
-                          </span>{' '}
-                          {acc.label}
+                          {(() => {
+                            const AccIcon = unlocked ? ACCESSORY_ICONS[acc.id] ?? Sparkles : Lock;
+                            return <AccIcon size={13} aria-hidden="true" />;
+                          })()}
+                          <span>{acc.label.replace(' </ >', '')}</span>
                         </button>
                       );
                     })}
@@ -203,7 +219,7 @@ export default function CharacterPage({
               <div className="dq-char-tab-pane" role="tabpanel" aria-label="Perfil do Herói">
                 <div className="dq-guild-card-head">
                   <span className="dq-sigil-badge" aria-hidden="true">
-                    {activeSigil.glyph}
+                    <SigilIcon id={activeSigil.id} size={26} />
                   </span>
                   <div>
                     <span className="dq-badge dq-badge-gold dq-tabular">Nível {user.level}</span>
@@ -230,17 +246,17 @@ export default function CharacterPage({
                 </div>
 
                 <div className="dq-guild-xp">
-                  <div className="dq-header-xp-top dq-tabular">
-                    <span className="dq-muted-xs">Progresso do Nível</span>
+                  <div className="dq-guild-xp-top dq-tabular">
+                    <span className="dq-muted-xs">Progresso do nível</span>
                     <span className="dq-xp-numbers">
-                      {user.currentXp} / {user.nextLevelXp} XP
+                      {user.currentXp} <span className="dq-xp-of">/ {user.nextLevelXp} XP</span>
                     </span>
                   </div>
                   <XPBar currentXp={user.currentXp} nextLevelXp={user.nextLevelXp} />
                 </div>
 
                 <label className="dq-field">
-                  <span>Nome na Guilda</span>
+                  <span>Nome na carta</span>
                   <input
                     type="text"
                     value={user.name}
@@ -251,7 +267,7 @@ export default function CharacterPage({
                 </label>
 
                 <div>
-                  <span className="dq-micro-label">Selo da Classe</span>
+                  <span className="dq-micro-label">Classe</span>
                   <div className="dq-sigil-grid" role="group" aria-label="Escolher selo de classe">
                     {HERO_SIGILS.map((sigil) => (
                       <button
@@ -262,7 +278,7 @@ export default function CharacterPage({
                         className={`dq-sigil-option ${user.avatarId === sigil.id ? 'is-selected' : ''}`}
                       >
                         <span className="dq-sigil-glyph" aria-hidden="true">
-                          {sigil.glyph}
+                          <SigilIcon id={sigil.id} size={18} />
                         </span>
                         <span className="dq-sigil-name">{sigil.role}</span>
                       </button>
@@ -273,11 +289,11 @@ export default function CharacterPage({
             )}
 
             {activeTab === 'session' && (
-              <div className="dq-char-tab-pane" role="tabpanel" aria-label="Preferências de Sessão">
+              <div className="dq-char-tab-pane" role="tabpanel" aria-label="Conta e sessão">
                 <div className="dq-session-card">
-                  <h2 className="dq-h3">Tour de Introdução</h2>
+                  <h2 className="dq-h3">Introdução</h2>
                   <p className="dq-muted-text">
-                    Reveja a apresentação interativa de {displayName} e a Primeira Centelha a qualquer momento.
+                    Reveja a abertura do pacote e a primeira carta com {displayName}.
                   </p>
                   <button
                     type="button"
@@ -285,39 +301,20 @@ export default function CharacterPage({
                     className="dq-btn dq-btn-secondary"
                   >
                     <Sparkles size={15} aria-hidden="true" />
-                    <span>Rever Onboarding</span>
+                    <span>Abrir o pacote de novo</span>
                   </button>
                 </div>
 
-                <div className="dq-session-card">
-                  <h2 className="dq-h3">
-                    {isGuestMode ? 'Progresso Local (Sandbox)' : 'Conta Conectada'}
-                  </h2>
-                  <p className="dq-muted-text">
-                    {isGuestMode
-                      ? 'Seu progresso fica salvo automaticamente neste navegador. Reinicie apenas se quiser começar do nível 1.'
-                      : 'Encerre sua sessão atual para voltar ao modo Sandbox local.'}
-                  </p>
-                  {isGuestMode ? (
-                    <button
-                      type="button"
-                      onClick={onResetSandbox}
-                      className="dq-btn dq-btn-danger"
-                    >
-                      <RotateCcw size={15} aria-hidden="true" />
-                      <span>Reiniciar Progresso Local</span>
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={onLogout}
-                      className="dq-btn dq-btn-danger"
-                    >
-                      <LogOut size={15} aria-hidden="true" />
-                      <span>Sair da Conta</span>
-                    </button>
-                  )}
-                </div>
+                <AccountPanel
+                  isGuestMode={isGuestMode}
+                  account={account}
+                  onOpenAuth={onOpenAuth}
+                  onResetSandbox={onResetSandbox}
+                  onLogout={onLogout}
+                  onResendVerification={onResendVerification}
+                  onExportData={onExportData}
+                  onDeleteAccount={onDeleteAccount}
+                />
               </div>
             )}
           </div>

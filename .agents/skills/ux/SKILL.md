@@ -26,7 +26,7 @@ Every core workflow must be 100% operable without a mouse:
 ---
 
 ## 3. Accessibility (A11y — Non-Negotiable)
-- **Contrast:** Minimum WCAG AA (`4.5:1` body, `3:1` large text/UI icons) in **both** Dark (*Obsidian Scriptorium*) and Light (*Warm Vellum*) modes. Target AAA (`>= 7:1`) for primary body text.
+- **Contrast:** Minimum WCAG AA (`4.5:1` body, `3:1` large text/UI icons) in **both** Dark (*Noite na Toca*) and Light (*Dia na Toca*) modes. Target AAA (`>= 7:1`) for primary body text.
 - **Semantic HTML:**
   - Use `<header>`, `<nav>`, `<main>`, `<aside>`, `<section>`, `<button>`, `<dialog>`/`role="dialog"`.
   - **Zero `<div onClick>` or `<span onClick>`** — interactive elements must be native `<button>` or `<a href>`.
@@ -47,7 +47,7 @@ Every core workflow must be 100% operable without a mouse:
 ---
 
 ## 5. Performance & Public Web Readiness
-- Preconnect/self-host typography (`Fraunces`, `Plus Jakarta Sans`, `JetBrains Mono`) with `display=swap`.
+- Preconnect/self-host typography (`Fredoka`, `Nunito`, `JetBrains Mono`) with `display=swap`.
 - Lazy-load heavy modals or guide views where appropriate; set `loading="lazy"` and `decoding="async"` on secondary images.
 - Keep `main.jsx` free of external CDN scripts (no `cdn.tailwindcss.com`, no third-party hotlinked textures/Pinterest avatars in production).
 - Include proper `<title>`, `<meta name="description">`, theme-color, and Open Graph (`og:title`, `og:description`, `og:image` `1200×630`) metadata for clean portfolio link previews.

@@ -1,147 +1,78 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { mountAvatar } from 'open-bot-avatar/dom';
+import React, { useState } from 'react';
+import PixelCompanion from './PixelCompanion.jsx';
+import BlobCompanion from './BlobCompanion.jsx';
 import { getCompanionStageData } from '../../data/companionAvatars.js';
-import { resolveTokenHex } from '../../utils/theme.js';
 
-export default function CompanionAvatar({
-  stage = 1,
-  state = 'idle',
-  mood = 'neutral',
-  theme = 'dark',
-  variant = 'camp',
-  accessoryId = 'spark',
-  companionName = '',
-  followPointer = true,
-  interactive = false,
-  onPet,
-  className = '',
-}) {
-  const hostRef = useRef(null);
-  const instanceRef = useRef(null);
-  const [petBurst, setPetBurst] = useState(false);
+const PIXEL_SIZES = { mini: 40, dock: 72, modal: 112, camp: 144, altar: 176, habitat: 168 };
+const USE_BLOB =
+  typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('mascot') === 'blob';
+
+/**
+ * The companion everywhere in the app. Renders the hand-drawn pixel fox
+ * (the blob from v1 stays reachable with ?mascot=blob for comparison).
+ */
+export default function CompanionAvatar(props) {
+  const {
+    stage = 1,
+    state = 'idle',
+    mood = 'neutral',
+    variant = 'camp',
+    accessoryId = 'spark',
+    companionName = '',
+    followPointer = true,
+    interactive = false,
+    onPet,
+    size,
+    className = '',
+  } = props;
+  const [petBurst, setPetBurst] = useState(0);
+
+  if (USE_BLOB) return <BlobCompanion {...props} />;
 
   const stageData = getCompanionStageData(stage);
   const displayName = companionName?.trim() || stageData.name;
-  const pixelSize = stageData.sizePx[variant] ?? 104;
-  const effectiveMood = petBurst ? 'happy' : mood;
-  const effectiveState = petBurst ? 'done' : state;
+  const pixelSize = size ?? PIXEL_SIZES[variant] ?? 120;
+  const isPetted = petBurst > 0;
 
-  useEffect(() => {
-    const host = hostRef.current;
-    if (!host) return undefined;
-
-    const color = resolveTokenHex(stageData.colorToken, '#2dd4bf');
-    const eyeColor = resolveTokenHex(stageData.eyeColorToken, '#0e1116');
-
-    const mounted = mountAvatar(host, {
-      definition: stageData.definition,
-      color,
-      eyeColor,
-      depth: stageData.depth,
-      state: effectiveState,
-      mood: effectiveMood,
-      followPointer,
-      label: `${displayName} — ${stageData.title}`,
-    });
-
-    instanceRef.current = mounted;
-
-    return () => {
-      mounted.destroy();
-      instanceRef.current = null;
-    };
-    // Remount cleanly when definition/stage changes to recalculate volumetric geometry
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stageData.id]);
-
-  useEffect(() => {
-    const mounted = instanceRef.current;
-    if (!mounted) return;
-
-    const color = resolveTokenHex(stageData.colorToken, '#2dd4bf');
-    const eyeColor = resolveTokenHex(stageData.eyeColorToken, '#0e1116');
-
-    mounted.update({
-      color,
-      eyeColor,
-      depth: stageData.depth,
-      state: effectiveState,
-      mood: effectiveMood,
-      followPointer,
-      label: `${displayName} — ${stageData.title}`,
-    });
-  }, [
-    theme,
-    stageData.colorToken,
-    stageData.eyeColorToken,
-    stageData.depth,
-    stageData.title,
-    displayName,
-    effectiveState,
-    effectiveMood,
-    followPointer,
-  ]);
-
-  const handlePet = () => {
-    if (!interactive) return;
-    setPetBurst(true);
-    if (onPet) onPet();
-    window.setTimeout(() => setPetBurst(false), 1400);
-  };
-
-  const showAccessories = variant !== 'mini';
-  const showFloorShadow = variant === 'camp' || variant === 'altar';
-
-  const inner = (
-    <span
-      className={`dq-avatar-frame dq-avatar-stage-${stage} ${petBurst ? 'is-petted' : ''} ${className}`}
-      style={{ '--avatar-size': `${pixelSize}px` }}
-    >
-      <span className="dq-avatar-aura" aria-hidden="true" />
-      {showFloorShadow && <span className="dq-avatar-floor-shadow" aria-hidden="true" />}
-      {showAccessories && accessoryId === 'glasses' && <span className="dq-acc-orbit" aria-hidden="true" />}
-      {showAccessories && accessoryId === 'crown' && (
-        <span className="dq-acc-crown" aria-hidden="true" title="Coroa Relíquia">
-          ♛
-        </span>
-      )}
-      {showAccessories && accessoryId === 'spark' && (
-        <span className="dq-acc-spark" aria-hidden="true">
-          &lt;/&gt;
-        </span>
-      )}
-      {showAccessories && accessoryId === 'scarf' && (
-        <span className="dq-acc-scarf" aria-hidden="true" title="Lenço da Guilda">
-          ❖
-        </span>
-      )}
-      {showAccessories && accessoryId === 'stars' && (
-        <span className="dq-acc-stars" aria-hidden="true" title="Halo Estelar">
-          ✦ ✧
-        </span>
-      )}
-      <span ref={hostRef} className="dq-avatar-host" />
-      {petBurst && (
-        <span className="dq-pet-hearts" aria-hidden="true">
-          ✦ ♥
+  const sprite = (
+    <span className={`dq-companion dq-companion--${variant} ${className}`}>
+      <PixelCompanion
+        stage={stage}
+        state={isPetted ? 'done' : state}
+        mood={isPetted ? 'happy' : mood}
+        size={pixelSize}
+        accessoryId={accessoryId}
+        followPointer={followPointer}
+        label={`${displayName} — ${stageData.title}`}
+      />
+      {isPetted && (
+        <span key={petBurst} className="dq-companion-hearts" aria-hidden="true">
+          <span />
+          <span />
+          <span />
         </span>
       )}
     </span>
   );
 
-  if (!interactive) {
-    return inner;
-  }
+  if (!interactive) return sprite;
+
+  const handlePet = () => {
+    const burst = Date.now();
+    setPetBurst(burst);
+    onPet?.();
+    window.setTimeout(() => setPetBurst((current) => (current === burst ? 0 : current)), 1300);
+  };
 
   return (
     <button
       type="button"
       className="dq-avatar-trigger"
       onClick={handlePet}
-      aria-label={`Interagir com ${displayName} (${stageData.title})`}
-      title={`Clique para interagir com ${displayName}`}
+      aria-label={`Fazer carinho em ${displayName}`}
+      title={`Fazer carinho em ${displayName}`}
     >
-      {inner}
+      {sprite}
     </button>
   );
 }

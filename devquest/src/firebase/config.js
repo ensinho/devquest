@@ -13,9 +13,10 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
-export const isFirebaseConfigured = Boolean(
-  firebaseConfig.apiKey && firebaseConfig.projectId && firebaseConfig.appId
-);
+// The GitHub Pages mirror (`vite build --mode ghpages`) has no API, so it stays guest-only.
+export const isFirebaseConfigured =
+  import.meta.env.MODE !== 'ghpages' &&
+  Boolean(firebaseConfig.apiKey && firebaseConfig.projectId && firebaseConfig.appId);
 
 let app = null;
 let auth = null;
@@ -25,6 +26,7 @@ let analytics = null;
 if (isFirebaseConfigured) {
   app = initializeApp(firebaseConfig);
   auth = getAuth(app);
+  auth.languageCode = 'pt-BR';
   db = getFirestore(app);
   if (typeof window !== 'undefined' && firebaseConfig.measurementId) {
     try {

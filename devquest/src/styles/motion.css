@@ -1,0 +1,74 @@
+/* ==========================================================================
+   DEVQUEST — SITE MOTION LAYER
+   Rules (Emil Kowalski / LottieFiles motion skills):
+   - transform + opacity only; never scale(0); ease-out on entrances.
+   - Occasional surfaces (pages, modals, toasts) get a short standard entrance.
+   - Frequent surfaces (tabs, chips, filters) do not stagger.
+   - Fill mode `backwards`: nothing is held after the entrance, so no
+     transformed ancestor traps position: fixed children.
+   - Reduced motion: the global rule in tokens.components.css collapses it all.
+   ========================================================================== */
+
+/* --- Page swap: the new page settles in, the old one is simply gone --- */
+.dq-main--enter {
+  animation: dq-page-in 300ms var(--ease-out) backwards;
+}
+
+@keyframes dq-page-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* --- Modals: backdrop fades, card rises from 96% (desktop) --- */
+.dq-modal-backdrop {
+  animation: dq-fade-in 200ms var(--ease-out) backwards;
+}
+
+.dq-modal {
+  animation: dq-modal-in 280ms var(--ease-out) backwards;
+}
+
+@keyframes dq-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes dq-modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.96);
+  }
+}
+
+/* --- Toast: rises from its own edge --- */
+.dq-toast {
+  animation: dq-toast-in 320ms var(--ease-drawer) backwards;
+}
+
+@keyframes dq-toast-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 120%);
+  }
+}
+
+/* --- Onboarding sheet: the deal-in on first paint is the only entrance --- */
+.dq-onb-backdrop {
+  animation: dq-fade-in 260ms var(--ease-out) backwards;
+}
+
+/* --- Bottom sheets on phones: slide up on the drawer curve --- */
+@media (max-width: 640px) {
+  .dq-modal {
+    animation: dq-sheet-in 380ms var(--ease-drawer) backwards;
+  }
+
+  @keyframes dq-sheet-in {
+    from {
+      transform: translateY(100%);
+    }
+  }
+}

@@ -8,9 +8,10 @@
   /* --- Buttons (Single Primary CTA Hierarchy) --- */
   --btn-min-height: 2.75rem; /* 44px touch target */
   --btn-radius: var(--radius-md);
-  --btn-primary-bg: var(--color-primary);
-  --btn-primary-bg-hover: var(--color-primary-hover);
+  --btn-primary-bg: var(--color-primary-fill);
+  --btn-primary-bg-hover: var(--color-primary-fill-hover);
   --btn-primary-ink: var(--color-primary-ink);
+  --btn-primary-edge: var(--color-primary-edge);
 
   --btn-secondary-bg: var(--color-surface-raised);
   --btn-secondary-bg-hover: var(--color-border-strong);
@@ -40,6 +41,30 @@
   --skill-node-accent-completed: var(--color-gold);
   --skill-node-accent-mastery: var(--color-arcane);
 
+  /* --- Collectible Cards (signature: back -> face -> foil) --- */
+  --tcg-radius: var(--radius-lg);
+  --tcg-art-radius: var(--radius-md);
+  --tcg-frame: var(--space-2);
+  --tcg-face: var(--color-card-face);
+  --tcg-art: var(--color-card-art);
+  --tcg-back: var(--color-card-back);
+  --tcg-back-line: var(--color-card-back-line);
+  --tcg-back-mark: var(--color-card-back-mark);
+  --tcg-back-ink: var(--color-card-back-ink);
+  --tcg-shadow: var(--shadow-card);
+  /* Paw-print pattern used as a mask on locked stations (alpha only, no colour). */
+  --tcg-paw-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg fill='black'%3E%3Cellipse cx='12' cy='15' rx='4.4' ry='3.5'/%3E%3Ccircle cx='6.8' cy='10' r='1.8'/%3E%3Ccircle cx='10.2' cy='7.2' r='1.8'/%3E%3Ccircle cx='13.8' cy='7.2' r='1.8'/%3E%3Ccircle cx='17.2' cy='10' r='1.8'/%3E%3C/g%3E%3C/svg%3E");
+  --chunky-edge: 0 3px 0 var(--color-border-strong);
+  --tcg-foil: linear-gradient(
+    115deg,
+    var(--color-foil-clear) 18%,
+    var(--color-foil-1) 32%,
+    var(--color-foil-2) 44%,
+    var(--color-foil-3) 56%,
+    var(--color-foil-4) 68%,
+    var(--color-foil-clear) 82%
+  );
+
   /* --- XP Bar --- */
   --xp-bar-track: var(--color-surface-sunken);
   --xp-bar-fill: var(--color-gold);
@@ -49,7 +74,7 @@
   --companion-bg: var(--color-surface);
   --companion-pedestal-bg: var(--color-surface-raised);
   --companion-aura-stage1: var(--color-live-soft);
-  --companion-aura-stage2: var(--color-primary-soft);
+  --companion-aura-stage2: var(--color-ember-soft);
   --companion-aura-stage3: var(--color-arcane-soft);
 
   /* --- Code Editor & Grimoire --- */
@@ -96,7 +121,8 @@
   border-radius: var(--btn-radius);
   font-family: var(--font-sans);
   font-size: var(--text-sm);
-  font-weight: 600;
+  font-weight: 650;
+  letter-spacing: 0.005em;
   line-height: 1;
   cursor: pointer;
   user-select: none;
@@ -125,7 +151,13 @@
 .dq-btn-primary {
   background-color: var(--btn-primary-bg);
   color: var(--btn-primary-ink);
-  box-shadow: var(--shadow-sm);
+  font-weight: 750;
+  box-shadow: 0 2px 0 var(--btn-primary-edge), var(--shadow-sm);
+}
+
+.dq-btn-primary:active:not(:disabled) {
+  transform: translateY(2px) scale(0.99);
+  box-shadow: 0 0 0 var(--btn-primary-edge), var(--shadow-sm);
 }
 
 .dq-btn-secondary {
@@ -172,8 +204,8 @@
 }
 
 .dq-badge-primary {
-  background-color: var(--color-primary-soft);
-  color: var(--color-primary);
+  background-color: var(--color-stage-soft);
+  color: var(--color-stage-ink);
 }
 
 .dq-badge-gold {

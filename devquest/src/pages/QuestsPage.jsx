@@ -1,20 +1,24 @@
-import React, { useState, useRef } from 'react';
-import MobileQuestHero from '../components/MobileQuestHero.jsx';
-import CompanionCamp from '../components/companion/CompanionCamp.jsx';
-import SkillTree from '../components/SkillTree.jsx';
-import SidePanel from '../components/SidePanel.jsx';
+import React, { useMemo } from 'react';
+import Habitat from '../components/home/Habitat.jsx';
+import Trail from '../components/home/Trail.jsx';
+import StationPanel from '../components/home/StationPanel.jsx';
 
+/**
+ * Home: the Toca (fox habitat) · the trail · the selected station.
+ * Desktop fits one screen with no page scroll; mobile stacks action-first.
+ */
 export default function QuestsPage({
-  user,
   skills,
   selectedSkill,
   onSelectSkill,
   onHoverSkill,
+  onLockedSkill,
   quests,
+  allQuests,
   recommendedQuest,
-  totalQuests,
   onStartQuest,
   onOpenCharacter,
+  onToggleTheme,
   displayStage,
   accessoryId,
   companionName,
@@ -28,83 +32,54 @@ export default function QuestsPage({
   onPet,
   onAnswerQuiz,
 }) {
-  const [quizTrigger, setQuizTrigger] = useState(0);
-  const campRef = useRef(null);
-  const sidePanelRef = useRef(null);
-
-  const handleOpenQuizFromHero = () => {
-    setQuizTrigger((n) => n + 1);
-    campRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
-
-  const handleSelectSkillSmart = (skill) => {
-    onSelectSkill(skill);
-    if (window.innerWidth <= 768) {
-      sidePanelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
-  };
+  const totalXp = useMemo(
+    () => allQuests.filter((q) => q.completed).reduce((sum, q) => sum + (q.xp ?? 0), 0),
+    [allQuests]
+  );
 
   return (
-    <div className="dq-page-stack dq-quests-page">
-      <MobileQuestHero
-        user={user}
-        completedCount={completedCount}
-        totalQuests={totalQuests}
+    <div className="dq-home">
+      <h1 className="dq-sr-only">DevQuest: trilha full-stack com um fox de estimação</h1>
+      <Habitat
         displayStage={displayStage}
         accessoryId={accessoryId}
         companionName={companionName}
-        theme={theme}
+        completedCount={completedCount}
+        bondInfo={bondInfo}
+        mentorMessage={mentorMessage}
         avatarState={avatarState}
         avatarMood={avatarMood}
-        recommendedQuest={recommendedQuest}
-        onStartRecommended={onStartQuest}
+        theme={theme}
+        totalXp={totalXp}
+        completedQuizzes={completedQuizzes}
         onPet={onPet}
-        onOpenQuiz={handleOpenQuizFromHero}
+        onAnswerQuiz={onAnswerQuiz}
+        onToggleTheme={onToggleTheme}
+        onOpenCharacter={onOpenCharacter}
       />
 
-      <div ref={campRef} className="dq-command-camp-wrap">
-        <CompanionCamp
-          user={user}
-          skills={skills}
-          recommendedQuest={recommendedQuest}
-          onStartQuest={onStartQuest}
-          onOpenCharacter={onOpenCharacter}
-          totalQuests={totalQuests}
-          displayStage={displayStage}
-          accessoryId={accessoryId}
-          companionName={companionName}
-          completedCount={completedCount}
-          completedQuizzes={completedQuizzes}
-          bondInfo={bondInfo}
-          mentorMessage={mentorMessage}
-          avatarState={avatarState}
-          avatarMood={avatarMood}
-          theme={theme}
-          onPet={onPet}
-          onAnswerQuiz={onAnswerQuiz}
-          quizTrigger={quizTrigger}
-        />
-      </div>
+      <Trail
+        skills={skills}
+        quests={allQuests}
+        selectedSkillId={selectedSkill?.id ?? null}
+        currentSkillId={recommendedQuest?.skillId ?? null}
+        nextQuestId={recommendedQuest?.id ?? null}
+        totalXp={totalXp}
+        displayStage={displayStage}
+        onSelectSkill={onSelectSkill}
+        onHoverSkill={onHoverSkill}
+        onLockedPress={onLockedSkill}
+      />
 
-      <div className="dq-map-workspace">
-        <div className="dq-quests-map-wrap">
-          <SkillTree
-            skills={skills}
-            selectedSkillId={selectedSkill?.id ?? null}
-            onSelectSkill={handleSelectSkillSmart}
-            onHoverSkill={onHoverSkill}
-          />
-        </div>
-
-        <div ref={sidePanelRef} className="dq-command-side-wrap">
-          <SidePanel
-            skill={selectedSkill}
-            quests={quests}
-            onStartQuest={onStartQuest}
-            useSecondaryCtas
-          />
-        </div>
-      </div>
+      <StationPanel
+        skill={selectedSkill}
+        quests={quests}
+        skills={skills}
+        recommendedSkillId={recommendedQuest?.skillId ?? null}
+        completedCount={completedCount}
+        onStartQuest={onStartQuest}
+        onSelectSkill={onSelectSkill}
+      />
     </div>
   );
 }

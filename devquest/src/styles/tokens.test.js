@@ -22,6 +22,14 @@ function collectJsxFiles(dir) {
   return results;
 }
 
+// Every stylesheet except the primitive palette must stay token-only.
+const SCREEN_STYLESHEETS = readdirSync(stylesDir).filter(
+  (file) => file.endsWith('.css') && !['tokens.primitives.css', 'tokens.css'].includes(file)
+);
+const SCREEN_ONLY_STYLESHEETS = SCREEN_STYLESHEETS.filter(
+  (file) => !['tokens.semantic.css', 'tokens.components.css'].includes(file)
+);
+
 const RAW_COLOR_PATTERN = /#[0-9a-fA-F]{3,8}\b|\brgba?\s*\(|\bhsla?\s*\(/;
 const PRIMITIVE_TOKEN_PATTERN = /var\(--primitive-/;
 const IMPORTANT_PATTERN = /!important\b/;
@@ -40,14 +48,15 @@ describe('3-layer CSS token architecture & Anti-Slop Design Gate (UIZZE / pen.de
   });
 
   it('enforces zero raw hex/rgb/hsl colors in semantic, component, app, and showcase CSS', () => {
-    for (const file of ['tokens.semantic.css', 'tokens.components.css', 'app.css', 'showcase.css']) {
+    expect(SCREEN_STYLESHEETS).toContain('binder.css');
+    for (const file of SCREEN_STYLESHEETS) {
       const css = readStyle(file);
       expect(css, `${file} must not contain raw colors`).not.toMatch(RAW_COLOR_PATTERN);
     }
   });
 
   it('prevents Layer 1 --primitive-* leaks in component, app, and showcase CSS', () => {
-    for (const file of ['tokens.components.css', 'app.css', 'showcase.css']) {
+    for (const file of ['tokens.components.css', ...SCREEN_ONLY_STYLESHEETS]) {
       const css = readStyle(file);
       expect(css, `${file} must reference semantic/component tokens only, never --primitive-*`).not.toMatch(
         PRIMITIVE_TOKEN_PATTERN
@@ -55,8 +64,8 @@ describe('3-layer CSS token architecture & Anti-Slop Design Gate (UIZZE / pen.de
     }
   });
 
-  it('forbids !important specificity hacks in app.css and showcase.css', () => {
-    for (const file of ['app.css', 'showcase.css']) {
+  it('forbids !important specificity hacks in every screen stylesheet', () => {
+    for (const file of SCREEN_ONLY_STYLESHEETS) {
       const css = readStyle(file);
       expect(css, `${file} must not use !important hacks`).not.toMatch(IMPORTANT_PATTERN);
     }

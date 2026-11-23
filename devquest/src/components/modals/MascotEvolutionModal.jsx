@@ -1,12 +1,16 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Sparkles } from 'lucide-react';
 import CompanionAvatar from '../companion/CompanionAvatar.jsx';
 import { getCompanionStageData } from '../../data/companionAvatars.js';
 
+/** Evolution = the companion card flips over into its next form, foil on. */
 export default function MascotEvolutionModal({ newStage, accessoryId, theme, onClose }) {
   const stageData = getCompanionStageData(newStage);
+  const previous = getCompanionStageData(Math.max(1, newStage - 1));
+  const ctaRef = useRef(null);
 
   useEffect(() => {
+    ctaRef.current?.focus({ preventScroll: true });
     const onKeyDown = (event) => {
       if (event.key === 'Escape') onClose();
     };
@@ -22,28 +26,37 @@ export default function MascotEvolutionModal({ newStage, accessoryId, theme, onC
       aria-labelledby="evolution-title"
       onClick={onClose}
     >
-      <div className="dq-modal dq-modal--sm dq-modal--celebrate" onClick={(e) => e.stopPropagation()}>
-        <span className={`dq-badge ${stageData.badgeClass}`}>
-          <Sparkles size={14} aria-hidden="true" /> Evolução Desbloqueada!
-        </span>
+      <div className="dq-modal dq-modal--sm dq-celebrate" onClick={(e) => e.stopPropagation()}>
+        <div className={`dq-onb-ccard dq-ccard--s${newStage} dq-celebrate-card`}>
+          <span className="dq-onb-ccard-plate">
+            <span>{stageData.name}</span>
+            <span className="dq-tabular">{newStage}/3</span>
+          </span>
+          <span className="dq-onb-ccard-art">
+            <CompanionAvatar
+              stage={newStage}
+              state="done"
+              mood="happy"
+              theme={theme}
+              variant="altar"
+              accessoryId={accessoryId}
+            />
+          </span>
+          <span className="dq-onb-ccard-type">
+            <Sparkles size={12} aria-hidden="true" />
+            {stageData.title} · {stageData.elementLabel}
+          </span>
+          <span className="dq-onb-ccard-foil" aria-hidden="true" />
+        </div>
 
-        <CompanionAvatar
-          stage={newStage}
-          state="done"
-          mood="happy"
-          theme={theme}
-          variant="altar"
-          accessoryId={accessoryId}
-        />
-
-        <h2 id="evolution-title" className="dq-h1">
-          {stageData.name}!
+        <h2 id="evolution-title" className="dq-celebrate-title">
+          {previous.name} virou {stageData.name}.
         </h2>
         <p className="dq-muted-text">
-          Seu companheiro evoluiu para <strong>{stageData.title}</strong> — maior, com nova silhueta 2.5D e energia renovada!
+          Nova forma, nova cor: o app inteiro agora acompanha a {stageData.realmName}.
         </p>
-        <button type="button" className="dq-btn dq-btn-primary" onClick={onClose}>
-          Incrível, vamos codar!
+        <button ref={ctaRef} type="button" className="dq-btn dq-btn-primary dq-celebrate-cta" onClick={onClose}>
+          Voltar ao mapa
         </button>
       </div>
     </div>

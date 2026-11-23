@@ -1,20 +1,18 @@
 ---
 name: design-system
-description: DevQuest's 3-layer CSS token architecture, Obsidian Scriptorium (Dark) & Warm Vellum (Light) themes, 0-1-2 containment rules, typography hierarchy, and authorial visual signature. Mandatory reading before editing any UI or CSS.
+description: DevQuest's 3-layer CSS token architecture, the "Toca" world (Noite na Toca dark / Dia na Toca light), the pixel-art fox companion, 0-1-2 containment, typography, and authorial visual signature. Mandatory reading before editing any UI or CSS.
 ---
 
 # DevQuest Design System — "Modern Arcane Codex"
 
-## 1. Visual Identity Philosophy
-DevQuest blends the **editorial clarity of modern developer tools** (clean typography, calm tonal layering, crisp tabular numbers) with the **tactile warmth of a tactical RPG codex** (amber forge highlights, relic gold achievements, living pixel-art companion, constellation skill map).
+## 1. Visual Identity Philosophy — "Toca"
+DevQuest is a **cozy pixel-fox learning game**: a hand-drawn fox (Kitsuby → Pyrokit → Archkits) lives in a little den on your screen, walks a serpentine trail of 9 skill stations with you, and reacts to every line of code. The interface is soft, round and chunky (Fredoka + Nunito, generous radii, "squishy" buttons with a 3px bottom edge) while the code surfaces stay precise (JetBrains Mono).
 
 **Anti-AI-Slop Mandate:**
-- No generic purple-neon SaaS gradients.
-- No heavy glassmorphism stacked over body text.
-- No decorative glow spam or rainbow borders.
-- No hardcoded colors or "eyeballed" margins.
-
----
+- No cream-paper + serif editorial look, no near-black + single neon accent dashboard.
+- No glow spam, no gradient text, no unicode glyphs standing in for icons (use lucide or authored pixel SVG).
+- No eyebrow labels above headings; no coloured `border-left` callouts.
+- No hardcoded colours or eyeballed margins.
 
 ## 2. Three-Layer CSS Token Architecture (`devquest/src/styles/`)
 
@@ -25,7 +23,7 @@ All styling flows strictly downward through 3 layers:
    *Never reference primitive tokens directly in page/component CSS.*
 
 2. **Layer 2 — Semantic (`tokens.semantic.css`):**
-   Maps primitives to meaning across **Dark (`Obsidian Scriptorium`, default)** and **Light (`Warm Vellum`, `[data-theme="light"]`)**:
+   Maps primitives to meaning across **Dark (`Noite na Toca`, default)** and **Light (`Dia na Toca`, `[data-theme="light"]`)**:
    - Surfaces: `--color-bg`, `--color-surface`, `--color-surface-raised`, `--color-surface-sunken`, `--color-overlay`
    - Ink: `--color-text`, `--color-text-secondary`, `--color-text-muted`, `--color-text-inverse`
    - Meaning:
@@ -59,18 +57,13 @@ All styling flows strictly downward through 3 layers:
 ---
 
 ## 5. Typography System
-- **Display (`--font-display`):** `Fraunces` (variable serif with subtle optical sizing) — reserved for brand wordmark, page H1/H2, Boss titles, Level Up numerals, and Guide titles. Never use for micro-labels (`< 14px`) or dense button rows.
-- **UI & Reading (`--font-sans`):** `Plus Jakarta Sans` — clean, high-legibility UI chrome, quest descriptions, and guide prose.
-- **Code (`--font-mono`):** `JetBrains Mono` — Challenge editor, inline code tokens, and Grimoire code snippets.
-- **Numeric Stability:** Always apply `font-variant-numeric: tabular-nums` (`class="tabular-nums"`) on XP counters, levels, progress ratios (`2/4`), and timers.
-
----
+- **Display (`--font-display`):** `Fredoka` (rounded, chunky; width axis 75–125) — wordmark, page titles, station names, quest titles, plates, numerals.
+- **UI & Reading (`--font-sans`):** `Nunito` — body copy, labels, descriptions.
+- **Code (`--font-mono`):** `JetBrains Mono` — editor, starter code, validator checks.
+- **Numeric Stability:** `font-variant-numeric: tabular-nums` (`.dq-tabular`) on XP, levels, ratios (`2/4`); XP and level in the header roll digit-by-digit (`RollingNumber`).
 
 ## 6. Authorial Visual Signature
-1. **Companion Camp (Living Pixel-Art Habitat):**
-   - Render mascot sprites with `image-rendering: pixelated` so pixel edges stay razor-sharp.
-   - Frame the mascot inside a calm circular/arched SVG pedestal whose ambient aura reflects its current evolution stage (`--color-live` → `--color-primary` → `--color-arcane`) and displays contextual tips rather than static filler.
-   - Provide a full habitat on desktop and a compact companion pill/card on mobile (`390×844`) — never `display: none` the mascot on mobile.
-2. **Constellation Skill Map:**
-   - Curved SVG paths (`cubic Bézier`) linking prerequisites; locked paths are muted dashed hairlines, active paths glow subtly in `--color-live`, mastered paths turn `--color-gold`.
-   - On mobile (`< 768px`), adapt gracefully to a connected vertical quest trail so no node shrinks below `44px` or causes horizontal overflow.
+1. **The Toca (`components/home/Habitat.jsx`, `habitatArt.js`):** a pixel landscape that is day in light theme and night in dark (stars, moon, fireflies). The sun/moon is a real theme toggle. The fox (`PixelCompanion`) wanders, looks around, naps after 40s without input (wakes on any pointer/key), eats a snack, takes pets (pixel hearts), asks the quick quiz in its speech bubble, and XP floats up like a damage number. Reduced motion freezes every loop.
+2. **The Serpentine Trail (`components/home/Trail.jsx`, `trailLayout.js`):** 9 stations snaking left→right→left; progress rings in earned mint, locked stations show a paw-print card back, live segments flow in cobalt, the mini fox stands on the current station, and a station pops open when it unlocks.
+3. **Companion stages recolour the app** through `--color-stage*` and `[data-companion-stage]`. Sprite inks live in `--pixel-s{1,2,3}-*` and stay the same in both themes.
+4. **Desktop home fits one screen** (Toca · Trail · Station panel, `height: 100dvh - chrome`); mobile stacks Toca → next quest → trail.

@@ -2,28 +2,117 @@
 <html lang="pt-BR" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>DevQuest · Aprenda programação full-stack com um fox de estimação</title>
     <meta
       name="description"
-      content="DevQuest — RPG interativo de aprendizado Full-Stack com Constellation Skill Map, desafios reais de código e mascote evolutivo 2.5D."
+      content="Aprenda HTML, CSS, JavaScript, React, Node.js e SQL jogando: 22 quests com editor de código validado ao vivo, grimórios curtos, Boss Fights e um fox em pixel-art que evolui com você. Grátis, em português."
     />
-    <meta property="og:title" content="DevQuest — Modern Arcane Codex" />
+    <meta
+      name="keywords"
+      content="aprender programação, curso full-stack grátis, HTML, CSS, JavaScript, React, Node.js, SQL, gamificação, exercícios de código, DevQuest"
+    />
+    <meta name="author" content="DevQuest" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <link rel="canonical" href="https://devquest-rpg.vercel.app/" />
+
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#10122b" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f6fafc" media="(prefers-color-scheme: light)" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="application-name" content="DevQuest" />
+    <meta name="apple-mobile-web-app-title" content="DevQuest" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="DevQuest" />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:url" content="https://devquest-rpg.vercel.app/" />
+    <meta property="og:title" content="DevQuest · Aprenda full-stack com um fox de estimação" />
     <meta
       property="og:description"
-      content="Aprenda Full-Stack com árvore de constelações, Boss Fights de código e seu mascote evolutivo 2.5D."
+      content="22 quests de código validadas ao vivo, grimórios curtos, Boss Fights e um mascote em pixel-art que evolui com você."
     />
-    <meta name="theme-color" content="#0e1116" />
+    <meta property="og:image" content="https://devquest-rpg.vercel.app/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Os três estágios do fox do DevQuest (Kitsuby, Pyrokit e Archkits) ao lado do título Aprenda full-stack com um fox de estimação." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="DevQuest · Aprenda full-stack com um fox de estimação" />
+    <meta
+      name="twitter:description"
+      content="22 quests de código validadas ao vivo, Boss Fights e um mascote em pixel-art que evolui com você."
+    />
+    <meta name="twitter:image" content="https://devquest-rpg.vercel.app/og-image.png" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "https://devquest-rpg.vercel.app/#website",
+            "url": "https://devquest-rpg.vercel.app/",
+            "name": "DevQuest",
+            "inLanguage": "pt-BR"
+          },
+          {
+            "@type": "WebApplication",
+            "name": "DevQuest",
+            "url": "https://devquest-rpg.vercel.app/",
+            "applicationCategory": "EducationalApplication",
+            "operatingSystem": "Web",
+            "inLanguage": "pt-BR",
+            "image": "https://devquest-rpg.vercel.app/og-image.png",
+            "description": "RPG para aprender desenvolvimento web full-stack: quests de código validadas ao vivo, grimórios e um fox em pixel-art que evolui.",
+            "offers": { "@type": "Offer", "price": "0", "priceCurrency": "BRL" }
+          },
+          {
+            "@type": "Course",
+            "name": "Trilha Full-Stack DevQuest",
+            "description": "Do HTML semântico ao app full-stack: HTML, CSS, JavaScript, design tokens, React, Node.js, SQL, acessibilidade e testes em 22 quests práticas.",
+            "inLanguage": "pt-BR",
+            "isAccessibleForFree": true,
+            "educationalLevel": "Iniciante",
+            "teaches": ["HTML", "CSS", "JavaScript", "React", "Node.js", "SQL", "Acessibilidade", "Testes"],
+            "provider": { "@type": "Organization", "name": "DevQuest", "url": "https://devquest-rpg.vercel.app/" },
+            "offers": { "@type": "Offer", "price": "0", "priceCurrency": "BRL", "category": "Free" }
+          }
+        ]
+      }
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Fredoka:wdth,wght@75..125,400..700&family=JetBrains+Mono:wght@400;500;600&family=Nunito:wght@400..900&display=swap"
       rel="stylesheet"
     />
-    <title>DevQuest — Modern Arcane Codex</title>
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      <main style="max-width: 40rem; margin: 3rem auto; padding: 0 1.5rem; font-family: system-ui, sans-serif; line-height: 1.6">
+        <h1>DevQuest · Aprenda programação full-stack jogando</h1>
+        <p>
+          DevQuest é um RPG gratuito em português para aprender desenvolvimento web: 22 quests com editor de código
+          validado ao vivo, grimórios de leitura rápida, Boss Fights e um fox em pixel-art que evolui com você.
+        </p>
+        <h2>O que você aprende</h2>
+        <ul>
+          <li>HTML semântico e acessível</li>
+          <li>CSS moderno com Flexbox, Grid e design tokens</li>
+          <li>JavaScript: variáveis, arrays e async/await</li>
+          <li>React: componentes, props, useState e listas</li>
+          <li>Node.js e Express: rotas e JSON</li>
+          <li>SQL: SELECT, WHERE, JOIN e GROUP BY</li>
+          <li>Acessibilidade e testes com Vitest</li>
+        </ul>
+        <p>Ative o JavaScript para jogar.</p>
+      </main>
+    </noscript>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

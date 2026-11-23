@@ -1,106 +1,168 @@
 /* ==========================================================================
-   LAYER 1 — PRIMITIVE TOKENS (DevQuest: Modern Arcane Codex)
+   LAYER 1 — PRIMITIVE TOKENS (DevQuest: "Toca" — cozy pixel-fox world)
    Raw palette ramps, spacing, typography, radii, motion, and z-index values.
    RULE: Only this file may contain raw hex/rgb/rgba color values.
    Screen and component CSS MUST NEVER reference --primitive-* directly.
    ========================================================================== */
 
 :root {
-  /* --- Neutral Ramp: Obsidian Scriptorium (Dark Canvas) --- */
-  --primitive-obsidian-950: #080a0e;
-  --primitive-obsidian-900: #0e1116;
-  --primitive-obsidian-850: #12171f;
-  --primitive-obsidian-800: #161b23;
-  --primitive-obsidian-750: #1b222c;
-  --primitive-obsidian-700: #1f2632;
-  --primitive-obsidian-600: #2b3444;
-  --primitive-obsidian-500: #424e62;
-  --primitive-obsidian-400: #707d91;
-  --primitive-obsidian-300: #9ca6b5;
-  --primitive-obsidian-200: #ccd3de;
-  --primitive-obsidian-100: #f3efe6;
+  /* --- Neutral Ramp: Tournament Table (Dark — deep ink blue, never pure black) --- */
+  --primitive-ink-975: #0b0c1f;
+  --primitive-ink-950: #10122b;
+  --primitive-ink-900: #161936;
+  --primitive-ink-850: #1b1f40;
+  --primitive-ink-800: #20254a;
+  --primitive-ink-750: #272d56;
+  --primitive-ink-700: #2f3662;
+  --primitive-ink-600: #3e467a;
+  --primitive-ink-500: #575f95;
+  --primitive-ink-400: #8f95c4;
+  --primitive-ink-300: #b6badd;
+  --primitive-ink-200: #dadcf2;
+  --primitive-ink-100: #f6f5ff;
 
-  /* --- Neutral Ramp: Warm Vellum (Light Canvas) --- */
-  --primitive-vellum-50: #fdfbf7;
-  --primitive-vellum-100: #f5f1e8;
-  --primitive-vellum-200: #ece6d9;
-  --primitive-vellum-300: #dfd7c6;
-  --primitive-vellum-400: #bfb5a2;
-  --primitive-vellum-500: #857d70;
-  --primitive-vellum-600: #5e584f;
-  --primitive-vellum-700: #3d3832;
-  --primitive-vellum-900: #1b1917;
+  /* --- Neutral Ramp: Card Stock (Light — cool paper, never cream) --- */
+  --primitive-paper-0: #ffffff;
+  --primitive-paper-50: #f6fafc;
+  --primitive-paper-100: #e8f2f7;
+  --primitive-paper-200: #d9e9f1;
+  --primitive-paper-300: #c2d6e1;
+  --primitive-paper-400: #9bb2c1;
+  --primitive-paper-500: #536b7c;
+  --primitive-paper-600: #405667;
+  --primitive-paper-700: #2a3e4e;
+  --primitive-paper-900: #172638;
 
-  /* --- Ember Amber (Primary CTA & Focus) --- */
-  --primitive-ember-300: #f5b95b;
-  --primitive-ember-400: #eeaa3e;
-  --primitive-ember-500: #e89b2d;
-  --primitive-ember-600: #c87b12;
-  --primitive-ember-700: #b86b00;
-  --primitive-ember-800: #8f5200;
+  /* --- Signal Yellow (the next step — and nothing else) --- */
+  --primitive-signal-200: #fff0b3;
+  --primitive-signal-300: #ffdd70;
+  --primitive-signal-400: #ffcb35;
+  --primitive-signal-500: #f4b800;
+  --primitive-signal-600: #d89c00;
+  --primitive-signal-800: #6e5300;
+  --primitive-signal-900: #1c1606;
 
-  /* --- Relic Gold (Earned Progress & Achievements Only) --- */
-  --primitive-gold-300: #fae08e;
-  --primitive-gold-400: #f4c95d;
-  --primitive-gold-500: #d9a734;
-  --primitive-gold-700: #9a6b00;
-  --primitive-gold-800: #785200;
+  /* --- Cobalt (available / unlocked / live paths) --- */
+  --primitive-cobalt-300: #a3bcff;
+  --primitive-cobalt-400: #779fff;
+  --primitive-cobalt-500: #4d7af5;
+  --primitive-cobalt-600: #325de0;
+  --primitive-cobalt-700: #2449c2;
+  --primitive-cobalt-800: #1b3894;
 
-  /* --- Arcane Teal (Live / Unlocked / Validation Pass) --- */
-  --primitive-teal-300: #5eead4;
-  --primitive-teal-400: #2dd4bf;
-  --primitive-teal-500: #14b8a6;
-  --primitive-teal-700: #0f766e;
-  --primitive-teal-800: #115e59;
+  /* --- Mint (earned: XP, completed cards, passing checks) --- */
+  --primitive-mint-300: #93f0c8;
+  --primitive-mint-400: #52e0a4;
+  --primitive-mint-500: #22c483;
+  --primitive-mint-700: #0a7a4f;
+  --primitive-mint-800: #075f3d;
 
-  /* --- Crimson Seal (Boss Fights, Errors, Destructive) --- */
-  --primitive-crimson-300: #ff8a92;
-  --primitive-crimson-400: #f25c66;
-  --primitive-crimson-500: #dc3a46;
-  --primitive-crimson-700: #c82333;
-  --primitive-crimson-800: #9f1b28;
+  /* --- Coral (Boss Fights, errors, destructive) --- */
+  --primitive-coral-300: #ffa29c;
+  --primitive-coral-400: #ff7b7b;
+  --primitive-coral-500: #f04c46;
+  --primitive-coral-700: #c22a30;
+  --primitive-coral-800: #991f25;
 
-  /* --- Arcane Violet (Evolution & Final Mastery Only) --- */
-  --primitive-violet-300: #c4b5fd;
-  --primitive-violet-400: #a78bfa;
-  --primitive-violet-600: #7c3aed;
-  --primitive-violet-700: #6d28d9;
+  /* --- Magenta (evolution & final mastery only) --- */
+  --primitive-magenta-300: #ffa3e0;
+  --primitive-magenta-400: #ff74cc;
+  --primitive-magenta-500: #ef3fb1;
+  --primitive-magenta-700: #b0207c;
+  --primitive-magenta-800: #891761;
 
-  /* --- Syntax Sky (Lexical Function / Selector Accent) --- */
-  --primitive-sky-300: #7dd3fc;
-  --primitive-sky-400: #38bdf8;
-  --primitive-sky-700: #0369a1;
+  /* --- Ember (stage 2 companion element) --- */
+  --primitive-ember-300: #ffb684;
+  --primitive-ember-400: #ff9452;
+  --primitive-ember-500: #f47a2f;
+  --primitive-ember-700: #b3501a;
+  --primitive-ember-800: #8c3d12;
 
   /* --- Alpha / Translucent Primitives --- */
   --primitive-white-a04: rgba(255, 255, 255, 0.04);
   --primitive-white-a08: rgba(255, 255, 255, 0.08);
   --primitive-white-a14: rgba(255, 255, 255, 0.14);
-  --primitive-ink-a06: rgba(27, 25, 23, 0.06);
-  --primitive-ink-a12: rgba(27, 25, 23, 0.12);
-  --primitive-ink-a18: rgba(27, 25, 23, 0.18);
-  --primitive-black-a35: rgba(5, 7, 10, 0.35);
-  --primitive-black-a55: rgba(5, 7, 10, 0.55);
-  --primitive-black-a72: rgba(5, 7, 10, 0.72);
-  --primitive-vellum-overlay: rgba(27, 25, 23, 0.45);
-  --primitive-obsidian-glass: rgba(22, 27, 35, 0.86);
-  --primitive-vellum-glass: rgba(253, 251, 247, 0.88);
+  --primitive-white-a24: rgba(255, 255, 255, 0.24);
+  --primitive-white-a55: rgba(255, 255, 255, 0.55);
+  --primitive-inkline-a06: rgba(17, 23, 39, 0.06);
+  --primitive-inkline-a10: rgba(17, 23, 39, 0.1);
+  --primitive-inkline-a16: rgba(17, 23, 39, 0.16);
+  --primitive-inkline-a24: rgba(17, 23, 39, 0.24);
+  --primitive-black-a30: rgba(3, 5, 12, 0.3);
+  --primitive-black-a50: rgba(3, 5, 12, 0.5);
+  --primitive-black-a70: rgba(3, 5, 12, 0.7);
+  --primitive-paper-overlay: rgba(17, 23, 39, 0.46);
+  --primitive-ink-glass: rgba(23, 32, 55, 0.88);
+  --primitive-paper-glass: rgba(255, 255, 255, 0.9);
 
-  --primitive-ember-dark-soft: rgba(232, 155, 45, 0.14);
-  --primitive-ember-dark-hero: rgba(232, 155, 45, 0.22);
-  --primitive-ember-light-soft: rgba(184, 107, 0, 0.11);
-  --primitive-ember-light-hero: rgba(184, 107, 0, 0.16);
-  --primitive-gold-dark-soft: rgba(244, 201, 93, 0.14);
-  --primitive-gold-light-soft: rgba(154, 107, 0, 0.11);
-  --primitive-teal-dark-soft: rgba(45, 212, 191, 0.13);
-  --primitive-teal-dark-hero: rgba(45, 212, 191, 0.22);
-  --primitive-teal-light-soft: rgba(15, 118, 110, 0.11);
-  --primitive-teal-light-hero: rgba(15, 118, 110, 0.16);
-  --primitive-crimson-dark-soft: rgba(242, 92, 102, 0.14);
-  --primitive-crimson-light-soft: rgba(200, 35, 51, 0.10);
-  --primitive-violet-dark-soft: rgba(167, 139, 250, 0.14);
-  --primitive-violet-dark-hero: rgba(167, 139, 250, 0.24);
-  --primitive-violet-light-soft: rgba(109, 40, 217, 0.10);
-  --primitive-violet-light-hero: rgba(109, 40, 217, 0.16);
+  --primitive-signal-a14: rgba(255, 212, 59, 0.14);
+  --primitive-signal-a28: rgba(255, 212, 59, 0.28);
+  --primitive-signal-deep-a12: rgba(110, 83, 0, 0.12);
+  --primitive-cobalt-a14: rgba(113, 152, 255, 0.14);
+  --primitive-cobalt-a26: rgba(113, 152, 255, 0.26);
+  --primitive-cobalt-deep-a10: rgba(36, 73, 194, 0.1);
+  --primitive-cobalt-deep-a18: rgba(36, 73, 194, 0.18);
+  --primitive-mint-a14: rgba(82, 224, 164, 0.14);
+  --primitive-mint-a28: rgba(82, 224, 164, 0.28);
+  --primitive-mint-deep-a10: rgba(10, 122, 79, 0.1);
+  --primitive-coral-a14: rgba(255, 111, 104, 0.14);
+  --primitive-coral-deep-a10: rgba(194, 42, 48, 0.1);
+  --primitive-magenta-a14: rgba(255, 106, 203, 0.14);
+  --primitive-magenta-a26: rgba(255, 106, 203, 0.26);
+  --primitive-magenta-deep-a10: rgba(176, 32, 124, 0.1);
+  --primitive-magenta-deep-a18: rgba(176, 32, 124, 0.18);
+  --primitive-ember-a14: rgba(255, 148, 82, 0.14);
+  --primitive-ember-a26: rgba(255, 148, 82, 0.26);
+  --primitive-ember-deep-a10: rgba(179, 80, 26, 0.1);
+  --primitive-ember-deep-a18: rgba(179, 80, 26, 0.18);
+
+  /* --- Foil (holographic finish on earned cards) --- */
+  --primitive-foil-mint: rgba(82, 224, 164, 0.32);
+  --primitive-foil-cobalt: rgba(113, 152, 255, 0.3);
+  --primitive-foil-magenta: rgba(255, 106, 203, 0.28);
+  --primitive-foil-signal: rgba(255, 226, 122, 0.3);
+  --primitive-foil-clear: rgba(255, 255, 255, 0);
+  --primitive-foil-sheen: rgba(255, 255, 255, 0.42);
+
+  /* --- Companion Pixel-Art Sprite Inks (theme-independent character colours) --- */
+  --primitive-px-white: #ffffff;
+  --primitive-px-night: #0a0f1e;
+  --primitive-px-cream: #fff3dc;
+  --primitive-px-snow: #f2f4fa;
+  --primitive-px-s1-outline: #141b3a;
+  --primitive-px-s2-outline: #2b1408;
+  --primitive-px-s3-outline: #2a0b22;
+  --primitive-px-s3-hat: #1b3894;
+  --primitive-px-s3-hat-light: #325de0;
+
+  /* --- Habitat scene (the Toca): day + night pixel landscape --- */
+  --primitive-sky-day-top: #86ccff;
+  --primitive-sky-day-bottom: #d9f2ff;
+  --primitive-sky-night-top: #191c44;
+  --primitive-sky-night-bottom: #3a3f7f;
+  --primitive-hill-day: #86d993;
+  --primitive-hill-day-shade: #62bd73;
+  --primitive-grass-day: #4b9d5d;
+  --primitive-hill-night: #2d6a58;
+  --primitive-hill-night-shade: #235546;
+  --primitive-grass-night: #1a4537;
+  --primitive-den-day: #5a4033;
+  --primitive-den-night: #0d0f24;
+  --primitive-den-rim-day: #8a6a52;
+  --primitive-den-rim-night: #3a3060;
+  --primitive-cloud-day: #ffffff;
+  --primitive-cloud-night: #50558f;
+  --primitive-sun: #ffcb35;
+  --primitive-sun-rim: #ff9f1c;
+  --primitive-moon: #fff4c7;
+  --primitive-moon-crater: #e8d99a;
+  --primitive-star: #ffe9a3;
+  --primitive-firefly: #eaff8f;
+  --primitive-flower-a: #ff74cc;
+  --primitive-flower-b: #ffcb35;
+  --primitive-cookie: #d99a55;
+  --primitive-cookie-chip: #6b3f1f;
+  --primitive-heart: #ff5f8f;
 
   /* --- Spacing Scale (4px rhythm) --- */
   --space-1: 0.25rem;   /* 4px */
@@ -115,19 +177,25 @@
   --space-12: 3rem;     /* 48px */
   --space-16: 4rem;     /* 64px */
 
-  /* --- Radius Scale --- */
+  /* --- Radius Scale (cards are crisp, not pillowy) --- */
   --radius-xs: 0.375rem;  /* 6px */
   --radius-sm: 0.5rem;    /* 8px */
   --radius-md: 0.75rem;   /* 12px */
   --radius-lg: 1rem;      /* 16px */
   --radius-xl: 1.375rem;  /* 22px */
-  --radius-2xl: 1.75rem;  /* 28px */
+  --radius-2xl: 1.875rem; /* 30px */
   --radius-full: 9999px;
 
   /* --- Typography Families --- */
-  --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
-  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  /* Fredoka: round, chunky, friendly display voice (has a width axis).
+     Nunito: rounded, very legible body. JetBrains Mono stays for code. */
+  --font-display: 'Fredoka', 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-sans: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --font-stretch-condensed: 90%;
+  --font-stretch-semi: 96%;
+  --font-stretch-normal: 100%;
+  --font-stretch-expanded: 100%;
 
   /* --- Type Scale --- */
   --text-2xs: 0.6875rem;  /* 11px */
@@ -137,22 +205,29 @@
   --text-lg: 1.125rem;    /* 18px */
   --text-xl: 1.375rem;    /* 22px */
   --text-2xl: 1.75rem;    /* 28px */
-  --text-3xl: 2.375rem;   /* 38px */
+  --text-3xl: 2.5rem;     /* 40px */
+  --text-4xl: 3.5rem;     /* 56px */
 
-  --leading-tight: 1.15;
-  --leading-snug: 1.3;
-  --leading-normal: 1.55;
-  --leading-relaxed: 1.7;
+  --leading-tight: 1.05;
+  --leading-snug: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.65;
 
   /* --- Motion Tokens --- */
   --duration-press: 100ms;
   --duration-fast: 160ms;
   --duration-base: 240ms;
   --duration-slow: 420ms;
+  --duration-flip: 640ms;
 
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-pop: cubic-bezier(0.34, 1.56, 0.64, 1);
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-flip: cubic-bezier(0.65, 0, 0.35, 1);
+  /* iOS-like sheet curve (Ionic): bottom sheets and drawers */
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  /* strong in-out for on-screen travel (cards flying, packs tearing) */
+  --ease-travel: cubic-bezier(0.77, 0, 0.175, 1);
 
   /* --- Z-Index Scale --- */
   --z-base: 1;

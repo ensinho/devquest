@@ -1,0 +1,369 @@
+/* ==========================================================================
+   DevQuest · Pixel Companion (Proposal B)
+   Hand-authored 32×32 fox sprite rendered as crisp inline SVG.
+   Colours: --pixel-s{n}-* semantic tokens only (same in both themes —
+   characters keep their palette; the ground shadow follows --color-stage-soft).
+   Motion: transform/opacity only, stepped timing so it feels pixel-native.
+   ========================================================================== */
+
+.dq-px {
+  --px-size: 96px;
+  --px-beat: calc(var(--duration-flip) * 2.5); /* ≈1.6s breathing cycle */
+  --px-wag: calc(var(--duration-slow) * 2);
+  --px-wag-fast: var(--duration-slow);
+  --px-hop: calc(var(--duration-flip) * 1.5);
+  --px-shake: calc(var(--duration-flip) * 3);
+  --px-perk: calc(var(--duration-flip) * 4);
+  --px-orbit: calc(var(--duration-flip) * 2);
+  --px-twinkle: calc(var(--duration-flip) * 2.25);
+  --px-float: calc(var(--duration-flip) * 3);
+
+  position: relative;
+  display: inline-block;
+  flex: none;
+  width: var(--px-size);
+  height: var(--px-size);
+  line-height: 0;
+  vertical-align: middle;
+}
+
+.dq-px__svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  image-rendering: pixelated;
+}
+
+/* --- Stage palettes ------------------------------------------------------ */
+.dq-px--s1 {
+  --px-outline: var(--pixel-s1-outline);
+  --px-shade: var(--pixel-s1-shade);
+  --px-body: var(--pixel-s1-body);
+  --px-light: var(--pixel-s1-light);
+  --px-belly: var(--pixel-s1-belly);
+  --px-eye: var(--pixel-s1-eye);
+  --px-shine: var(--pixel-s1-shine);
+  --px-blush: var(--pixel-s1-blush);
+  --px-accent: var(--pixel-s1-accent);
+  --px-accent2: var(--pixel-s1-accent2);
+  --px-hat-light: var(--pixel-s1-light);
+  --px-spark: var(--pixel-s1-accent);
+}
+
+.dq-px--s2 {
+  --px-outline: var(--pixel-s2-outline);
+  --px-shade: var(--pixel-s2-shade);
+  --px-body: var(--pixel-s2-body);
+  --px-light: var(--pixel-s2-light);
+  --px-belly: var(--pixel-s2-belly);
+  --px-eye: var(--pixel-s2-eye);
+  --px-shine: var(--pixel-s2-shine);
+  --px-blush: var(--pixel-s2-blush);
+  --px-accent: var(--pixel-s2-accent);
+  --px-accent2: var(--pixel-s2-accent2);
+  --px-hat-light: var(--pixel-s2-light);
+  --px-spark: var(--pixel-s2-accent);
+}
+
+.dq-px--s3 {
+  --px-outline: var(--pixel-s3-outline);
+  --px-shade: var(--pixel-s3-shade);
+  --px-body: var(--pixel-s3-body);
+  --px-light: var(--pixel-s3-light);
+  --px-belly: var(--pixel-s3-belly);
+  --px-eye: var(--pixel-s3-eye);
+  --px-shine: var(--pixel-s3-shine);
+  --px-blush: var(--pixel-s3-blush);
+  --px-accent: var(--pixel-s3-accent);
+  --px-accent2: var(--pixel-s3-accent2);
+  --px-hat-light: var(--pixel-s3-hat-light);
+  --px-spark: var(--pixel-s3-accent2);
+}
+
+.dq-px .px-outline { fill: var(--px-outline); }
+.dq-px .px-shade { fill: var(--px-shade); }
+.dq-px .px-body { fill: var(--px-body); }
+.dq-px .px-light { fill: var(--px-light); }
+.dq-px .px-belly { fill: var(--px-belly); }
+.dq-px .px-eye { fill: var(--px-eye); }
+.dq-px .px-shine { fill: var(--px-shine); }
+.dq-px .px-blush { fill: var(--px-blush); }
+.dq-px .px-accent { fill: var(--px-accent); }
+.dq-px .px-accent2 { fill: var(--px-accent2); }
+.dq-px .px-hat-light { fill: var(--px-hat-light); }
+.dq-px .px-spark { fill: var(--px-spark); }
+.dq-px .px-drop { fill: var(--pixel-s1-light); }
+
+.dq-px__shadow {
+  fill: var(--color-stage-soft);
+}
+
+/* --- Layer defaults (static frame = reduced-motion frame) ---------------- */
+.dq-px__tail--b,
+.dq-px__body--perk,
+.dq-px__sweat,
+.dq-px__sparkle {
+  opacity: 0;
+}
+
+/* --- Idle: breathing bob + tail wag ------------------------------------- */
+.dq-px__creature {
+  animation: dq-px-bob var(--px-beat) steps(1, end) infinite;
+}
+
+.dq-px__tail--a {
+  animation: dq-px-frame-a var(--px-wag) steps(1, end) infinite;
+}
+
+.dq-px__tail--b {
+  animation: dq-px-frame-b var(--px-wag) steps(1, end) infinite;
+}
+
+.dq-px.mood-happy .dq-px__tail--a,
+.dq-px.is-done .dq-px__tail--a {
+  animation-name: dq-px-frame-a;
+  animation-duration: var(--px-wag-fast);
+}
+
+.dq-px.mood-happy .dq-px__tail--b,
+.dq-px.is-done .dq-px__tail--b {
+  animation-name: dq-px-frame-b;
+  animation-duration: var(--px-wag-fast);
+}
+
+/* --- Waiting: ears perk up (with an occasional twitch) ------------------ */
+.dq-px.is-waiting .dq-px__body--perk {
+  opacity: 1;
+  animation: dq-px-perk var(--px-perk) steps(1, end) infinite;
+}
+
+.dq-px.is-waiting .dq-px__body--rest {
+  opacity: 0;
+  animation: dq-px-perk-rest var(--px-perk) steps(1, end) infinite;
+}
+
+/* --- Working: quicker, concentrated breathing --------------------------- */
+.dq-px.is-working .dq-px__creature {
+  animation-duration: calc(var(--px-beat) / 2);
+}
+
+/* --- Done: hop + sparkles ----------------------------------------------- */
+.dq-px.is-done .dq-px__creature {
+  animation: dq-px-hop var(--px-hop) steps(1, end) infinite;
+}
+
+.dq-px.is-done .dq-px__sparkle {
+  opacity: 1;
+  animation: dq-px-pop var(--px-hop) steps(1, end) infinite;
+}
+
+.dq-px.is-done .dq-px__sparkle--2 {
+  animation-delay: calc(var(--px-hop) / -3);
+}
+
+.dq-px.is-done .dq-px__sparkle--3 {
+  animation-delay: calc(var(--px-hop) / -1.5);
+}
+
+/* --- Blocked: short shake + sweat drop ---------------------------------- */
+.dq-px.is-blocked .dq-px__shake {
+  animation: dq-px-shake var(--px-shake) steps(1, end) infinite;
+}
+
+.dq-px.is-blocked .dq-px__sweat {
+  opacity: 1;
+  animation: dq-px-sweat var(--px-shake) steps(1, end) infinite;
+}
+
+/* --- Accessories --------------------------------------------------------- */
+.dq-px__spark {
+  animation: dq-px-float var(--px-float) steps(1, end) infinite;
+}
+
+.dq-px__star {
+  animation: dq-px-twinkle var(--px-twinkle) steps(1, end) infinite;
+}
+
+.dq-px__star--2 {
+  animation-delay: calc(var(--px-twinkle) / -3);
+}
+
+.dq-px__star--3 {
+  animation-delay: calc(var(--px-twinkle) / -1.5);
+}
+
+.dq-px__halo-phase {
+  opacity: 0.35;
+  animation: dq-px-orbit var(--px-orbit) steps(1, end) infinite;
+}
+
+.dq-px__halo-phase--1 { animation-delay: calc(var(--px-orbit) / -4 * 3); }
+.dq-px__halo-phase--2 { animation-delay: calc(var(--px-orbit) / -2); }
+.dq-px__halo-phase--3 { animation-delay: calc(var(--px-orbit) / -4); }
+
+/* --- Sleep: slow deep breathing, lazy tail --------------------------------- */
+.dq-px.is-sleep .dq-px__creature {
+  animation: dq-px-sleep-breath calc(var(--px-beat) * 2.2) steps(1, end) infinite;
+}
+
+.dq-px.is-sleep .dq-px__tail--a,
+.dq-px.is-sleep .dq-px__tail--b {
+  animation-duration: calc(var(--px-wag) * 3);
+}
+
+/* --- Eat: quick chomp bounce + fast happy wag ----------------------------- */
+.dq-px.is-eat .dq-px__creature {
+  animation: dq-px-chomp calc(var(--px-beat) / 4) steps(1, end) infinite;
+}
+
+.dq-px.is-eat .dq-px__tail--a {
+  animation-duration: var(--px-wag-fast);
+}
+
+.dq-px.is-eat .dq-px__tail--b {
+  animation-duration: var(--px-wag-fast);
+}
+
+/* --- Walk: trotting bob ----------------------------------------------------- */
+.dq-px.is-walk .dq-px__creature {
+  animation: dq-px-trot calc(var(--px-beat) / 3.2) steps(1, end) infinite;
+}
+
+.dq-px.is-walk .dq-px__tail--a,
+.dq-px.is-walk .dq-px__tail--b {
+  animation-duration: calc(var(--px-wag) / 2);
+}
+
+@keyframes dq-px-sleep-breath {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(1px); }
+  100% { transform: translateY(1px); }
+}
+
+@keyframes dq-px-chomp {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(1px); }
+  100% { transform: translateY(1px); }
+}
+
+@keyframes dq-px-trot {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-1px); }
+  100% { transform: translateY(-1px); }
+}
+
+/* --- Keyframes (1 unit = 1 sprite pixel inside the 32×32 viewBox) -------- */
+@keyframes dq-px-bob {
+  0% { transform: translateY(0); }
+  55% { transform: translateY(-1px); }
+  100% { transform: translateY(-1px); }
+}
+
+@keyframes dq-px-frame-a {
+  0% { opacity: 1; }
+  50% { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+@keyframes dq-px-frame-b {
+  0% { opacity: 0; }
+  50% { opacity: 1; }
+  100% { opacity: 1; }
+}
+
+@keyframes dq-px-perk {
+  0% { opacity: 1; }
+  76% { opacity: 0; }
+  80% { opacity: 1; }
+  84% { opacity: 0; }
+  88% { opacity: 1; }
+  100% { opacity: 1; }
+}
+
+@keyframes dq-px-perk-rest {
+  0% { opacity: 0; }
+  76% { opacity: 1; }
+  80% { opacity: 0; }
+  84% { opacity: 1; }
+  88% { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+@keyframes dq-px-hop {
+  0% { transform: translateY(0); }
+  12% { transform: translateY(-2px); }
+  24% { transform: translateY(-3px); }
+  36% { transform: translateY(-2px); }
+  48% { transform: translateY(0); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes dq-px-pop {
+  0% { opacity: 0; transform: translateY(0); }
+  20% { opacity: 1; transform: translateY(0); }
+  45% { opacity: 1; transform: translateY(-1px); }
+  65% { opacity: 0; transform: translateY(-1px); }
+  100% { opacity: 0; transform: translateY(0); }
+}
+
+@keyframes dq-px-shake {
+  0% { transform: translateX(0); }
+  4% { transform: translateX(-1px); }
+  8% { transform: translateX(1px); }
+  12% { transform: translateX(-1px); }
+  16% { transform: translateX(1px); }
+  20% { transform: translateX(0); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes dq-px-sweat {
+  0% { opacity: 1; transform: translateY(0); }
+  40% { opacity: 1; transform: translateY(1px); }
+  70% { opacity: 1; transform: translateY(2px); }
+  85% { opacity: 0; transform: translateY(2px); }
+  100% { opacity: 0; transform: translateY(0); }
+}
+
+@keyframes dq-px-float {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-1px); }
+  100% { transform: translateY(-1px); }
+}
+
+@keyframes dq-px-twinkle {
+  0% { opacity: 1; }
+  60% { opacity: 0.3; }
+  80% { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+@keyframes dq-px-orbit {
+  0% { opacity: 1; }
+  25% { opacity: 0.35; }
+  100% { opacity: 0.35; }
+}
+
+/* --- Reduced motion: a single calm, readable frame ----------------------- */
+@media (prefers-reduced-motion: reduce) {
+  /* Doubled root class out-ranks every state selector above (0,3,0, later in source). */
+  .dq-px.dq-px :is(
+      .dq-px__creature,
+      .dq-px__shake,
+      .dq-px__tail--a,
+      .dq-px__tail--b,
+      .dq-px__body--rest,
+      .dq-px__body--perk,
+      .dq-px__sparkle,
+      .dq-px__sweat,
+      .dq-px__spark,
+      .dq-px__star,
+      .dq-px__halo-phase
+    ) {
+    animation: none;
+  }
+
+  .dq-px.dq-px .dq-px__halo-phase {
+    opacity: 1;
+  }
+}

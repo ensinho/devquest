@@ -17,7 +17,7 @@ devquest/ (git root)
 │   └── wounds.md                     # Bug & regression diary (never repeat mistakes)
 ├── .agents/
 │   └── skills/
-│       ├── design-system/SKILL.md    # 3-layer tokens, 0-1-2 containment, visual identity
+│       ├── design-system/SKILL.md    # 3-layer tokens, Toca world, fox companion, visual identity
 │       ├── ux/SKILL.md               # Flows, latency, keyboard, a11y, mobile craft
 │       ├── mobile-craft/SKILL.md     # Native-grade mobile onboarding, thumb-zone, floating dock
 │       ├── guided-clarity/SKILL.md   # Progressive disclosure, cognitive load & guided flows
@@ -27,6 +27,10 @@ devquest/ (git root)
 └── devquest/                         # React 19 + Vite 7 + Firebase web app
     ├── index.html
     ├── package.json
+    ├── vercel.json                   # Deploy config + security headers (CSP, HSTS…)
+    ├── firestore.rules               # Browser = read-own-only; all writes via the API
+    ├── api/                          # Vercel functions (session, me, progress, export, admin/stats, health)
+    ├── server/                       # API internals: auth/http guard, progress engine, QuickJS sandbox, metadata
     └── src/
         ├── styles/                   # 3-layer CSS tokens (primitives -> semantic -> components)
         ├── utils/                    # Pure logic & theme utilities (unit tested)
@@ -57,18 +61,19 @@ Before modifying CSS, layout, components, pages, or modals, you **MUST** read:
 
 1. **3-Layer CSS Tokens Only:** `primitives` → `semantic` → `components` (`devquest/src/styles/`).
    - **Zero raw hex/rgb/rgba/hsl values** in screen or component CSS. Every color, spacing step, radius, font size, and transition duration must reference a semantic or component token.
-2. **Dark + Light Parity:** Every view and state must work in **Obsidian Scriptorium (Dark)** and **Warm Vellum (Light)** (`data-theme="dark" | "light"`). Never leave light mode broken or unreadable.
+2. **Dark + Light Parity:** Every view and state must work in **Noite na Toca (Dark)** and **Dia na Toca (Light)** (`data-theme="dark" | "light"`). The habitat scene follows the theme (night sky / day sky). Never leave light mode broken or unreadable.
 3. **Calm Containment (0-1-2 Rule):**
    - Never nest `1px` or `2px` solid borders inside bordered panels inside bordered sections.
    - Separate hierarchy with **tonal elevation** (`--color-bg` → `--color-surface` → `--color-surface-raised`) and generous spacing.
-4. **One Primary CTA per Screen / Modal:** Only one element per view/dialog receives the primary `--color-primary` fill. Secondary actions stay tonal or ghost.
+4. **One Primary CTA per Screen / Modal:** Only one element per view/dialog receives the primary yellow fill (`--color-primary-fill`). Secondary actions stay tonal or ghost.
 5. **Semantic Color Discipline:**
-   - `--color-primary` (Ember Amber): primary CTA, selected node, active focus.
-   - `--color-gold` (Relic Gold): earned progress only (XP, level up, completed badges).
-   - `--color-live` (Arcane Teal): available/unlocked skills, active paths, passing code checks.
-   - `--color-danger` (Crimson Seal): Boss Fights, syntax/test errors, destructive actions.
-   - `--color-arcane` (Arcane Violet): mascot evolution & Final Mastery node only.
-6. **Authorial Visual Signature:** Protect and elevate DevQuest's two signature pieces — the **Companion Camp** (reactive pixel-art mascot habitat) and the **Constellation Skill Map** (living curved dependency graph, vertical trail on mobile).
+   - `--color-primary` / `--color-primary-fill` (**Signal Yellow**): the next step only (primary CTA, the next quest, the journey's next segment).
+   - `--color-stage` / `--color-stage-ink` (**Companion Stage**): selection, active tabs, the companion frame. Cobalt (Kitsuby) → Ember (Pyrokit) → Magenta (Archkits); the whole app follows the fox's evolution.
+   - `--color-gold` (**Earned Mint**, legacy name): XP, completed stations/quests, passing checks.
+   - `--color-live` (**Cobalt**): available stations, live trail segments.
+   - `--color-danger` (**Coral**): Boss Fights, syntax/test errors, destructive actions.
+   - `--color-arcane` (**Magenta**): evolution meter and Final Mastery only.
+6. **Authorial Visual Signature:** Protect and elevate DevQuest's two signature pieces — the **Toca** (the pixel-art fox's living habitat: wanders, naps, eats, takes pets, asks quizzes, reacts to code, XP floats) and the **Serpentine Trail** (9 stations with progress rings; the mini fox stands on your current station). Desktop home fits one screen with no page scroll.
 
 ---
 
@@ -107,6 +112,17 @@ A task is **NOT complete** until all four checks pass in the current state:
 
 ---
 
-## 7. Living Memory (`docs/wounds.md`)
+## 7. Backend Rules (`docs/backend.md`)
+
+1. **The browser never writes Firestore.** Every mutation goes through `api/*` (Firebase Admin). `firestore.rules` stays read-own-only; changing it requires redeploying rules (`npm run deploy:rules`) and re-running `scripts/e2e-api.mjs`.
+2. **Server-authoritative progress.** XP, levels, stages and unlocks are recomputed on the server with the shared modules in `src/data` and `src/utils`. Keep those modules pure (no DOM, no assets) so both sides import them.
+3. **Never execute learner code on the server outside the sandbox.** Quest checks call `runSnippet`, never `new Function`/`eval` (W-016).
+4. **Secrets live only in Vercel env vars** (`FIREBASE_SERVICE_ACCOUNT_B64`, `IP_HASH_SALT`). Never commit keys; `.env*`, `.vercel` are gitignored.
+5. **Privacy:** store no raw IPs or coordinates; every new stored field must appear in `/api/export` and be erased by `DELETE /api/me`.
+6. Backend changes add the live check to the gate: `node scripts/e2e-api.mjs <deployment-url>` (25 checks, throwaway accounts).
+
+---
+
+## 8. Living Memory (`docs/wounds.md`)
 
 Whenever you fix a tricky bug, layout trap, or recurring pitfall, append a concise 5-line entry to `docs/wounds.md` (`Symptom → Root Cause → Prevention Rule`) so the codebase gets stronger with every iteration.

@@ -124,7 +124,7 @@ export default function ArenaPage({
     if (validation.isValid) {
       setSubmitState('success');
       onSound?.('win');
-      onCompleteQuest(activeQuest.id);
+      onCompleteQuest(activeQuest.id, code);
     } else {
       setSubmitState('error');
       onSound?.('error');

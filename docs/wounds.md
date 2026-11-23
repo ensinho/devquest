@@ -58,3 +58,49 @@
 - **Symptom:** Typing inside `CodeEditor` showed the blinking caret offset several pixels from the highlighted characters (`<h1>|</h1>` visually landed over `/`).
 - **Root Cause:** `<pre class="dq-ide-highlight"><code>` let browser UA `code { font-family: monospace }` override `JetBrains Mono` while `<textarea>` used `JetBrains Mono`; additionally `.dq-tok-tag`/`.dq-tok-keyword` applied `font-weight: 600` and ligatures/scrollbars differed between the two layers.
 - **Prevention Rule:** Explicitly inherit all font/box metrics onto `.dq-ide-code`, enforce uniform `font-weight: 400`, `font-variant-ligatures: none`, and matching `overflow-y: scroll; scrollbar-gutter: stable;` on both `.dq-ide-highlight` and `.dq-ide-textarea`.
+
+### W-012 — Inline CSS variable silently beat a responsive size override
+- **Symptom:** At `390×844` the habitat fox rendered at 168px and was pushed under the speech bubble; the mobile `--px-size: 116px` rule did nothing.
+- **Root Cause:** `PixelCompanion` writes `--px-size` in its inline `style`, and an inline custom property always out-ranks a stylesheet declaration of the same property on the same element.
+- **Prevention Rule:** Size sprites from JS (`size` prop via a `matchMedia` hook) or override the consuming property (`width`/`height`) from a more specific selector — never re-declare a variable the component sets inline.
+
+### W-013 — `preserveAspectRatio="xMidYMax slice"` cropped the scene's landmarks
+- **Symptom:** On the tall desktop habitat the den, sign post and a cloud were invisible; on the wide mobile habitat they appeared.
+- **Root Cause:** `slice` scales to cover; in a portrait container only the middle ~35% of the 192-unit scene stays visible.
+- **Prevention Rule:** Keep every meaningful scene prop inside the central band (x≈62–130 of 192) and capture both a portrait (desktop column) and a landscape (mobile) habitat before shipping.
+
+### W-014 — Mobile dock clearance created desktop scroll on a one-screen layout
+- **Symptom:** The desktop home was designed to fit `100dvh` but the page still scrolled by ~80px.
+- **Root Cause:** `.dq-app` reserves `6rem` bottom padding for the mobile floating dock at every width.
+- **Prevention Rule:** One-screen pages override the shell's bottom padding at `min-width: 769px` (`.dq-app--quests`) and size themselves with `calc(100dvh - chrome)`.
+
+### W-015 — The anti-slop gate flagged a comment
+- **Symptom:** `tokens.test.js` failed on a new stylesheet with no `!important` declarations.
+- **Root Cause:** The file's header comment literally said "no !important"; the gate is a plain regex over the file.
+- **Prevention Rule:** Describe the rule in words ("no specificity hacks") in comments; new stylesheets are picked up by the gate automatically (every `src/styles/*.css` except primitives).
+
+### W-016 — Server-side quest validation would have been remote code execution
+- **Symptom:** Moving quest validation to the API meant `q7`/`q18` checks called `new Function(learnerCode)()` inside the Vercel function — any player could read `process.env` (service-account key).
+- **Root Cause:** Curriculum checks were written for the browser, where executing the learner's own code is harmless.
+- **Prevention Rule:** Quest checks never call `new Function`/`eval` directly; they use `runSnippet` (`src/utils/snippetRunner.js`). The API installs the QuickJS sandbox (`server/sandbox.js`) before validating. `server/progressEngine.test.js` asserts the sandbox has no `process`/`require`/`fetch` and kills infinite loops.
+
+### W-017 — `ERR_REQUIRE_ESM` crashed every Vercel function at boot
+- **Symptom:** All `/api/*` returned `FUNCTION_INVOCATION_FAILED`; logs showed `require() of ES Module jose/dist/webapi/index.js from jwks-rsa`.
+- **Root Cause:** `firebase-admin@14` pulls `jwks-rsa@4` → ESM-only `jose@6`; Vercel's function loader doesn't support `require(esm)` even on Node 24.
+- **Prevention Rule:** Pin `firebase-admin@^13` (jwks-rsa 3 / CJS jose 4) until Vercel supports it; after any backend dependency bump, `curl /api/health` on the deployment before aliasing.
+
+### W-018 — Playwright `networkidle` never settles for signed-in pages
+- **Symptom:** `page.goto(..., { waitUntil: 'networkidle' })` timed out after sign-in.
+- **Root Cause:** The Firestore `onSnapshot` listener keeps a long-poll WebChannel open.
+- **Prevention Rule:** Use `waitUntil: 'load'` + explicit `waitForSelector` for authenticated captures.
+
+### W-019 — Double "show password" eye in Edge
+- **Symptom:** The password field showed Edge's native reveal button next to ours.
+- **Root Cause:** Chromium-Edge adds `::-ms-reveal` to `type=password` inputs.
+- **Prevention Rule:** Any custom reveal toggle hides `::-ms-reveal` and `::-ms-clear` on its input.
+
+### W-020 — Mirrored card showing through the pack mid-flip
+- **Symptom:** During the onboarding pack tear, the companion card appeared mirrored and see-through on top of the pack.
+- **Root Cause:** The card rotates from `rotateY(180deg)` while stacked above the pack; its back face renders by default and it sat on a higher z-index.
+- **Prevention Rule:** Any flip-in reveal sets `backface-visibility: hidden` on the flipping element and starts *behind* the thing it emerges from; stack reveal layers in one grid cell (`grid-area: 1/1`) instead of toggling `position: absolute`, so nothing jumps when the state flips.
+- **Verify:** Scrub the timeline with `document.getAnimations().forEach(a => { a.pause(); a.currentTime = t })` and screenshot key frames.

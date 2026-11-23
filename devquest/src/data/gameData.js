@@ -1,3 +1,5 @@
+import { runSnippet } from '../utils/snippetRunner.js';
+
 export const HERO_SIGILS = [
   { id: 'sigil-paladin', name: 'Guardião do Código', glyph: '◈', role: 'Full-Stack' },
   { id: 'sigil-sorcerer', name: 'Mago Assíncrono', glyph: '✦', role: 'Lógica JS' },
@@ -276,23 +278,14 @@ export const INITIAL_QUESTS = [
       {
         label: 'Valor do tipo string válido',
         test: (c) => {
-          try {
-            const fn = new Function(`${c}; return hero;`);
-            return typeof fn() === 'string' && fn().trim().length > 0;
-          } catch {
-            return false;
-          }
+          const run = runSnippet(c, 'hero');
+          return run.ok && typeof run.value === 'string' && run.value.trim().length > 0;
         },
       },
     ],
     solution: (code) => {
-      try {
-        const fn = new Function(`${code}; return hero;`);
-        const val = fn();
-        return typeof val === 'string' && val.trim().length > 0;
-      } catch {
-        return false;
-      }
+      const run = runSnippet(code, 'hero');
+      return run.ok && typeof run.value === 'string' && run.value.trim().length > 0;
     },
   },
   {
@@ -310,30 +303,22 @@ export const INITIAL_QUESTS = [
       {
         label: 'Retorna exatamente [3, 4, 5]',
         test: (c) => {
-          try {
-            const fn = new Function(`${c}; return newArr;`);
-            const res = fn();
-            return Array.isArray(res) && res.length === 3 && res[0] === 3 && res[2] === 5;
-          } catch {
-            return false;
-          }
+          const run = runSnippet(c, 'newArr');
+          const res = run.ok ? run.value : null;
+          return Array.isArray(res) && res.length === 3 && res[0] === 3 && res[2] === 5;
         },
       },
     ],
     solution: (code) => {
-      try {
-        const fn = new Function(`${code}; return newArr;`);
-        const res = fn();
-        return (
-          Array.isArray(res) &&
-          res.length === 3 &&
-          res[0] === 3 &&
-          res[1] === 4 &&
-          res[2] === 5
-        );
-      } catch {
-        return false;
-      }
+      const run = runSnippet(code, 'newArr');
+      const res = run.ok ? run.value : null;
+      return (
+        Array.isArray(res) &&
+        res.length === 3 &&
+        res[0] === 3 &&
+        res[1] === 4 &&
+        res[2] === 5
+      );
     },
   },
   {
@@ -662,100 +647,5 @@ export const INITIAL_QUESTS = [
   },
 ];
 
-export const INITIAL_GUIDES = [
-  {
-    id: 'async',
-    title: 'Grimório da Assincronicidade',
-    category: 'JavaScript',
-    readTime: '3 min',
-    description: 'Domine Promises, async/await e o Event Loop sem travar a interface.',
-    mentorSummary:
-      'Regra de ouro: sempre envolva await em try/catch para tratar falhas de rede com elegância!',
-    content: [
-      { type: 'h3', text: 'O Event Loop' },
-      {
-        type: 'p',
-        text: 'JavaScript executa em uma única thread, mas o Event Loop delega chamadas assíncronas (como fetch e timers) e traz o resultado de volta assim que a pilha principal fica livre.',
-      },
-      { type: 'h3', text: 'Async / Await na prática' },
-      {
-        type: 'p',
-        text: 'Async/await deixa o fluxo assíncrono linear e legível, facilitando o tratamento de erros com try/catch.',
-      },
-      {
-        type: 'code',
-        text: `async function getQuestData() {\n  try {\n    const response = await fetch('https://api.devquest.com/quests');\n    return await response.json();\n  } catch (error) {\n    console.error('Falha ao buscar quests:', error);\n  }\n}`,
-      },
-    ],
-  },
-  {
-    id: 'flexbox',
-    title: 'Códice do Flexbox & Grid',
-    category: 'CSS3',
-    readTime: '2 min',
-    description: 'Alinhe elementos em 1D (Flexbox) e componha grades limpas em 2D (CSS Grid).',
-    mentorSummary:
-      'Dica rápida: use Flexbox para barras/linhas e CSS Grid para galerias de cards em múltiplas colunas!',
-    content: [
-      { type: 'h3', text: 'Flexbox para Alinhamento' },
-      {
-        type: 'p',
-        text: 'Ao definir display: flex, justify-content controla o eixo principal e align-items controla o eixo cruzado.',
-      },
-      {
-        type: 'code',
-        text: `.arena {\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  gap: 1rem;\n}`,
-      },
-      { type: 'h3', text: 'CSS Grid para Estruturas 2D' },
-      {
-        type: 'code',
-        text: `.cards {\n  display: grid;\n  grid-template-columns: repeat(2, 1fr);\n  gap: 1rem;\n}`,
-      },
-    ],
-  },
-  {
-    id: 'dom',
-    title: 'Pergaminho do DOM Semântico',
-    category: 'HTML5',
-    readTime: '2 min',
-    description: 'Construa páginas acessíveis, navegáveis por teclado e amigáveis a leitores de tela.',
-    mentorSummary:
-      'Nunca use <div onClick> para botões! <button type="button"> já traz teclado, foco e acessibilidade de graça.',
-    content: [
-      { type: 'h3', text: 'Semântica é Superpoder' },
-      {
-        type: 'p',
-        text: 'Usar <header>, <nav>, <main>, <aside> e <button> permite que navegadores, teclado e tecnologias assistivas entendam seu produto imediatamente.',
-      },
-      {
-        type: 'code',
-        text: `<section aria-label="Boas-vindas">\n  <h1>Welcome to DevQuest</h1>\n  <p>Sua jornada Full-Stack começa aqui.</p>\n  <button type="button">Começar</button>\n</section>`,
-      },
-    ],
-  },
-  {
-    id: 'hooks',
-    title: 'Círculo Rúnico de React Hooks',
-    category: 'React',
-    readTime: '3 min',
-    description: 'Estado previsível com useState, listas com key e derivações limpas com useMemo.',
-    mentorSummary:
-      'Se um valor pode ser calculado a partir de outro estado, use useMemo em vez de useEffect + setState!',
-    content: [
-      { type: 'h3', text: 'Estado local com useState' },
-      {
-        type: 'code',
-        text: `const [xp, setXp] = useState(0);\nconst addXp = () => setXp((prev) => prev + 35);`,
-      },
-      { type: 'h3', text: 'Derive em vez de duplicar estado' },
-      {
-        type: 'p',
-        text: 'Guardar estado derivado em outro useState costuma causar renderizações extras e loops infinitos. Calcule com useMemo diretamente da fonte da verdade.',
-      },
-      {
-        type: 'code',
-        text: `const unlockedSkills = useMemo(() => {\n  return skills.filter((s) => s.dependencies.every((d) => done.has(d)));\n}, [skills, done]);`,
-      },
-    ],
-  },
-];
+// Grimórios live in their own module; re-exported so existing imports keep working.
+export { INITIAL_GUIDES } from './guides.js';

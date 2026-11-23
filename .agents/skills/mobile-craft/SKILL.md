@@ -67,4 +67,4 @@ Inspired by best-in-class consumer mobile onboarding (full-bleed expressive artw
    - Standard modals (`GuideModal`, `AuthModal`, celebrations) anchor cleanly to the bottom below `640px` with rounded top corners (`--radius-2xl`), a subtle top drag-indicator pill, and `env(safe-area-inset-bottom)` padding.
    - Guard hover styles strictly behind `@media (hover: hover) and (pointer: fine)` to prevent sticky hover states on touch screens.
 5. **Token & Theme Parity:**
-   - Every mobile surface, floating dock, onboarding hero artwork card, and stacked tray MUST use 3-layer CSS tokens (`tokens.primitives.css` → `tokens.semantic.css` → `tokens.components.css`) and pass both **Dark (Obsidian Scriptorium)** and **Light (Warm Vellum)** visual inspection at `390×844`.
+   - Every mobile surface, floating dock, onboarding hero artwork card, and stacked tray MUST use 3-layer CSS tokens (`tokens.primitives.css` → `tokens.semantic.css` → `tokens.components.css`) and pass both **Dark (Noite na Toca)** and **Light (Dia na Toca)** visual inspection at `390×844`.

@@ -1,0 +1,1402 @@
+/* ==========================================================================
+   DEVQUEST — ONBOARDING: "Open your starter pack"
+   1. Tear the pack -> your companion card rises and flips in.
+   2. Play your first card -> live validator, preview, foil on pass.
+   3. Sign your hero card.
+   Tokens only. Motion is transform/opacity; reduced motion rests.
+   ========================================================================== */
+
+.dq-onb-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: grid;
+  place-items: center;
+  padding: var(--space-6);
+  background-color: var(--color-overlay);
+  backdrop-filter: blur(10px);
+}
+
+.dq-onb-sheet {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr);
+  width: min(62rem, 100%);
+  min-height: min(36rem, calc(100dvh - 3rem));
+  border-radius: var(--radius-2xl);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  animation: dq-deal-in 420ms var(--ease-out) both;
+}
+
+/* --- Left: the stage --- */
+.dq-onb-stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-height: 0;
+  padding: var(--space-5);
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 55%, var(--color-companion-hero), transparent 72%),
+    radial-gradient(circle, var(--color-border-subtle) 1px, transparent 1.5px) 0 0 / 18px 18px,
+    var(--color-surface-sunken);
+}
+
+.dq-onb-stage-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dq-onb-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-display);
+  font-stretch: var(--font-stretch-expanded);
+  font-size: var(--text-sm);
+  font-weight: 850;
+}
+
+.dq-onb-utility-row {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.dq-onb-mini-icon {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 0;
+  border-radius: var(--radius-full);
+  background-color: var(--color-surface);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+}
+
+/* --- Step 1: the pack ------------------------------------------------------
+   Choreography (TEAR_MS = 1500ms, one beat, seen once):
+     0–330ms   anticipation: squash + shake, seam lights up
+     330–700   tear: the top strip flies off, light rays + flash from the seam
+     560–1180  the pack drops away while the card rises and flips in
+     1100–1500 pixel sparks burst, card settles
+   A second tap skips to the end. Tilt/glare only on fine pointers.
+   -------------------------------------------------------------------------- */
+.dq-onb-pack-scene {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-5);
+  min-height: 0;
+}
+
+/* every layer of the reveal shares one grid cell */
+.dq-onb-pack-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: 0;
+  perspective: 900px;
+}
+
+.dq-onb-pack-stage > * {
+  grid-area: 1 / 1;
+}
+
+.dq-pack-hit {
+  position: relative;
+  z-index: 3;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transform-style: preserve-3d;
+  transition: transform 420ms var(--ease-out);
+}
+
+.dq-pack-hit.is-tilting {
+  transition-duration: 90ms;
+}
+
+.dq-pack {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 11.5rem;
+  height: 16rem;
+  filter: drop-shadow(0 18px 24px var(--color-overlay));
+  animation: dq-pack-idle 3.6s var(--ease-standard) infinite alternate;
+}
+
+.dq-pack-top {
+  position: relative;
+  z-index: 2;
+  display: block;
+  height: 1.5rem;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  background: linear-gradient(180deg, var(--color-stage), var(--color-stage));
+  /* zig-zag tear line along the bottom edge */
+  clip-path: polygon(
+    0 0, 100% 0, 100% 100%,
+    95% 80%, 90% 100%, 85% 80%, 80% 100%, 75% 80%, 70% 100%, 65% 80%, 60% 100%, 55% 80%, 50% 100%,
+    45% 80%, 40% 100%, 35% 80%, 30% 100%, 25% 80%, 20% 100%, 15% 80%, 10% 100%, 5% 80%, 0 100%
+  );
+  transform-origin: 10% 100%;
+}
+
+.dq-pack-crimp {
+  display: block;
+  height: 0.75rem;
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--color-text-inverse) 0 2px,
+    transparent 2px 6px
+  );
+  opacity: 0.32;
+}
+
+.dq-pack-crimp--bottom {
+  height: 0.875rem;
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  background-color: var(--color-arcane);
+  opacity: 1;
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--color-overlay) 0 2px,
+    transparent 2px 6px
+  );
+}
+
+.dq-pack-seam {
+  position: absolute;
+  z-index: 3;
+  top: 1.25rem;
+  left: 6%;
+  right: 6%;
+  height: 2px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-primary);
+  box-shadow: 0 0 14px 3px var(--color-primary);
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+.dq-pack-body {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  margin-top: -0.25rem;
+  background: linear-gradient(170deg, var(--color-stage) 0%, var(--color-arcane) 130%);
+  color: var(--color-text-inverse);
+  overflow: hidden;
+}
+
+.dq-pack-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 9rem;
+  height: 9rem;
+  margin: -5.25rem 0 0 -4.5rem;
+  border-radius: var(--radius-full);
+  box-shadow:
+    inset 0 0 0 1px var(--color-text-inverse),
+    0 0 0 14px var(--color-primary-soft);
+  opacity: 0.22;
+}
+
+.dq-pack .dq-brandmark {
+  position: relative;
+  filter: drop-shadow(0 4px 6px var(--color-overlay));
+}
+
+.dq-pack .dq-brandmark-back {
+  fill: var(--color-text-inverse);
+}
+
+.dq-pack-title {
+  position: relative;
+  margin-top: var(--space-2);
+  font-family: var(--font-display);
+  font-stretch: var(--font-stretch-expanded);
+  font-size: var(--text-xl);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+.dq-pack-sub {
+  position: relative;
+  font-size: var(--text-2xs);
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.dq-pack-count {
+  position: relative;
+  margin-top: var(--space-3);
+  padding: 3px var(--space-2);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-text-inverse);
+  color: var(--color-stage-ink);
+  font-size: var(--text-2xs);
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.dq-pack-foil {
+  position: absolute;
+  inset: 0;
+  background-image: var(--tcg-foil);
+  background-size: 300% 300%;
+  background-position: var(--mx, 0%) var(--my, 0%);
+  mix-blend-mode: screen;
+  opacity: 0.28;
+  pointer-events: none;
+  animation: dq-foil-sweep 3.2s var(--ease-standard) infinite alternate;
+}
+
+.dq-pack-hit.is-tilting .dq-pack-foil {
+  animation: none;
+  opacity: 0.5;
+}
+
+.dq-pack-glare,
+.dq-onb-ccard-glare {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at var(--mx, 50%) var(--my, 0%),
+    var(--color-primary-soft),
+    transparent 55%
+  );
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--duration-base) var(--ease-out);
+}
+
+.is-tilting .dq-pack-glare,
+.is-tilting .dq-onb-ccard-glare {
+  opacity: 1;
+}
+
+/* light behind the reveal */
+.dq-onb-rays {
+  z-index: 0;
+  width: 26rem;
+  height: 26rem;
+  border-radius: var(--radius-full);
+  background: repeating-conic-gradient(
+    from 0deg,
+    var(--color-primary-soft) 0deg 7deg,
+    transparent 7deg 22deg
+  );
+  mask-image: radial-gradient(circle, var(--color-text) 18%, transparent 68%);
+  opacity: 0;
+  transform: scale(0.5);
+  pointer-events: none;
+}
+
+.dq-onb-flash {
+  z-index: 3;
+  width: 14rem;
+  height: 14rem;
+  border-radius: var(--radius-full);
+  background: radial-gradient(circle, var(--color-primary) 0%, var(--color-primary-soft) 38%, transparent 70%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* --- the tear --- */
+.is-tearing .dq-pack {
+  animation: dq-pack-tear 1500ms linear forwards;
+}
+
+.is-tearing .dq-pack-top {
+  animation: dq-top-rip 1500ms linear forwards;
+}
+
+.is-tearing .dq-pack-seam {
+  animation: dq-seam-glow 1500ms linear forwards;
+}
+
+.is-tearing .dq-pack-foil {
+  animation-duration: 600ms;
+}
+
+.is-tearing .dq-onb-rays {
+  animation: dq-rays-burst 1500ms var(--ease-out) forwards;
+}
+
+.is-tearing .dq-onb-flash {
+  animation: dq-flash 1500ms linear forwards;
+}
+
+.is-tearing .dq-onb-ccard {
+  /* rises from behind the pack; its mirrored back never shows mid-flip */
+  backface-visibility: hidden;
+  animation: dq-card-emerge 1500ms linear both;
+}
+
+.is-tearing .dq-pack-hit {
+  cursor: default;
+}
+
+.is-tearing .dq-onb-pack-stage {
+  cursor: pointer;
+}
+
+/* --- open: ambient glory behind the card --- */
+.is-open .dq-onb-rays {
+  opacity: 0.55;
+  transform: scale(1);
+  animation: dq-rays-spin 48s linear infinite;
+}
+
+/* forms row keeps its slot from the start, so nothing jumps on reveal */
+.dq-onb-forms[aria-hidden='true'] {
+  visibility: hidden;
+}
+
+.is-open .dq-onb-forms {
+  animation: dq-deal-in 360ms 80ms var(--ease-out) both;
+}
+
+/* --- pixel sparks --- */
+.dq-burst {
+  position: relative;
+  z-index: 4;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.dq-burst-bit {
+  position: absolute;
+  left: calc(var(--s) / -2);
+  top: calc(var(--s) / -2);
+  width: var(--s);
+  height: var(--s);
+  background-color: var(--color-primary);
+  opacity: 0;
+  animation: dq-spark-fly 640ms var(--ease-out) var(--delay) both;
+}
+
+.dq-burst-bit.is-tone1 {
+  background-color: var(--color-stage);
+}
+
+.dq-burst-bit.is-tone2 {
+  background-color: var(--color-gold);
+}
+
+.dq-burst-bit.is-tone3 {
+  background-color: var(--color-arcane);
+}
+
+.dq-burst--reveal .dq-burst-bit {
+  animation-delay: calc(1080ms + var(--delay));
+}
+
+.dq-burst--pass {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+}
+
+/* --- Companion card revealed from the pack --- */
+.dq-onb-ccard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 12.5rem;
+  padding: var(--space-2);
+  border-radius: var(--radius-xl);
+  background-color: var(--tcg-face);
+  box-shadow:
+    inset 0 0 0 3px var(--color-stage),
+    var(--shadow-lg);
+  overflow: hidden;
+}
+
+.dq-onb-ccard-plate,
+.dq-onb-hcard-plate {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background-color: var(--color-stage);
+  color: var(--color-text-inverse);
+  font-family: var(--font-display);
+  font-stretch: var(--font-stretch-condensed);
+  font-size: var(--text-lg);
+  font-weight: 850;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.dq-onb-ccard-plate .dq-tabular,
+.dq-onb-hcard-plate .dq-tabular {
+  flex: none;
+  white-space: nowrap;
+  font-size: var(--text-2xs);
+}
+
+.dq-onb-ccard-art,
+.dq-onb-hcard-art {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  height: 10.5rem;
+  border-radius: var(--radius-md);
+  background:
+    radial-gradient(ellipse 60% 55% at 50% 50%, var(--color-companion-hero), transparent 72%),
+    var(--tcg-art);
+}
+
+/* the sprite always fits its card window */
+.dq-onb-ccard-art .dq-px {
+  width: auto;
+  height: 86%;
+  max-width: 100%;
+  aspect-ratio: 1;
+}
+
+.dq-onb-ccard-type,
+.dq-onb-hcard-type {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0 var(--space-1) var(--space-1);
+  font-size: var(--text-2xs);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-stage-ink);
+}
+
+.dq-onb-ccard-foil,
+.dq-onb-spell-foil {
+  position: absolute;
+  inset: 0;
+  background-image: var(--tcg-foil);
+  background-size: 260% 260%;
+  mix-blend-mode: screen;
+  opacity: 0.3;
+  pointer-events: none;
+  animation: dq-foil-sweep 3.4s var(--ease-standard) infinite alternate;
+}
+
+[data-theme='light'] .dq-onb-ccard-foil,
+[data-theme='light'] .dq-onb-spell-foil,
+[data-theme='light'] .dq-pack-foil {
+  mix-blend-mode: multiply;
+}
+
+.dq-onb-forms {
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-1);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+  animation: dq-deal-in 360ms 200ms var(--ease-out) both;
+}
+
+.dq-onb-form-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 2.5rem;
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-text-muted);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.dq-onb-form-btn .dq-tabular {
+  display: grid;
+  place-items: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: var(--radius-xs);
+  background-color: var(--color-surface-sunken);
+  font-size: var(--text-2xs);
+}
+
+.dq-onb-form-btn.is-active {
+  background-color: var(--color-stage);
+  color: var(--color-text-inverse);
+}
+
+.dq-onb-form-btn.is-active .dq-tabular {
+  background-color: var(--color-text-inverse);
+  color: var(--color-stage-ink);
+}
+
+/* --- Step 2: first card --- */
+.dq-onb-spell {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-4);
+  min-height: 0;
+}
+
+.dq-onb-spell-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-xl);
+  background-color: var(--color-surface);
+  box-shadow:
+    inset 0 0 0 2px var(--color-live),
+    var(--shadow-md);
+  overflow: hidden;
+  transition: box-shadow var(--duration-base) var(--ease-out);
+}
+
+.dq-onb-spell-card.is-passed {
+  box-shadow:
+    inset 0 0 0 2px var(--color-gold),
+    var(--shadow-md);
+}
+
+.dq-onb-spell-foil {
+  opacity: 0;
+  transition: opacity var(--duration-slow) var(--ease-out);
+}
+
+.dq-onb-spell-card.is-passed .dq-onb-spell-foil {
+  opacity: 0.38;
+}
+
+.dq-onb-spell-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dq-onb-file {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.dq-onb-xp {
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-gold-soft);
+  color: var(--color-gold);
+  font-size: var(--text-xs);
+  font-weight: 800;
+}
+
+.dq-onb-code-input {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  min-height: 4rem;
+  padding: var(--space-3);
+  border: 0;
+  border-radius: var(--radius-md);
+  background-color: var(--code-bg);
+  color: var(--syntax-tag);
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  resize: none;
+}
+
+.dq-onb-code-input:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.dq-onb-preview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-height: 4.25rem;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface-raised);
+}
+
+.dq-onb-preview-label {
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-subtle);
+}
+
+.dq-onb-preview-h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-stretch: var(--font-stretch-condensed);
+  font-size: var(--text-2xl);
+  font-weight: 850;
+  line-height: 1.05;
+  overflow-wrap: anywhere;
+  animation: dq-deal-in 240ms var(--ease-out) both;
+}
+
+.dq-onb-preview-empty {
+  font-size: var(--text-sm);
+  color: var(--color-text-subtle);
+}
+
+.dq-onb-checks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dq-onb-check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.dq-onb-check.is-passed {
+  color: var(--color-gold);
+  font-weight: 700;
+}
+
+.dq-onb-spell-side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* --- Step 3: hero card --- */
+.dq-onb-hero {
+  flex: 1;
+  display: grid;
+  place-items: center;
+}
+
+.dq-onb-hcard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 13rem;
+  padding: var(--space-2);
+  border-radius: var(--radius-xl);
+  background-color: var(--tcg-face);
+  box-shadow:
+    inset 0 0 0 3px var(--color-text),
+    var(--shadow-lg);
+  animation: dq-deal-in 420ms var(--ease-out) both;
+}
+
+.dq-onb-hcard-plate {
+  background-color: var(--color-text);
+  color: var(--color-bg);
+}
+
+.dq-onb-hcard-plate > span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dq-onb-hcard-art {
+  height: 9.5rem;
+  color: var(--color-stage-ink);
+}
+
+.dq-onb-hcard-buddy {
+  position: absolute;
+  right: var(--space-2);
+  bottom: var(--space-2);
+}
+
+.dq-onb-hcard-type {
+  color: var(--color-text-muted);
+}
+
+.dq-onb-hcard-stats {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-1);
+  padding: 0 var(--space-1) var(--space-1);
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  color: var(--color-text-secondary);
+}
+
+.dq-onb-hcard-stats span {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+/* --- Right: copy + actions --- */
+.dq-onb-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  min-height: 0;
+  padding: var(--space-8) var(--space-8) var(--space-6);
+}
+
+.dq-onb-progress {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.dq-onb-bar-seg {
+  flex: 1;
+  height: 1.5rem;
+  padding: 0.5625rem 0;
+  border: 0;
+  background-color: transparent;
+  background-image: linear-gradient(var(--color-surface-sunken), var(--color-surface-sunken));
+  background-clip: content-box;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+}
+
+.dq-onb-bar-seg.is-done {
+  background-image: linear-gradient(var(--color-text-subtle), var(--color-text-subtle));
+}
+
+.dq-onb-bar-seg.is-active {
+  background-image: linear-gradient(var(--color-text), var(--color-text));
+}
+
+.dq-onb-copy {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-4);
+}
+
+.dq-onb-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-stretch: var(--font-stretch-condensed);
+  font-size: clamp(var(--text-2xl), 3.4vw, var(--text-3xl));
+  font-weight: 850;
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+.dq-onb-subtitle {
+  margin: 0;
+  max-width: 40ch;
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  color: var(--color-text-muted);
+}
+
+.dq-onb-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.dq-onb-field-label {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
+.dq-onb-name-input {
+  min-height: 3rem;
+  font-size: var(--text-base);
+}
+
+.dq-onb-name-input:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.dq-onb-sigils {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.dq-onb-sigil {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 2.75rem;
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface-raised);
+  color: var(--color-text-muted);
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.dq-onb-sigil.is-selected {
+  color: var(--color-text);
+  box-shadow: inset 0 0 0 2px var(--color-stage);
+}
+
+.dq-onb-sigil.is-selected svg {
+  color: var(--color-stage);
+}
+
+.dq-onb-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.dq-onb-cta {
+  width: 100%;
+  min-height: 3.25rem;
+  font-size: var(--text-base);
+}
+
+.dq-onb-secondary {
+  min-height: 2.75rem;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.dq-onb-mini-icon:focus-visible,
+.dq-onb-form-btn:focus-visible,
+.dq-onb-sigil:focus-visible,
+.dq-onb-secondary:focus-visible,
+.dq-onb-bar-seg:focus-visible,
+.dq-pack-hit:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .dq-onb-secondary:hover,
+  .dq-onb-mini-icon:hover {
+    color: var(--color-text);
+  }
+
+  .dq-onb-form-btn:hover:not(.is-active),
+  .dq-onb-sigil:hover:not(.is-selected) {
+    color: var(--color-text);
+    background-color: var(--color-border-subtle);
+  }
+}
+
+@media (max-width: 768px) {
+  .dq-onb-backdrop {
+    padding: 0;
+  }
+
+  .dq-onb-sheet {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 50fr) minmax(0, 50fr);
+    width: 100%;
+    height: 100dvh;
+    min-height: 0;
+    border-radius: 0;
+  }
+
+  .dq-onb-sheet--step3 {
+    grid-template-rows: minmax(0, 36fr) minmax(0, 64fr);
+  }
+
+  .dq-onb-stage {
+    padding: max(var(--space-3), env(safe-area-inset-top)) var(--space-4) var(--space-3);
+  }
+
+  .dq-onb-mini-icon {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+
+  .dq-onb-pack-scene {
+    gap: var(--space-3);
+  }
+
+  .dq-pack {
+    width: 8.75rem;
+    height: 12.25rem;
+  }
+
+  .dq-pack .dq-brandmark {
+    width: 44px;
+    height: 44px;
+  }
+
+  .dq-pack-ring {
+    width: 7rem;
+    height: 7rem;
+    margin: -4rem 0 0 -3.5rem;
+  }
+
+  .dq-onb-rays {
+    width: 18rem;
+    height: 18rem;
+  }
+
+  .dq-onb-ccard {
+    width: 10rem;
+  }
+
+  .dq-onb-ccard-art {
+    height: 7.5rem;
+  }
+
+  .dq-onb-form-btn {
+    min-height: 2.75rem;
+    padding: 0 var(--space-2);
+  }
+
+  .dq-onb-spell {
+    grid-template-columns: minmax(0, 1fr);
+    align-content: center;
+    gap: var(--space-2);
+  }
+
+  .dq-onb-spell-card {
+    gap: var(--space-2);
+    padding: var(--space-3);
+  }
+
+  .dq-onb-code-input {
+    min-height: 3.25rem;
+  }
+
+  .dq-onb-preview {
+    min-height: 3.5rem;
+  }
+
+  .dq-onb-preview-h1 {
+    font-size: var(--text-xl);
+  }
+
+  .dq-onb-spell-side {
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .dq-onb-spell-side .dq-avatar-trigger,
+  .dq-onb-spell-side .dq-avatar-frame {
+    display: none;
+  }
+
+  .dq-onb-hcard {
+    width: 11rem;
+  }
+
+  .dq-onb-hcard-art {
+    height: 6rem;
+  }
+
+  .dq-onb-body {
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5) calc(var(--space-4) + env(safe-area-inset-bottom));
+    overflow-y: auto;
+  }
+
+  .dq-onb-copy {
+    justify-content: flex-start;
+    gap: var(--space-3);
+  }
+
+  .dq-onb-subtitle {
+    font-size: var(--text-sm);
+  }
+
+  .dq-onb-sigils {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+
+/* ==========================================================================
+   ONBOARDING MOTION — card tilt, step swaps, celebrations, exit
+   ========================================================================== */
+
+/* revealed card: tilt + holo glare follow the pointer */
+.dq-onb-ccard-tilt {
+  z-index: 1;
+  transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transform-style: preserve-3d;
+  transition: transform 480ms var(--ease-out);
+}
+
+.dq-onb-ccard-tilt.is-tilting {
+  transition-duration: 90ms;
+}
+
+.dq-onb-ccard-tilt.is-tilting .dq-onb-ccard-foil {
+  animation: none;
+  background-position: var(--mx) var(--my);
+  opacity: 0.55;
+}
+
+/* switching form: the art window crossfades, the frame stays put */
+.dq-onb-ccard-art {
+  animation: dq-art-swap 320ms var(--ease-out) backwards;
+}
+
+/* step swaps follow the direction of travel: next enters from the right */
+.dq-onb-scene {
+  animation: dq-scene-in 420ms var(--ease-out) backwards;
+}
+
+.dq-onb-copy {
+  animation: dq-scene-in 360ms var(--ease-out) backwards;
+}
+
+.dq-onb-sheet[data-dir='back'] .dq-onb-scene,
+.dq-onb-sheet[data-dir='back'] .dq-onb-copy {
+  animation-name: dq-scene-in-back;
+}
+
+/* step 2: XP badge pops when the spell passes */
+.dq-onb-xp.is-won {
+  animation: dq-xp-pop 520ms var(--ease-pop) both;
+}
+
+.dq-onb-spell-card {
+  overflow: visible;
+}
+
+.dq-onb-spell-foil {
+  border-radius: inherit;
+}
+
+.dq-onb-spell-card.is-passed {
+  animation: dq-card-cheer 520ms var(--ease-pop);
+}
+
+/* step 3: changing class flips the sigil in */
+.dq-onb-hcard-sigil {
+  display: grid;
+  place-items: center;
+  animation: dq-sigil-in 360ms var(--ease-pop) backwards;
+}
+
+/* exit: the hero card stamps, the sheet lifts, the backdrop clears */
+.dq-onb-sheet.is-leaving {
+  animation: dq-sheet-out 360ms var(--ease-travel) forwards;
+}
+
+.dq-onb-sheet.is-leaving .dq-onb-hcard {
+  animation: dq-stamp 360ms var(--ease-pop) forwards;
+}
+
+.dq-onb-backdrop.is-leaving {
+  animation: dq-fade-out 360ms var(--ease-out) forwards;
+}
+
+/* --- keyframes --- */
+@keyframes dq-pack-idle {
+  from {
+    transform: translateY(0) rotate(-1deg);
+  }
+  to {
+    transform: translateY(-8px) rotate(1deg);
+  }
+}
+
+@keyframes dq-foil-sweep {
+  from {
+    background-position: 0% 0%;
+  }
+  to {
+    background-position: 100% 100%;
+  }
+}
+
+@keyframes dq-pack-tear {
+  0% {
+    transform: none;
+    animation-timing-function: var(--ease-out);
+  }
+  9% {
+    transform: scale(0.95, 0.97) rotate(-2deg);
+  }
+  14% {
+    transform: scale(1.02) rotate(2.5deg);
+  }
+  18% {
+    transform: rotate(-3deg);
+  }
+  22% {
+    transform: rotate(2deg);
+  }
+  26% {
+    transform: rotate(-1deg);
+  }
+  30% {
+    transform: none;
+    opacity: 1;
+    animation-timing-function: var(--ease-travel);
+  }
+  44% {
+    transform: translateY(-4px) scale(1.02);
+    opacity: 1;
+    animation-timing-function: var(--ease-travel);
+  }
+  76% {
+    transform: translateY(58%) scale(0.9) rotate(4deg);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(58%) scale(0.9) rotate(4deg);
+    opacity: 0;
+  }
+}
+
+@keyframes dq-top-rip {
+  0%,
+  28% {
+    transform: none;
+    opacity: 1;
+    animation-timing-function: var(--ease-out);
+  }
+  34% {
+    transform: translateY(-3px) rotate(-3deg);
+    opacity: 1;
+    animation-timing-function: var(--ease-out);
+  }
+  58% {
+    transform: translate(4.5rem, -6rem) rotate(34deg);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(4.5rem, -6rem) rotate(34deg);
+    opacity: 0;
+  }
+}
+
+@keyframes dq-seam-glow {
+  0% {
+    opacity: 0;
+    transform: scaleX(0);
+    animation-timing-function: var(--ease-out);
+  }
+  24% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+  34% {
+    opacity: 1;
+    transform: scaleX(1.06) scaleY(2.5);
+  }
+  48%,
+  100% {
+    opacity: 0;
+    transform: scaleX(1.1) scaleY(4);
+  }
+}
+
+@keyframes dq-flash {
+  0%,
+  30% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  38% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+  60%,
+  100% {
+    opacity: 0;
+    transform: scale(1.6);
+  }
+}
+
+@keyframes dq-rays-burst {
+  0%,
+  28% {
+    opacity: 0;
+    transform: scale(0.4) rotate(0deg);
+  }
+  52% {
+    opacity: 1;
+    transform: scale(1.12) rotate(24deg);
+  }
+  100% {
+    opacity: 0.55;
+    transform: scale(1) rotate(40deg);
+  }
+}
+
+@keyframes dq-rays-spin {
+  from {
+    transform: scale(1) rotate(40deg);
+  }
+  to {
+    transform: scale(1) rotate(400deg);
+  }
+}
+
+@keyframes dq-card-emerge {
+  0%,
+  37% {
+    opacity: 0;
+    transform: translateY(46%) scale(0.72) rotateY(180deg);
+    animation-timing-function: var(--ease-out);
+  }
+  46% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+    transform: translateY(-5%) scale(1.04) rotateY(0deg);
+    animation-timing-function: var(--ease-out);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes dq-spark-fly {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--x), var(--y)) scale(0.4);
+  }
+}
+
+@keyframes dq-art-swap {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+}
+
+@keyframes dq-scene-in {
+  from {
+    opacity: 0;
+    transform: translateX(28px);
+  }
+}
+
+@keyframes dq-scene-in-back {
+  from {
+    opacity: 0;
+    transform: translateX(-28px);
+  }
+}
+
+@keyframes dq-xp-pop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.28) rotate(-4deg);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes dq-card-cheer {
+  0% {
+    transform: none;
+  }
+  35% {
+    transform: translateY(-4px) scale(1.015);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes dq-sigil-in {
+  from {
+    opacity: 0;
+    transform: perspective(500px) rotateY(80deg) scale(0.9);
+  }
+}
+
+@keyframes dq-stamp {
+  0% {
+    transform: none;
+  }
+  45% {
+    transform: scale(1.06) rotate(-2deg);
+  }
+  100% {
+    transform: scale(1.02) translateY(-6px);
+  }
+}
+
+@keyframes dq-sheet-out {
+  to {
+    opacity: 0;
+    transform: translateY(-14px) scale(0.97);
+  }
+}
+
+@keyframes dq-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dq-pack,
+  .dq-pack-foil,
+  .dq-onb-ccard-foil,
+  .dq-onb-spell-foil,
+  .is-open .dq-onb-rays {
+    animation: none;
+  }
+
+  .dq-pack-hit,
+  .dq-onb-ccard-tilt {
+    transform: none;
+  }
+}

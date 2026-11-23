@@ -36,5 +36,5 @@ When the user shares a screenshot, URL, or UI library component to take inspirat
 ## 4. Absorbed Craft Patterns (Always Prefer These Over Heavy Libraries)
 - **Automated Anti-Slop Gate (UIZZE / pen.dev pattern):** Keep design rules executable inside `devquest/src/styles/tokens.test.js` so regressions fail deterministically before commit.
 - **Zero-JS Animated SVG Micro-Icons (ThinkUI pattern):** Prefer lightweight inline SVG + CSS `stroke-dashoffset` / `transform` micro-motions (`AnimatedCheckIcon`, subtle icon hover tilt, CTA arrow glide) over heavy icon animation runtimes.
-- **Tactile Codex Paper Motion (PaperAnimation pattern):** Use subtle composite-only (`transform`/`opacity`) parchment card lifts and passing-check stamp pops that honor DevQuest's *Warm Vellum* & *Obsidian Scriptorium* codex identity while respecting `prefers-reduced-motion: reduce`.
+- **Tactile Codex Paper Motion (PaperAnimation pattern):** Use subtle composite-only (`transform`/`opacity`) parchment card lifts and passing-check stamp pops that honor DevQuest's cozy *Toca* identity while respecting `prefers-reduced-motion: reduce`.
 - **Spatial Grounding Without WebGL Bloat (Tripo3D discipline):** Ground 2.5D companions with soft directional floor shadows and optical depth rather than shipping multi-megabyte WebGL scenes on mobile.

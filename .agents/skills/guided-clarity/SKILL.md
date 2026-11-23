@@ -44,4 +44,4 @@ Before finalizing any screen in DevQuest, verify:
 - [ ] **No Duplicate Widgets:** Are XP bars, mascot avatars, or customization controls shown only once per screen?
 - [ ] **Noise Stripped:** Are compiler stats, locked future modules, and destructive actions tucked behind progressive disclosure?
 - [ ] **Guided Sequencing:** Does the learner clearly see Step 1 → Step 2 → Boss without guessing?
-- [ ] **Breathing Space:** Does the screen feel calm, intentional, and spacious in both **Obsidian Dark** and **Warm Vellum Light**?
+- [ ] **Breathing Space:** Does the screen feel calm, intentional, and spacious in both **Noite na Toca (Dark)** and **Dia na Toca (Light)**?
