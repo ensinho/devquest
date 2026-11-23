@@ -159,12 +159,8 @@
 .dq-guide-card.is-featured {
   grid-column: span 2;
   grid-row: span 2;
-  background:
-    radial-gradient(ellipse 80% 70% at 100% 0%, var(--color-stage-soft), transparent 70%),
-    var(--color-surface);
-  box-shadow:
-    inset 0 0 0 2px var(--color-primary),
-    var(--shadow-md);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-md);
 }
 
 .dq-guide-card.is-studied:not(.is-featured) {
@@ -214,6 +210,12 @@
 
 .dq-guide-flag {
   align-self: flex-start;
+  background-color: var(--color-primary-fill);
+  color: var(--color-primary-ink);
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .dq-guide-title {
@@ -239,11 +241,22 @@
 }
 
 .dq-guide-objectives li {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
+  position: relative;
+  padding-left: var(--space-4);
   font-size: var(--text-sm);
+  line-height: var(--leading-normal);
   color: var(--color-text-secondary);
+}
+
+.dq-guide-objectives li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: var(--radius-full);
+  background-color: var(--color-stage);
 }
 
 .dq-guide-unlocks {
@@ -359,34 +372,33 @@
 }
 
 .dq-guide-goals {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: var(--space-2);
   margin: 0;
-  padding: 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface-raised);
   list-style: none;
-  counter-reset: goal;
 }
 
 .dq-guide-goals li {
-  counter-increment: goal;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  padding: var(--space-3);
-  border-radius: var(--radius-md);
-  background-color: var(--color-surface-raised);
+  position: relative;
+  padding-left: var(--space-4);
   font-size: var(--text-sm);
-  line-height: var(--leading-snug);
+  line-height: var(--leading-normal);
   color: var(--color-text-secondary);
 }
 
 .dq-guide-goals li::before {
-  content: counter(goal, decimal-leading-zero);
-  font-family: var(--font-mono);
-  font-size: var(--text-2xs);
-  font-weight: 700;
-  color: var(--color-stage-ink);
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: var(--radius-full);
+  background-color: var(--color-stage);
 }
 
 .dq-guide-body {
@@ -453,8 +465,8 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
-  min-height: 2rem;
-  padding: 0 var(--space-2);
+  min-height: 2.5rem;
+  padding: 0 var(--space-3);
   border: 0;
   border-radius: var(--radius-sm);
   background: transparent;
@@ -465,6 +477,7 @@
   text-transform: none;
   letter-spacing: 0;
   cursor: pointer;
+  touch-action: manipulation;
 }
 
 .dq-guide-code-wrap .dq-guide-code {
@@ -657,7 +670,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  min-height: 2.25rem;
+  min-height: var(--btn-min-height);
   color: var(--color-stage-ink);
   font-size: var(--text-sm);
   font-weight: 700;

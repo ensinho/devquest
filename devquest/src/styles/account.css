@@ -32,7 +32,15 @@
   font-size: var(--text-sm);
   font-weight: 600;
   cursor: pointer;
-  transition: background-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
+  touch-action: manipulation;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    transform var(--duration-press) var(--ease-out);
+}
+
+.dq-auth-tab:active {
+  transform: scale(0.97);
 }
 
 .dq-auth-tab.is-active {

@@ -1,7 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { BookOpen, Clock, ArrowRight, Sparkles, Search, X, Wrench, Swords, Check } from 'lucide-react';
+import { BookOpen, Clock, ArrowRight, Search, X, Wrench, Swords, Check } from 'lucide-react';
 import CompanionAvatar from '../components/companion/CompanionAvatar.jsx';
-import AnimatedCheckIcon from '../components/AnimatedCheckIcon.jsx';
 import { getCompanionStageData } from '../data/companionAvatars.js';
 import { SKILL_ICONS } from '../data/skillIcons.js';
 
@@ -216,9 +215,7 @@ export default function GuidesPage({
                 </div>
 
                 {isFeatured && !isStudied && (
-                  <span className="dq-badge dq-badge-live dq-guide-flag">
-                    <Sparkles size={11} aria-hidden="true" /> Leia agora
-                  </span>
+                  <span className="dq-badge dq-guide-flag">Leia agora</span>
                 )}
 
                 <h2 className="dq-h3 dq-guide-title">{guide.title}</h2>
@@ -227,10 +224,7 @@ export default function GuidesPage({
                 {isFeatured && guide.objectives?.length > 0 && (
                   <ul className="dq-guide-objectives">
                     {guide.objectives.map((o) => (
-                      <li key={o}>
-                        <AnimatedCheckIcon checked={isStudied} size={14} />
-                        <span>{o}</span>
-                      </li>
+                      <li key={o}>{o}</li>
                     ))}
                   </ul>
                 )}

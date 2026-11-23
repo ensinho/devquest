@@ -67,6 +67,10 @@ export default function AccountPanel({
   const handleDelete = async (event) => {
     event.preventDefault();
     setDeleteError('');
+    if (!password.trim()) {
+      setDeleteError('Digite sua senha atual para confirmar a exclusão.');
+      return;
+    }
     setBusy(true);
     try {
       await onDeleteAccount(password);
@@ -167,7 +171,7 @@ export default function AccountPanel({
               </p>
             )}
             <div className="dq-account-actions">
-              <button type="submit" className="dq-btn dq-btn-danger" disabled={busy || !password} aria-busy={busy}>
+              <button type="submit" className="dq-btn dq-btn-danger" disabled={busy} aria-busy={busy}>
                 <Trash2 size={15} aria-hidden="true" />
                 <span>{busy ? 'Apagando…' : 'Apagar tudo'}</span>
               </button>

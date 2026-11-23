@@ -11,13 +11,13 @@
 
 /* --- Page swap: the new page settles in, the old one is simply gone --- */
 .dq-main--enter {
-  animation: dq-page-in 300ms var(--ease-out) backwards;
+  animation: dq-page-in 200ms var(--ease-out) backwards;
 }
 
 @keyframes dq-page-in {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(6px);
   }
 }
 
@@ -27,13 +27,13 @@
   animation: none;
 }
 
-/* --- Modals: backdrop fades, card rises from 96% (desktop) --- */
+/* --- Modals: backdrop fades, card rises from 97% (desktop) --- */
 .dq-modal-backdrop {
-  animation: dq-fade-in 200ms var(--ease-out) backwards;
+  animation: dq-fade-in 180ms var(--ease-out) backwards;
 }
 
 .dq-modal {
-  animation: dq-modal-in 280ms var(--ease-out) backwards;
+  animation: dq-modal-in 220ms var(--ease-out) backwards;
 }
 
 @keyframes dq-fade-in {
@@ -45,7 +45,14 @@
 @keyframes dq-modal-in {
   from {
     opacity: 0;
-    transform: translateY(10px) scale(0.96);
+    transform: translateY(8px) scale(0.97);
+  }
+}
+
+@keyframes dq-popover-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.95);
   }
 }
 
@@ -57,7 +64,7 @@
 }
 
 .dq-toast {
-  animation: dq-toast-in 320ms var(--ease-drawer) backwards;
+  animation: dq-toast-in 240ms var(--ease-drawer) backwards;
 }
 
 @keyframes dq-toast-in {

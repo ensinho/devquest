@@ -15,7 +15,6 @@ import {
   ChevronUp,
   ListChecks,
   Search,
-  Sparkles,
 } from 'lucide-react';
 import CompanionAvatar from '../components/companion/CompanionAvatar.jsx';
 import CodeEditor from '../components/CodeEditor.jsx';
@@ -233,7 +232,7 @@ export default function ArenaPage({
       >
         <div className="dq-arena-sidebar-head">
           <div className="dq-arena-sidebar-top">
-            <span className="dq-eyebrow">Trilha de Desafios</span>
+            <h2 className="dq-arena-sidebar-title">Desafios</h2>
             <span className="dq-badge dq-badge-gold dq-tabular">
               {completedTotal}/{quests.length}
             </span>
@@ -477,7 +476,7 @@ export default function ArenaPage({
         {submitState === 'success' && nextUnlockedQuest && (
           <div className="dq-arena-victory-bar" role="status">
             <div className="dq-arena-victory-copy">
-              <Sparkles size={16} aria-hidden="true" />
+              <CheckCircle2 size={16} aria-hidden="true" />
               <span>
                 <strong>Desafio vencido!</strong> Continue o ritmo no próximo desafio da trilha.
               </span>
@@ -546,16 +545,16 @@ export default function ArenaPage({
                     <CheckCircle2 size={15} aria-hidden="true" />
                     <span>Tudo pronto! Clique em Validar Código (ou Ctrl+Enter).</span>
                   </p>
-                ) : (
-                  <ul className="dq-diag-issues">
-                    {validation.diagnostics.map((msg) => (
+                ) : !validation.lexical.ok || submitState === 'error' ? (
+                  <ul className="dq-diag-issues" role="alert">
+                    {(submitState === 'error' ? validation.diagnostics : validation.lexical.issues).map((msg) => (
                       <li key={msg}>
                         <AlertTriangle size={14} aria-hidden="true" />
                         <span>{msg}</span>
                       </li>
                     ))}
                   </ul>
-                )}
+                ) : null}
 
                 <details className="dq-diag-details">
                   <summary>
@@ -599,7 +598,7 @@ export default function ArenaPage({
             {nextUnlockedQuest && (
               <button
                 type="button"
-                className="dq-btn dq-btn-secondary"
+                className="dq-btn dq-btn-ghost"
                 onClick={() => onSelectQuest(nextUnlockedQuest.id)}
               >
                 <span>Próxima: {nextUnlockedQuest.title}</span>

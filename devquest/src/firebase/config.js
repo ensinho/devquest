@@ -28,7 +28,10 @@ if (isFirebaseConfigured) {
   auth = getAuth(app);
   auth.languageCode = 'pt-BR';
   db = getFirestore(app);
-  if (typeof window !== 'undefined' && firebaseConfig.measurementId) {
+  const isLocalHost =
+    typeof window !== 'undefined' &&
+    ['localhost', '127.0.0.1'].includes(window.location.hostname);
+  if (import.meta.env.PROD && !isLocalHost && firebaseConfig.measurementId) {
     try {
       analytics = getAnalytics(app);
     } catch {

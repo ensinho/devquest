@@ -120,3 +120,8 @@
 - **Symptom:** Completing a quest never showed the station unlock flip or the trail lighting up.
 - **Root Cause:** `Trail` diffed statuses against a `useRef` of its previous render, but quests are won in the Arena and the Home remounts on the way back, so "previous" was always the current state.
 - **Prevention Rule:** Changes earned on another page are diffed against what the player last *saw* (module-scope snapshot, see `lastSeenTrail` / `lastSeenXp`), and the catch-up choreography plays on arrival. Scrub it with `page.clock.pauseAt()` so app timers can't cancel runs mid-capture.
+
+### W-024 — Hiding a `flex: 1` spacer collapsed trailing plate controls to the left; `--color-primary` broke Light-mode featured outlines
+- **Symptom:** Below `1360px` and on `390×844` mobile, `.dq-hab-stage` and `.dq-hab-plate-btn` bunched against the fox name leaving the right half of the plate empty; in Light mode `.dq-guide-card.is-featured` drew a dark olive-brown 2px border because `--color-primary` is dark ink in light theme (`--color-primary-fill` is Signal Yellow).
+- **Root Cause:** `.dq-hab-title` was the only `flex: 1` spacer in `.dq-hab-plate`, so `display: none` removed the push; featured cards referenced `--color-primary` for borders instead of tonal elevation or `--color-primary-fill`.
+- **Prevention Rule:** Put `margin-left: auto` on the first trailing control (`.dq-hab-stage`, `.dq-ccard-stage`) so layout survives hiding middle subtitles, use tonal elevation instead of heavy card outlines, and never use `--color-primary` as a bright yellow fill/border (use `--color-primary-fill`).

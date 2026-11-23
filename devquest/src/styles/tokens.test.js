@@ -34,6 +34,8 @@ const RAW_COLOR_PATTERN = /#[0-9a-fA-F]{3,8}\b|\brgba?\s*\(|\bhsla?\s*\(/;
 const PRIMITIVE_TOKEN_PATTERN = /var\(--primitive-/;
 const IMPORTANT_PATTERN = /!important\b/;
 const INLINE_STYLE_TAG_PATTERN = /<style[\s>]/i;
+const EYEBROW_SLOP_PATTERN = /\bdq-eyebrow\b/;
+const LEFT_BORDER_CALLOUT_PATTERN = /\bborder-left\s*:\s*[2-9]\d*px\s+solid|box-shadow\s*:\s*inset\s+[2-9]\d*px\s+0\s+0/;
 
 describe('3-layer CSS token architecture & Anti-Slop Design Gate (UIZZE / pen.dev)', () => {
   it('imports layers in strict order: primitives -> semantic -> components', () => {
@@ -68,6 +70,21 @@ describe('3-layer CSS token architecture & Anti-Slop Design Gate (UIZZE / pen.de
     for (const file of SCREEN_ONLY_STYLESHEETS) {
       const css = readStyle(file);
       expect(css, `${file} must not use !important hacks`).not.toMatch(IMPORTANT_PATTERN);
+    }
+  });
+
+  it('enforces Anti-AI-Slop rules: zero eyebrow labels and zero coloured left-border callouts', () => {
+    for (const file of SCREEN_ONLY_STYLESHEETS) {
+      const css = readStyle(file);
+      expect(css, `${file} must not define .dq-eyebrow labels`).not.toMatch(EYEBROW_SLOP_PATTERN);
+      expect(css, `${file} must not use coloured left-border callouts`).not.toMatch(
+        LEFT_BORDER_CALLOUT_PATTERN
+      );
+    }
+
+    for (const filePath of collectJsxFiles(srcDir)) {
+      const source = readFileSync(filePath, 'utf8');
+      expect(source, `${filePath} must not use .dq-eyebrow labels`).not.toMatch(EYEBROW_SLOP_PATTERN);
     }
   });
 

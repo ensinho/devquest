@@ -245,10 +245,10 @@ textarea {
 .dq-ccard-plate {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: var(--space-2);
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-lg);
+  min-height: 3rem;
+  padding: var(--space-2) var(--space-3) var(--space-2) var(--space-4);
+  border-radius: var(--radius-xl);
   background-color: var(--color-stage);
   color: var(--color-text-inverse);
 }
@@ -259,21 +259,29 @@ textarea {
 
 .dq-ccard-name {
   font-family: var(--font-display);
-  font-stretch: var(--font-stretch-condensed);
   font-size: var(--text-xl);
-  font-weight: 850;
-  letter-spacing: 0.01em;
+  font-weight: 700;
   line-height: 1;
-  text-transform: uppercase;
+}
+
+.dq-ccard-meta {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  opacity: 0.84;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .dq-ccard-stage {
+  margin-left: auto;
   font-family: var(--font-display);
-  font-stretch: var(--font-stretch-expanded);
   font-size: var(--text-xs);
-  font-weight: 800;
+  font-weight: 700;
   padding: 3px var(--space-2);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-full);
   background-color: var(--color-text-inverse);
   color: var(--color-stage-ink);
 }
@@ -386,25 +394,22 @@ textarea {
    HERO & COMPANION PAGE — the companion as a big card
    ========================================================================== */
 .dq-altar-panel {
-  gap: var(--space-4);
+  gap: var(--space-3);
   padding: var(--space-3);
   border-radius: var(--radius-2xl);
-  background-color: var(--tcg-face);
-  box-shadow:
-    inset 0 0 0 3px var(--color-stage),
-    var(--shadow-md);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-sm);
 }
 
 .dq-altar-plate .dq-ccard-name {
   margin: 0;
-  font-size: var(--text-2xl);
+  font-size: var(--text-xl);
 }
 
 .dq-altar-stage {
   background:
-    radial-gradient(ellipse 60% 55% at 50% 40%, var(--color-companion-hero), transparent 72%),
-    radial-gradient(circle, var(--color-border-subtle) 1px, transparent 1.5px) 0 0 / 14px 14px,
-    var(--tcg-art);
+    radial-gradient(circle, var(--color-border-subtle) 1.5px, transparent 2px) 0 0 / 18px 18px,
+    var(--color-surface-sunken);
 }
 
 .dq-library-meta {

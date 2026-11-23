@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   Heart,
-  Sparkles,
+  Star,
   Lock,
   User,
   SlidersHorizontal,
@@ -10,6 +10,7 @@ import {
   Ribbon,
   Orbit,
   Crown,
+  PackageOpen,
 } from 'lucide-react';
 import SigilIcon from '../components/SigilIcon.jsx';
 import AccountPanel from '../components/AccountPanel.jsx';
@@ -37,11 +38,11 @@ const ACCESSORY_ICONS = {
   scarf: Ribbon,
   glasses: Orbit,
   crown: Crown,
-  stars: Sparkles,
+  stars: Star,
 };
 
 const PANEL_TABS = [
-  { id: 'companion', label: 'Mascote', icon: Sparkles },
+  { id: 'companion', label: 'Mascote', icon: Heart },
   { id: 'hero', label: 'Herói', icon: User },
   { id: 'session', label: 'Conta', icon: SlidersHorizontal },
 ];
@@ -88,12 +89,11 @@ export default function CharacterPage({
             <h1 id="altar-title" className="dq-ccard-name">
               {displayName}
             </h1>
+            <span className="dq-ccard-meta">
+              {stageData.title} · {stageData.realmName}
+            </span>
             <span className="dq-ccard-stage dq-tabular">{stageData.stage}/3</span>
           </div>
-          <p className="dq-ccard-type">
-            <Sparkles size={13} aria-hidden="true" />
-            {stageData.title} · {stageData.realmName}
-          </p>
 
           <div className="dq-altar-stage">
             <CompanionAvatar
@@ -203,7 +203,7 @@ export default function CharacterPage({
                           className={`dq-stage-pill ${accessoryId === acc.id ? 'is-active' : ''}`}
                         >
                           {(() => {
-                            const AccIcon = unlocked ? ACCESSORY_ICONS[acc.id] ?? Sparkles : Lock;
+                            const AccIcon = unlocked ? ACCESSORY_ICONS[acc.id] ?? Star : Lock;
                             return <AccIcon size={13} aria-hidden="true" />;
                           })()}
                           <span>{acc.label.replace(' </ >', '')}</span>
@@ -300,7 +300,7 @@ export default function CharacterPage({
                     onClick={onReplayOnboarding}
                     className="dq-btn dq-btn-secondary"
                   >
-                    <Sparkles size={15} aria-hidden="true" />
+                    <PackageOpen size={15} aria-hidden="true" />
                     <span>Abrir o pacote de novo</span>
                   </button>
                 </div>

@@ -108,7 +108,7 @@ export default function OnboardingModal({
   const [passBurst, setPassBurst] = useState(0);
   const [leaving, setLeaving] = useState(false);
   const touchStartXRef = useRef(null);
-  const primaryRef = useRef(null);
+  const sheetRef = useRef(null);
   const tearTimerRef = useRef(null);
   const chordTimerRef = useRef(null);
   const chordPlayedRef = useRef(false);
@@ -125,7 +125,7 @@ export default function OnboardingModal({
   const signedName = heroName.trim() || 'Aventureiro';
 
   useEffect(() => {
-    primaryRef.current?.focus({ preventScroll: true });
+    sheetRef.current?.focus({ preventScroll: true });
   }, [step]);
 
   useEffect(
@@ -334,6 +334,8 @@ export default function OnboardingModal({
       onTouchEnd={handleTouchEnd}
     >
       <div
+        ref={sheetRef}
+        tabIndex={-1}
         className={`dq-onb-sheet dq-onb-sheet--step${step} ${leaving ? 'is-leaving' : ''}`}
         data-dir={dir > 0 ? 'fwd' : 'back'}
       >
@@ -628,7 +630,6 @@ export default function OnboardingModal({
 
           <div className="dq-onb-actions">
             <button
-              ref={primaryRef}
               type="button"
               className="dq-btn dq-btn-primary dq-onb-cta"
               onClick={handleNext}
