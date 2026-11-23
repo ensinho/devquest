@@ -30,3 +30,6 @@ Thumbs.db
 .vscode/*
 !.vscode/extensions.json
 .idea/
+
+# local export for the portfolio repo (screenshots, video, icons)
+portfolio-kit/
