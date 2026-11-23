@@ -1,12 +1,46 @@
 import React, { useEffect, useRef } from 'react';
 import { Sparkles } from 'lucide-react';
 import CompanionAvatar from '../companion/CompanionAvatar.jsx';
+import Burst from '../Burst.jsx';
 import { getCompanionStageData } from '../../data/companionAvatars.js';
 
-/** Evolution = the companion card flips over into its next form, foil on. */
+function StageCard({ stage, accessoryId, theme, className }) {
+  const data = getCompanionStageData(stage);
+  return (
+    <div className={`dq-onb-ccard dq-evo-card ${className}`} data-companion-stage={stage}>
+      <span className="dq-onb-ccard-plate">
+        <span>{data.name}</span>
+        <span className="dq-tabular">{stage}/3</span>
+      </span>
+      <span className="dq-onb-ccard-art">
+        <CompanionAvatar
+          stage={stage}
+          state="done"
+          mood="happy"
+          theme={theme}
+          variant="altar"
+          accessoryId={accessoryId}
+        />
+      </span>
+      <span className="dq-onb-ccard-type">
+        <Sparkles size={12} aria-hidden="true" />
+        {data.title} · {data.elementLabel}
+      </span>
+      <span className="dq-onb-ccard-foil" aria-hidden="true" />
+    </div>
+  );
+}
+
+/*
+ * Evolution: the old form's card charges up (anticipation), turns edge-on as
+ * the stage-coloured flash peaks, and the new form flips face-up in its own
+ * colours; sparks finish with its settle. Timeline lives in binder.css
+ * (CELEBRATIONS). The "evolve" arpeggio (App) climbs into the flash.
+ */
 export default function MascotEvolutionModal({ newStage, accessoryId, theme, onClose }) {
   const stageData = getCompanionStageData(newStage);
-  const previous = getCompanionStageData(Math.max(1, newStage - 1));
+  const previousStage = Math.max(1, newStage - 1);
+  const previous = getCompanionStageData(previousStage);
   const ctaRef = useRef(null);
 
   useEffect(() => {
@@ -27,26 +61,18 @@ export default function MascotEvolutionModal({ newStage, accessoryId, theme, onC
       onClick={onClose}
     >
       <div className="dq-modal dq-modal--sm dq-celebrate" onClick={(e) => e.stopPropagation()}>
-        <div className={`dq-onb-ccard dq-ccard--s${newStage} dq-celebrate-card`}>
-          <span className="dq-onb-ccard-plate">
-            <span>{stageData.name}</span>
-            <span className="dq-tabular">{newStage}/3</span>
-          </span>
-          <span className="dq-onb-ccard-art">
-            <CompanionAvatar
-              stage={newStage}
-              state="done"
-              mood="happy"
-              theme={theme}
-              variant="altar"
+        <div className="dq-evo-stage">
+          {previousStage !== newStage && (
+            <StageCard
+              stage={previousStage}
               accessoryId={accessoryId}
+              theme={theme}
+              className="dq-evo-card--old"
             />
-          </span>
-          <span className="dq-onb-ccard-type">
-            <Sparkles size={12} aria-hidden="true" />
-            {stageData.title} · {stageData.elementLabel}
-          </span>
-          <span className="dq-onb-ccard-foil" aria-hidden="true" />
+          )}
+          <span className="dq-evo-flash" aria-hidden="true" />
+          <StageCard stage={newStage} accessoryId={accessoryId} theme={theme} className="dq-evo-card--new" />
+          <Burst className="dq-burst--evo" count={18} radius={150} />
         </div>
 
         <h2 id="evolution-title" className="dq-celebrate-title">

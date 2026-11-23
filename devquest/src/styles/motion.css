@@ -21,6 +21,12 @@
   }
 }
 
+/* One entrance per container: the first home of a session deals its panels
+   in, so the page itself doesn't also rise. */
+.dq-main--enter:has(> .dq-home--first) {
+  animation: none;
+}
+
 /* --- Modals: backdrop fades, card rises from 96% (desktop) --- */
 .dq-modal-backdrop {
   animation: dq-fade-in 200ms var(--ease-out) backwards;
@@ -44,6 +50,12 @@
 }
 
 /* --- Toast: rises from its own edge --- */
+/* A celebration modal owns the screen: a toast fired with it sits under the
+   backdrop instead of covering the sheet's title on phones (W-022). */
+*:has(> .dq-modal-backdrop) > .dq-toast {
+  z-index: calc(var(--z-modal) - 1);
+}
+
 .dq-toast {
   animation: dq-toast-in 320ms var(--ease-drawer) backwards;
 }
@@ -72,3 +84,67 @@
     }
   }
 }
+
+/* --- Arena victory: the bar rises into the gap it opens, its spark pops --- */
+.dq-arena-victory-bar {
+  animation: dq-victory-in 280ms var(--ease-out) backwards;
+}
+
+.dq-arena-victory-copy svg {
+  animation: dq-stamp-pop 360ms 120ms var(--ease-pop) backwards;
+}
+
+@keyframes dq-victory-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+}
+
+/* --- Pixel sparks (components/Burst.jsx): onboarding, level up, evolution --- */
+.dq-burst {
+  position: relative;
+  z-index: 4;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.dq-burst-bit {
+  position: absolute;
+  left: calc(var(--s) / -2);
+  top: calc(var(--s) / -2);
+  width: var(--s);
+  height: var(--s);
+  background-color: var(--color-primary);
+  opacity: 0;
+  animation: dq-spark-fly 560ms var(--ease-out) calc(var(--burst-at, 0ms) + var(--delay)) both;
+}
+
+.dq-burst-bit.is-tone1 {
+  background-color: var(--color-stage);
+}
+
+.dq-burst-bit.is-tone2 {
+  background-color: var(--color-gold);
+}
+
+.dq-burst-bit.is-tone3 {
+  background-color: var(--color-arcane);
+}
+
+
+@keyframes dq-spark-fly {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--x), var(--y)) scale(0.4);
+  }
+}
+

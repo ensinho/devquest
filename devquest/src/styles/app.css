@@ -143,7 +143,9 @@
   height: 100%;
   border-radius: var(--radius-full);
   background-color: var(--xp-bar-fill);
-  transition: width var(--duration-slow) var(--ease-out);
+  /* reveal, not resize: clip-path keeps the rounded end and skips layout */
+  clip-path: inset(0 calc(100% - var(--fill, 0%)) 0 0 round var(--radius-full));
+  transition: clip-path var(--duration-slow) var(--ease-out);
 }
 
 .dq-icon-btn {
@@ -262,10 +264,10 @@
 /* Zero-JS Animated SVG Checkmark + Codex Stamp Pop (ThinkUI + PaperAnimation) */
 @keyframes dq-stamp-pop {
   0% {
-    transform: scale(0.94);
+    transform: scale(0.7);
   }
   55% {
-    transform: scale(1.03);
+    transform: scale(1.15);
   }
   100% {
     transform: scale(1);
@@ -300,7 +302,9 @@
   opacity: 1;
 }
 
-.dq-diag-item.is-passed {
+/* a requirement flips to passing while you type: only the icon pops,
+   the row text you're reading stays still */
+.dq-diag-item.is-passed .dq-anim-check {
   animation: dq-stamp-pop var(--duration-base) var(--ease-pop) both;
 }
 
@@ -396,7 +400,8 @@
   height: 100%;
   border-radius: var(--radius-full);
   background-color: var(--color-stage);
-  transition: width var(--duration-slow) var(--ease-out);
+  clip-path: inset(0 calc(100% - var(--fill, 0%)) 0 0 round var(--radius-full));
+  transition: clip-path var(--duration-slow) var(--ease-out);
 }
 
 /* --- Companion Flash Quiz Card --- */

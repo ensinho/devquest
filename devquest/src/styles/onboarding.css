@@ -311,7 +311,7 @@
 }
 
 .dq-onb-flash {
-  z-index: 3;
+  z-index: 5;
   width: 14rem;
   height: 14rem;
   border-radius: var(--radius-full);
@@ -345,8 +345,14 @@
   animation: dq-flash 1500ms linear forwards;
 }
 
+/* The card flips face-up IN FRONT of the pack: the back half of the flip is
+   hidden (W-020) and the face first shows under the flash peak, so the pack
+   is never seen through the card, and the card never through the pack. */
+.is-tearing .dq-onb-ccard-tilt {
+  z-index: 4;
+}
+
 .is-tearing .dq-onb-ccard {
-  /* rises from behind the pack; its mirrored back never shows mid-flip */
   backface-visibility: hidden;
   animation: dq-card-emerge 1500ms linear both;
 }
@@ -375,46 +381,18 @@
   animation: dq-deal-in 360ms 80ms var(--ease-out) both;
 }
 
-/* --- pixel sparks --- */
-.dq-burst {
-  position: relative;
-  z-index: 4;
-  width: 0;
-  height: 0;
-  pointer-events: none;
+/* sparks start as the card's face is up and finish with its settle (<1500ms) */
+.dq-burst--reveal {
+  z-index: 6;
+  --burst-at: 880ms;
 }
 
-.dq-burst-bit {
-  position: absolute;
-  left: calc(var(--s) / -2);
-  top: calc(var(--s) / -2);
-  width: var(--s);
-  height: var(--s);
-  background-color: var(--color-primary);
-  opacity: 0;
-  animation: dq-spark-fly 640ms var(--ease-out) var(--delay) both;
-}
-
-.dq-burst-bit.is-tone1 {
-  background-color: var(--color-stage);
-}
-
-.dq-burst-bit.is-tone2 {
-  background-color: var(--color-gold);
-}
-
-.dq-burst-bit.is-tone3 {
-  background-color: var(--color-arcane);
-}
-
-.dq-burst--reveal .dq-burst-bit {
-  animation-delay: calc(1080ms + var(--delay));
-}
-
+/* step 2: sparks burst off the XP badge the moment "+25" lands on it */
 .dq-burst--pass {
   position: absolute;
   top: 50%;
   left: 50%;
+  --burst-at: 500ms;
 }
 
 /* --- Companion card revealed from the pack --- */
@@ -609,6 +587,7 @@
 }
 
 .dq-onb-xp {
+  position: relative;
   padding: 2px var(--space-2);
   border-radius: var(--radius-sm);
   background-color: var(--color-gold-soft);
@@ -1094,8 +1073,25 @@
 }
 
 /* step 2: XP badge pops when the spell passes */
+/* the badge pops on arrival of the flying chip (XP_FLY_MS), not on the pass */
 .dq-onb-xp.is-won {
-  animation: dq-xp-pop 520ms var(--ease-pop) both;
+  animation: dq-xp-pop 520ms 480ms var(--ease-pop) both;
+}
+
+.dq-onb-xp-fly {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 5;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-gold);
+  color: var(--color-text-inverse);
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: 800;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .dq-onb-spell-card {
@@ -1179,7 +1175,7 @@
     opacity: 1;
     animation-timing-function: var(--ease-travel);
   }
-  76% {
+  72% {
     transform: translateY(58%) scale(0.9) rotate(4deg);
     opacity: 0;
   }
@@ -1274,38 +1270,26 @@
   }
 }
 
+/* explicit beats: edge-on by ~690ms (flash still fading), face-up ~960ms */
 @keyframes dq-card-emerge {
   0%,
   37% {
     opacity: 0;
-    transform: translateY(46%) scale(0.72) rotateY(180deg);
-    animation-timing-function: var(--ease-out);
+    transform: translateY(24%) scale(0.72) rotateY(180deg);
+    animation-timing-function: var(--ease-travel);
   }
   46% {
     opacity: 1;
-  }
-  80% {
-    opacity: 1;
-    transform: translateY(-5%) scale(1.04) rotateY(0deg);
+    transform: translateY(10%) scale(0.86) rotateY(90deg);
     animation-timing-function: var(--ease-out);
+  }
+  64% {
+    transform: translateY(-6%) scale(1.05) rotateY(0deg);
+    animation-timing-function: var(--ease-standard);
   }
   100% {
     opacity: 1;
     transform: none;
-  }
-}
-
-@keyframes dq-spark-fly {
-  0% {
-    opacity: 1;
-    transform: translate(0, 0) scale(1);
-  }
-  70% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-    transform: translate(var(--x), var(--y)) scale(0.4);
   }
 }
 

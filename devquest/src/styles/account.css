@@ -35,10 +35,6 @@
   transition: background-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
 }
 
-.dq-auth-tab:hover {
-  color: var(--color-text);
-}
-
 .dq-auth-tab.is-active {
   background-color: var(--color-surface-raised);
   color: var(--color-stage-ink);
@@ -73,10 +69,6 @@
   background: transparent;
   color: var(--color-text-muted);
   cursor: pointer;
-}
-
-.dq-password-toggle:hover {
-  color: var(--color-text);
 }
 
 .dq-auth-tab:focus-visible,
@@ -276,5 +268,12 @@
 @media (prefers-reduced-motion: reduce) {
   .dq-sigil-btn.is-syncing::after {
     animation: none;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .dq-auth-tab:hover,
+  .dq-password-toggle:hover {
+    color: var(--color-text);
   }
 }

@@ -1,20 +1,32 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { Sun, Moon, Volume2, VolumeX, Wand2, Sparkles, Heart } from 'lucide-react';
 import CompanionAvatar from '../companion/CompanionAvatar.jsx';
 import AnimatedCheckIcon from '../AnimatedCheckIcon.jsx';
 import BrandMark from '../BrandMark.jsx';
+import Burst from '../Burst.jsx';
 import SigilIcon from '../SigilIcon.jsx';
 import { COMPANION_STAGES, getCompanionStageData } from '../../data/companionAvatars.js';
 import { HERO_SIGILS } from '../../data/gameData.js';
 import { getSpellChecks, readHeadingText } from '../../utils/onboardingSpell.js';
+import { motionToken, play, prefersReducedMotion } from '../../utils/motion.js';
 
 const TOTAL_STEPS = 3;
-/* One cinematic beat, seen once: anticipation → tear → light → card flip → sparks. */
+/*
+ * The pack: one cinematic beat, seen once (onboarding.css has the frames).
+ *   0–450   anticipation: squash + wiggle          (pack, support)
+ *   420–870 the top rips off                       (pack top, support)
+ *   570     flash peak + the "win" chord           (decoration + sound)
+ *   555→    the card flips face-up in front of the pack; its face shows
+ *           under the flash, so the pack is never seen through   (lead)
+ *   660–1080 the empty pack drops away behind the card
+ *   880–1480 sparks finish as the card settles       (decoration)
+ * A second tap skips to the end. Sound lands on the flash, not on the click.
+ */
 const TEAR_MS = 1500;
+const TEAR_CHORD_MS = 540;
+/* Step 2: "+25" flies from the preview to the XP badge; the badge pops on arrival. */
+const XP_FLY_MS = 520;
 const LEAVE_MS = 360;
-
-const prefersReducedMotion = () =>
-  typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
 /**
  * Pointer-driven 3D tilt + glare. Writes CSS vars straight onto the element
@@ -63,36 +75,6 @@ function useTilt(maxDeg, active) {
   return ref;
 }
 
-/** Pixel sparks flung outward on a ring. Deterministic, so renders stay pure. */
-function Burst({ count = 16, radius = 130, className = '' }) {
-  const bits = useMemo(
-    () =>
-      Array.from({ length: count }, (_, i) => {
-        const angle = (i / count) * Math.PI * 2 + (i % 2 ? 0.18 : -0.12);
-        const dist = radius * (0.62 + ((i * 37) % 11) / 24);
-        return {
-          x: Math.round(Math.cos(angle) * dist),
-          y: Math.round(Math.sin(angle) * dist),
-          size: i % 3 === 0 ? 8 : 5,
-          tone: i % 4,
-          delay: (i % 5) * 22,
-        };
-      }),
-    [count, radius]
-  );
-  return (
-    <span className={`dq-burst ${className}`} aria-hidden="true">
-      {bits.map((b, i) => (
-        <span
-          key={i}
-          className={`dq-burst-bit is-tone${b.tone}`}
-          style={{ '--x': `${b.x}px`, '--y': `${b.y}px`, '--s': `${b.size}px`, '--delay': `${b.delay}ms` }}
-        />
-      ))}
-    </span>
-  );
-}
-
 function getInitialStep() {
   const stepParam = Number(new URLSearchParams(window.location.search).get('onboardingStep'));
   if (stepParam >= 1 && stepParam <= TOTAL_STEPS) return stepParam;
@@ -128,7 +110,11 @@ export default function OnboardingModal({
   const touchStartXRef = useRef(null);
   const primaryRef = useRef(null);
   const tearTimerRef = useRef(null);
+  const chordTimerRef = useRef(null);
+  const chordPlayedRef = useRef(false);
   const leaveTimerRef = useRef(null);
+  const spellCardRef = useRef(null);
+  const flyRef = useRef(null);
   const packTiltRef = useTilt(22, step === 1 && packState === 'sealed');
   const cardTiltRef = useTilt(12, step === 1 && packState === 'open');
 
@@ -145,25 +131,37 @@ export default function OnboardingModal({
   useEffect(
     () => () => {
       window.clearTimeout(tearTimerRef.current);
+      window.clearTimeout(chordTimerRef.current);
       window.clearTimeout(leaveTimerRef.current);
     },
     []
   );
 
+  const playChord = () => {
+    window.clearTimeout(chordTimerRef.current);
+    if (chordPlayedRef.current) return;
+    chordPlayedRef.current = true;
+    onSound?.('win');
+  };
+
   const openPack = () => {
     // A second tap while it tears skips straight to the reveal (interruptible).
     if (packState === 'tearing') {
       window.clearTimeout(tearTimerRef.current);
+      playChord();
       setPackState('open');
       return;
     }
     if (packState !== 'sealed') return;
-    onSound?.('win');
     if (prefersReducedMotion()) {
+      playChord();
       setPackState('open');
       return;
     }
+    // The click gets a tick now; the chord waits for the flash.
+    onSound?.('check');
     setPackState('tearing');
+    chordTimerRef.current = window.setTimeout(playChord, TEAR_CHORD_MS);
     tearTimerRef.current = window.setTimeout(() => setPackState('open'), TEAR_MS);
   };
 
@@ -173,6 +171,7 @@ export default function OnboardingModal({
     onSound?.('check');
     if (next > 1 && packState !== 'open') {
       window.clearTimeout(tearTimerRef.current);
+      window.clearTimeout(chordTimerRef.current);
       setPackState('open');
     }
     setDir(next > step ? 1 : -1);
@@ -198,14 +197,48 @@ export default function OnboardingModal({
   const spellPassed = spellChecks.every((c) => c.passed);
   const headingText = readHeadingText(spellCode);
 
+  // The spell flips to passing: the card hops now (CSS), "+25" flies to the
+  // badge, and the chord lands with the badge pop on arrival.
   useEffect(() => {
-    if (spellPassed) {
+    if (!spellPassed) return undefined;
+    setPassBurst((n) => n + 1);
+    if (prefersReducedMotion()) {
       onSound?.('win');
-      setPassBurst((n) => n + 1);
+      return undefined;
     }
-    // play once when the spell flips to passing
+    onSound?.('check');
+    const arrive = window.setTimeout(() => onSound?.('win'), XP_FLY_MS - 40);
+    return () => window.clearTimeout(arrive);
+    // play once per flip to passing
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [spellPassed]);
+
+  useLayoutEffect(() => {
+    const card = spellCardRef.current;
+    const chip = flyRef.current;
+    if (!card || !chip || !passBurst) return undefined;
+    const from = card.querySelector('.dq-onb-preview')?.getBoundingClientRect();
+    const to = card.querySelector('.dq-onb-xp')?.getBoundingClientRect();
+    if (!from || !to) return undefined;
+    const base = card.getBoundingClientRect();
+    const half = chip.getBoundingClientRect();
+    const at = (rect, lift = 0) =>
+      `translate(${rect.left - base.left + rect.width / 2 - half.width / 2}px, ${
+        rect.top - base.top + rect.height / 2 - half.height / 2 - lift
+      }px)`;
+    // Rises off the preview, then travels in-out to the badge and merges into it.
+    const run = play(
+      chip,
+      [
+        { transform: `${at(from)} scale(0.9)`, opacity: 0 },
+        { transform: `${at(from, 14)} scale(1.12)`, opacity: 1, offset: 0.22 },
+        { transform: `${at(to)} scale(0.72)`, opacity: 1, offset: 0.92 },
+        { transform: `${at(to)} scale(0.6)`, opacity: 0 },
+      ],
+      { id: 'dq-xp-fly', duration: XP_FLY_MS, easing: motionToken('--ease-travel', 'ease-in-out') }
+    );
+    return () => run?.cancel();
+  }, [passBurst]);
 
   const handlePet = () => {
     setPetCount((c) => c + 1);
@@ -426,13 +459,20 @@ export default function OnboardingModal({
 
           {step === 2 && (
             <div key="s2" className="dq-onb-scene dq-onb-spell">
-              <div className={`dq-onb-spell-card ${spellPassed ? 'is-passed' : ''}`}>
+              <div ref={spellCardRef} className={`dq-onb-spell-card ${spellPassed ? 'is-passed' : ''}`}>
                 {passBurst > 0 && spellPassed && (
-                  <Burst key={passBurst} className="dq-burst--pass" count={14} radius={170} />
+                  <span key={passBurst} ref={flyRef} className="dq-onb-xp-fly dq-tabular" aria-hidden="true">
+                    +25
+                  </span>
                 )}
                 <div className="dq-onb-spell-head">
                   <span className="dq-onb-file">index.html</span>
-                  <span className={`dq-onb-xp dq-tabular ${spellPassed ? 'is-won' : ''}`}>+25 XP</span>
+                  <span className={`dq-onb-xp dq-tabular ${spellPassed ? 'is-won' : ''}`}>
+                    +25 XP
+                    {passBurst > 0 && spellPassed && (
+                      <Burst key={passBurst} className="dq-burst--pass" count={10} radius={64} />
+                    )}
+                  </span>
                 </div>
                 <textarea
                   value={spellCode}
@@ -516,7 +556,7 @@ export default function OnboardingModal({
                   {activeSigil.name} · {activeSigil.role}
                 </span>
                 <span className="dq-onb-hcard-stats dq-tabular">
-                  <span>0 XP</span>
+                  <span>{spellPassed ? 25 : 0} XP</span>
                   <span>0/22 quests</span>
                   <span>
                     <Heart size={11} aria-hidden="true" /> {companionName}

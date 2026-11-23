@@ -128,8 +128,11 @@
   --syntax-punct: var(--primitive-ink-300);
 }
 
-/* --- Companion Stage Harmony (Dark Mode) --- */
-[data-theme='dark'][data-companion-stage='1'] {
+/* --- Companion Stage Harmony (Dark Mode) ---
+   Also scoped to any descendant with the attribute, so one card can keep an
+   older stage's colours (the evolution modal flips old form → new form). */
+[data-theme='dark'][data-companion-stage='1'],
+[data-theme='dark'] [data-companion-stage='1'] {
   --color-stage: var(--primitive-cobalt-400);
   --color-stage-ink: var(--primitive-cobalt-300);
   --color-stage-soft: var(--primitive-cobalt-a14);
@@ -137,7 +140,8 @@
   --color-companion-hero: var(--primitive-cobalt-a26);
 }
 
-[data-theme='dark'][data-companion-stage='2'] {
+[data-theme='dark'][data-companion-stage='2'],
+[data-theme='dark'] [data-companion-stage='2'] {
   --color-stage: var(--primitive-ember-400);
   --color-stage-ink: var(--primitive-ember-300);
   --color-stage-soft: var(--primitive-ember-a14);
@@ -145,7 +149,8 @@
   --color-companion-hero: var(--primitive-ember-a26);
 }
 
-[data-theme='dark'][data-companion-stage='3'] {
+[data-theme='dark'][data-companion-stage='3'],
+[data-theme='dark'] [data-companion-stage='3'] {
   --color-stage: var(--primitive-magenta-400);
   --color-stage-ink: var(--primitive-magenta-300);
   --color-stage-soft: var(--primitive-magenta-a14);
@@ -273,7 +278,8 @@
 }
 
 /* --- Companion Stage Harmony (Light Mode) --- */
-[data-theme='light'][data-companion-stage='1'] {
+[data-theme='light'][data-companion-stage='1'],
+[data-theme='light'] [data-companion-stage='1'] {
   --color-stage: var(--primitive-cobalt-600);
   --color-stage-ink: var(--primitive-cobalt-700);
   --color-stage-soft: var(--primitive-cobalt-deep-a10);
@@ -281,7 +287,8 @@
   --color-companion-hero: var(--primitive-cobalt-deep-a18);
 }
 
-[data-theme='light'][data-companion-stage='2'] {
+[data-theme='light'][data-companion-stage='2'],
+[data-theme='light'] [data-companion-stage='2'] {
   --color-stage: var(--primitive-ember-500);
   --color-stage-ink: var(--primitive-ember-700);
   --color-stage-soft: var(--primitive-ember-deep-a10);
@@ -289,7 +296,8 @@
   --color-companion-hero: var(--primitive-ember-deep-a18);
 }
 
-[data-theme='light'][data-companion-stage='3'] {
+[data-theme='light'][data-companion-stage='3'],
+[data-theme='light'] [data-companion-stage='3'] {
   --color-stage: var(--primitive-magenta-500);
   --color-stage-ink: var(--primitive-magenta-700);
   --color-stage-soft: var(--primitive-magenta-deep-a10);

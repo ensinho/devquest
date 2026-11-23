@@ -19,7 +19,7 @@ DevQuest is a **cozy pixel-fox learning game**: a hand-drawn fox (Kitsuby → Py
 All styling flows strictly downward through 3 layers:
 
 1. **Layer 1 — Primitives (`tokens.primitives.css`):**
-   Raw palette ramps (`--primitive-obsidian-*`, `--primitive-vellum-*`, `--primitive-ember-*`, `--primitive-gold-*`, `--primitive-teal-*`, `--primitive-crimson-*`, `--primitive-violet-*`), spacing (`--space-1` to `--space-16`), radii (`--radius-sm` to `--radius-full`), type scale (`--text-2xs` to `--text-3xl`), motion durations & curves (`--duration-press`, `--duration-fast`, `--duration-base`, `--ease-pop`, `--ease-out`), z-index layers.
+   Raw palette ramps (`--primitive-obsidian-*`, `--primitive-vellum-*`, `--primitive-ember-*`, `--primitive-gold-*`, `--primitive-teal-*`, `--primitive-crimson-*`, `--primitive-violet-*`), spacing (`--space-1` to `--space-16`), radii (`--radius-sm` to `--radius-full`), type scale (`--text-2xs` to `--text-3xl`), motion durations & curves (`--duration-press/fast/base/slow/flip/shake/travel/reveal`, `--ease-out/pop/standard/flip/drawer/travel`), z-index layers. JS motion (WAAPI) reads the same tokens through `src/utils/motion.js` (`play`, `shake`, `durationToken`), which also no-ops under reduced motion.
    *Never reference primitive tokens directly in page/component CSS.*
 
 2. **Layer 2 — Semantic (`tokens.semantic.css`):**
@@ -64,6 +64,6 @@ All styling flows strictly downward through 3 layers:
 
 ## 6. Authorial Visual Signature
 1. **The Toca (`components/home/Habitat.jsx`, `habitatArt.js`):** a pixel landscape that is day in light theme and night in dark (stars, moon, fireflies). The sun/moon is a real theme toggle. The fox (`PixelCompanion`) wanders, looks around, naps after 40s without input (wakes on any pointer/key), eats a snack, takes pets (pixel hearts), asks the quick quiz in its speech bubble, and XP floats up like a damage number. Reduced motion freezes every loop.
-2. **The Serpentine Trail (`components/home/Trail.jsx`, `trailLayout.js`):** 9 stations snaking left→right→left; progress rings in earned mint, locked stations show a paw-print card back, live segments flow in cobalt, the mini fox stands on the current station, and a station pops open when it unlocks.
+2. **The Serpentine Trail (`components/home/Trail.jsx`, `trailLayout.js`):** 9 stations snaking left→right→left; progress rings in earned mint, locked stations show a paw-print card back, live segments flow in cobalt, the mini fox stands on the current station. Coming back from a won quest replays a catch-up: the station stamps, the segment lights, the next station flips open and the mini fox walks there (`Trail.jsx`, diffed against the last trail the player saw).
 3. **Companion stages recolour the app** through `--color-stage*` and `[data-companion-stage]`. Sprite inks live in `--pixel-s{1,2,3}-*` and stay the same in both themes.
 4. **Desktop home fits one screen** (Toca · Trail · Station panel, `height: 100dvh - chrome`); mobile stacks Toca → next quest → trail.

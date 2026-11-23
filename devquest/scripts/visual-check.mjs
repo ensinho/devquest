@@ -8,7 +8,7 @@ const getArg = (flag, fallback) => {
   return index !== -1 && args[index + 1] ? args[index + 1] : fallback;
 };
 
-const baseUrl = getArg('--url', 'http://127.0.0.1:4173/devquest/?showcase=design-system');
+const baseUrl = getArg('--url', 'http://127.0.0.1:4173/devquest/?skipOnboarding=1');
 const outDir = resolve(getArg('--out', resolve(process.cwd(), '..', 'tmp-visual-checks')));
 
 mkdirSync(outDir, { recursive: true });

@@ -219,6 +219,12 @@
   --duration-base: 240ms;
   --duration-slow: 420ms;
   --duration-flip: 640ms;
+  /* error shake: 3 short oscillations, firm stop */
+  --duration-shake: 320ms;
+  /* on-screen travel (the trail fox walking station to station) */
+  --duration-travel: 720ms;
+  /* one-off cinematic beats (pack opening, evolution); onboarding owns its timeline */
+  --duration-reveal: 1500ms;
 
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-pop: cubic-bezier(0.34, 1.56, 0.64, 1);

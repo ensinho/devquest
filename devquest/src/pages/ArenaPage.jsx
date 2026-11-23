@@ -22,6 +22,7 @@ import CodeEditor from '../components/CodeEditor.jsx';
 import AnimatedCheckIcon from '../components/AnimatedCheckIcon.jsx';
 import { getCompanionStageData } from '../data/companionAvatars.js';
 import { validateQuestCode } from '../utils/codeValidator.js';
+import { shake } from '../utils/motion.js';
 
 function sanitizePreviewHtml(rawHtml = '') {
   return rawHtml
@@ -51,6 +52,7 @@ export default function ArenaPage({
   const [submitState, setSubmitState] = useState('idle'); // 'idle' | 'error' | 'success'
   const [isTyping, setIsTyping] = useState(false);
   const typingRef = useRef(null);
+  const checklistRef = useRef(null);
 
   const skillStatusMap = useMemo(
     () => new Map(skills.map((s) => [s.id, s.status])),
@@ -128,6 +130,10 @@ export default function ArenaPage({
     } else {
       setSubmitState('error');
       onSound?.('error');
+      // Point at what's missing: the unmet requirements shake once (restartable).
+      checklistRef.current
+        ?.querySelectorAll('.dq-diag-item:not(.is-passed)')
+        .forEach((item) => shake(item));
     }
   };
 
@@ -240,7 +246,7 @@ export default function ArenaPage({
             aria-valuemax={100}
             aria-label="Progresso total das quests"
           >
-            <div className="dq-bond-fill" style={{ width: `${progressPct}%` }} />
+            <div className="dq-bond-fill" style={{ '--fill': `${progressPct}%` }} />
           </div>
 
           <label className="dq-arena-search">
@@ -519,10 +525,10 @@ export default function ArenaPage({
                 aria-valuemax={100}
                 aria-label="Requisitos atendidos"
               >
-                <div className="dq-bond-fill" style={{ width: `${checksPct}%` }} />
+                <div className="dq-bond-fill" style={{ '--fill': `${checksPct}%` }} />
               </div>
 
-              <ul className="dq-diag-checklist" aria-label="Requisitos do desafio">
+              <ul ref={checklistRef} className="dq-diag-checklist" aria-label="Requisitos do desafio">
                 {validation.checks.map((item) => (
                   <li
                     key={item.label}

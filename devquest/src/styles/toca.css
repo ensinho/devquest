@@ -27,15 +27,22 @@
   border-radius: var(--radius-2xl);
   background-color: var(--color-surface);
   box-shadow: var(--shadow-sm);
-  animation: dq-deal-in 480ms var(--ease-out) both;
 }
 
-.dq-trail {
+/* The three panels deal in once per session (first arrival). After that the
+   home is visited tens of times a day: the page swap alone carries it. */
+.dq-home--first .dq-hab,
+.dq-home--first .dq-trail,
+.dq-home--first .dq-station-panel {
+  animation: dq-deal-in 480ms var(--ease-out) backwards;
+}
+
+.dq-home--first .dq-trail {
   animation-delay: 70ms;
 }
 
-.dq-station-panel {
-  animation-delay: 140ms;
+.dq-home--first .dq-station-panel {
+  animation-delay: 120ms;
 }
 
 /* ==========================================================================
@@ -227,14 +234,23 @@
   animation: dq-bubble-pop 320ms var(--ease-pop) both;
 }
 
-/* the fox */
+/* the fox: a full-width track slides (translateX % = scene width), the fox
+   rides it centred on its left edge. Constant walking speed = linear. */
+.dq-hab-fox-track {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  transform: translateX(var(--fox-x, 46%));
+  transition: transform var(--fox-walk, 0ms) linear;
+}
+
 .dq-hab-fox {
   position: absolute;
-  left: var(--fox-x, 46%);
+  left: 0;
   bottom: calc(18% - 1.1rem);
-  z-index: 2;
   transform: translateX(-50%);
-  transition: left var(--fox-walk, 0ms) linear;
+  pointer-events: auto;
 }
 
 .dq-hab-fox-btn {
@@ -426,7 +442,8 @@
   height: 100%;
   border-radius: inherit;
   background-color: var(--color-stage);
-  transition: width var(--duration-slow) var(--ease-out);
+  clip-path: inset(0 calc(100% - var(--fill, 0%)) 0 0 round var(--radius-full));
+  transition: clip-path var(--duration-slow) var(--ease-out);
 }
 
 .dq-hab-meter.is-evo > span {
@@ -649,6 +666,7 @@
   padding: 5px;
   border-radius: var(--radius-full);
   background: conic-gradient(var(--color-gold) calc(var(--ring) * 1%), var(--color-border-strong) 0);
+  backface-visibility: hidden;
   transition: transform var(--duration-base) var(--ease-pop);
 }
 
@@ -768,19 +786,22 @@
   box-shadow: var(--focus-ring);
 }
 
-.dq-station.is-opening .dq-station-disc {
-  animation: dq-station-open 820ms var(--ease-pop) both;
-}
-
-.dq-station.is-nudged .dq-station-disc {
-  animation: dq-nudge 380ms var(--ease-out);
-}
-
 .dq-trail-fox {
   position: absolute;
   z-index: 2;
   transform: translate(-50%, calc(-100% - var(--disc) / 2 + 0.6rem));
   pointer-events: none;
+}
+
+/* the catch-up walk (Trail.jsx) animates these with WAAPI; one transform each */
+.dq-trail-fox-walk,
+.dq-trail-fox-hop,
+.dq-trail-fox-face {
+  display: block;
+}
+
+.dq-trail-fox-face.is-left {
+  transform: scaleX(-1);
 }
 
 /* ==========================================================================
@@ -1126,11 +1147,6 @@
   to { stroke-dashoffset: -30; }
 }
 
-@keyframes dq-station-open {
-  0% { transform: scale(0.6) rotateY(180deg); }
-  60% { transform: scale(1.12) rotateY(0); }
-  100% { transform: scale(1); }
-}
 
 @media (hover: hover) and (pointer: fine) {
   .dq-hab-action:hover:not(:disabled) {
@@ -1329,7 +1345,7 @@
     animation: none;
   }
 
-  .dq-hab-fox {
+  .dq-hab-fox-track {
     transition: none;
   }
 }

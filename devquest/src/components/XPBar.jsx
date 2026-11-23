@@ -13,7 +13,7 @@ export default function XPBar({ currentXp, nextLevelXp, compact = false }) {
       aria-valuemax={100}
       aria-label={`Experiência: ${currentXp} de ${safeNext} XP`}
     >
-      <div className="dq-xpbar-fill" style={{ width: `${percentage}%` }} />
+      <div className="dq-xpbar-fill" style={{ '--fill': `${percentage}%` }} />
     </div>
   );
 }

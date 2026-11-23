@@ -1,8 +1,26 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import CompanionAvatar from '../companion/CompanionAvatar.jsx';
+import RollingNumber from '../RollingNumber.jsx';
+import Burst from '../Burst.jsx';
+import { prefersReducedMotion } from '../../utils/motion.js';
+
+/*
+ * Level up, one gesture: the medal pops in with the modal (lead), the number
+ * rolls from the old level as it lands (support), sparks finish with the roll
+ * (decoration). The CTA is focusable from the first frame.
+ */
+const ROLL_AT_MS = 260;
 
 export default function LevelUpModal({ newLevel, displayStage, accessoryId, theme, onClose }) {
   const ctaRef = useRef(null);
+  const [shownLevel, setShownLevel] = useState(() =>
+    prefersReducedMotion() ? newLevel : Math.max(1, newLevel - 1)
+  );
+
+  useEffect(() => {
+    const t = window.setTimeout(() => setShownLevel(newLevel), ROLL_AT_MS);
+    return () => window.clearTimeout(t);
+  }, [newLevel]);
 
   useEffect(() => {
     ctaRef.current?.focus({ preventScroll: true });
@@ -24,7 +42,8 @@ export default function LevelUpModal({ newLevel, displayStage, accessoryId, them
       <div className="dq-modal dq-modal--sm dq-celebrate" onClick={(e) => e.stopPropagation()}>
         <div className="dq-levelup-badge" aria-hidden="true">
           <span className="dq-levelup-label">Nível</span>
-          <span className="dq-levelup-num dq-tabular">{newLevel}</span>
+          <RollingNumber value={shownLevel} className="dq-levelup-num" />
+          <Burst className="dq-burst--levelup" count={14} radius={96} />
           <span className="dq-levelup-buddy">
             <CompanionAvatar
               stage={displayStage}

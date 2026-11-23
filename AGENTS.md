@@ -34,9 +34,9 @@ devquest/ (git root)
     └── src/
         ├── styles/                   # 3-layer CSS tokens (primitives -> semantic -> components)
         ├── utils/                    # Pure logic & theme utilities (unit tested)
-        ├── components/               # Reusable UI components & modals
+        ├── components/               # UI components, modals, home/ (Toca + Trail), companion/ (pixel sprites as code)
         ├── pages/                    # Quests, Guides, Character
-        └── assets/                   # Pixel-art mascot sprites & static assets
+        └── data/                     # Curriculum, quests, guides (shared with the API)
 ```
 
 All app commands (`npm run ...`) run inside `devquest/`.

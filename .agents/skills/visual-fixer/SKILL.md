@@ -13,7 +13,7 @@ Never rely on mental CSS rendering or assumptions. Inspect the **actual rendered
 ## 2. Visual-First Prototyping Workflow (Multiple Directions)
 When tasked with a layout or design decision that has 2–3 strong directions:
 1. Ensure the local Vite dev server is running (`npm run dev` inside `devquest/`).
-2. Build lightweight isolated preview pages or query-driven showcase states (`?preview=variant-a`, `?preview=variant-b`) that import `src/styles/tokens.css` directly.
+2. Build lightweight isolated preview pages or query-driven preview states (`?preview=variant-a`, `?preview=variant-b`) that import `src/styles/tokens.css` directly.
 3. Capture PNGs using Playwright headless across Desktop Dark, Desktop Light, and Mobile.
 4. Open and visually inspect every PNG using `read_file`.
 5. Present a comparative Markdown summary with embedded/linked PNGs and concrete trade-offs so the user chooses before production components are rewritten.

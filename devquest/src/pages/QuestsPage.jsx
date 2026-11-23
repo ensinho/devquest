@@ -1,7 +1,10 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Habitat from '../components/home/Habitat.jsx';
 import Trail from '../components/home/Trail.jsx';
 import StationPanel from '../components/home/StationPanel.jsx';
+
+/** The panels deal in on the first home of the session only (see toca.css). */
+let hasDealtHome = false;
 
 /**
  * Home: the Toca (fox habitat) · the trail · the selected station.
@@ -37,8 +40,13 @@ export default function QuestsPage({
     [allQuests]
   );
 
+  const [isFirstArrival] = useState(() => !hasDealtHome);
+  useEffect(() => {
+    hasDealtHome = true;
+  }, []);
+
   return (
-    <div className="dq-home">
+    <div className={`dq-home ${isFirstArrival ? 'dq-home--first' : ''}`}>
       <h1 className="dq-sr-only">DevQuest: trilha full-stack com um fox de estimação</h1>
       <Habitat
         displayStage={displayStage}

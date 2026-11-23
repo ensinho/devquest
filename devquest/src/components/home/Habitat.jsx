@@ -44,6 +44,9 @@ function randomBetween(min, max) {
   return min + Math.random() * (max - min);
 }
 
+/** XP the Toca showed last time it was on screen (see the float effect). */
+let lastSeenXp = null;
+
 /**
  * The Toca: the fox's home. A living pixel scene (day in light theme, night
  * in dark), where the fox wanders, looks around, naps when you leave, eats a
@@ -177,11 +180,14 @@ export default function Habitat({
     };
   }, [later, pushFloat, setBehaviorSafe]);
 
-  // XP floats up like a damage number whenever it grows.
-  const prevXpRef = useRef(totalXp);
+  // XP floats up like a damage number whenever it grows — including XP won in
+  // the Arena: the Toca remounts on the way back, so compare with the last XP
+  // it showed (module scope, this session) and float the difference on arrival.
+  const prevXpRef = useRef(lastSeenXp ?? totalXp);
   useEffect(() => {
     const gained = totalXp - prevXpRef.current;
     prevXpRef.current = totalXp;
+    lastSeenXp = totalXp;
     if (gained > 0) pushFloat(`+${gained} XP`, 'xp');
   }, [totalXp, pushFloat]);
 
@@ -250,7 +256,7 @@ export default function Habitat({
       ? 'zzz… (mexe o mouse que eu acordo)'
       : mentorMessage;
 
-  const sceneStyle = useMemo(
+  const foxTrackStyle = useMemo(
     () => ({ '--fox-x': `${posX}%`, '--fox-walk': `${walkMs}ms`, '--fox-facing': facing }),
     [posX, walkMs, facing]
   );
@@ -274,7 +280,7 @@ export default function Habitat({
         </button>
       </div>
 
-      <div className={`dq-hab-scene is-${behavior}`} style={sceneStyle}>
+      <div className={`dq-hab-scene is-${behavior}`}>
         <svg
           className="dq-hab-land"
           viewBox={`0 0 ${SCENE_W} ${SCENE_H}`}
@@ -326,60 +332,63 @@ export default function Habitat({
           {bubbleText}
         </p>
 
-        <div className="dq-hab-fox">
-          <button
-            type="button"
-            className="dq-hab-fox-btn"
-            onClick={handlePet}
-            aria-label={`Fazer carinho em ${displayName}`}
-          >
-            <span className="dq-hab-fox-flip">
-              <PixelCompanion
-                stage={displayStage}
-                state={spriteState}
-                mood={spriteMood}
-                size={compact ? 112 : 168}
-                accessoryId={accessoryId}
-                followPointer={behavior !== 'sleep'}
-                label={`${displayName} — ${stageData.title}`}
-              />
-            </span>
-          </button>
+        {/* full-width track: walking is a transform on the track, never `left` */}
+        <div className="dq-hab-fox-track" style={foxTrackStyle}>
+          <div className="dq-hab-fox">
+            <button
+              type="button"
+              className="dq-hab-fox-btn"
+              onClick={handlePet}
+              aria-label={`Fazer carinho em ${displayName}`}
+            >
+              <span className="dq-hab-fox-flip">
+                <PixelCompanion
+                  stage={displayStage}
+                  state={spriteState}
+                  mood={spriteMood}
+                  size={compact ? 112 : 168}
+                  accessoryId={accessoryId}
+                  followPointer={behavior !== 'sleep'}
+                  label={`${displayName} — ${stageData.title}`}
+                />
+              </span>
+            </button>
 
-          {behavior === 'sleep' && !appReacting && (
-            <span className="dq-hab-zzz" aria-hidden="true">
-              <span>z</span>
-              <span>z</span>
-              <span>Z</span>
-            </span>
-          )}
-
-          {cookie > 0 && (
-            <svg key={cookie} className="dq-hab-cookie" viewBox="0 0 8 8" shapeRendering="crispEdges" aria-hidden="true">
-              <path className="dq-hab-cookie-body" d={COOKIE_PATH} />
-              <path className="dq-hab-cookie-chip" d={COOKIE_CHIPS} />
-            </svg>
-          )}
-
-          <span className="dq-hab-floats" aria-hidden="true">
-            {floats.map((f, i) =>
-              f.kind === 'heart' ? (
-                <svg
-                  key={f.id}
-                  className="dq-hab-float is-heart"
-                  style={{ '--float-x': `${(i % 3) * 18 - 18}px` }}
-                  viewBox="0 0 8 8"
-                  shapeRendering="crispEdges"
-                >
-                  <path d={HEART_PATH} />
-                </svg>
-              ) : (
-                <span key={f.id} className={`dq-hab-float is-${f.kind}`}>
-                  {f.text}
-                </span>
-              )
+            {behavior === 'sleep' && !appReacting && (
+              <span className="dq-hab-zzz" aria-hidden="true">
+                <span>z</span>
+                <span>z</span>
+                <span>Z</span>
+              </span>
             )}
-          </span>
+
+            {cookie > 0 && (
+              <svg key={cookie} className="dq-hab-cookie" viewBox="0 0 8 8" shapeRendering="crispEdges" aria-hidden="true">
+                <path className="dq-hab-cookie-body" d={COOKIE_PATH} />
+                <path className="dq-hab-cookie-chip" d={COOKIE_CHIPS} />
+              </svg>
+            )}
+
+            <span className="dq-hab-floats" aria-hidden="true">
+              {floats.map((f, i) =>
+                f.kind === 'heart' ? (
+                  <svg
+                    key={f.id}
+                    className="dq-hab-float is-heart"
+                    style={{ '--float-x': `${(i % 3) * 18 - 18}px` }}
+                    viewBox="0 0 8 8"
+                    shapeRendering="crispEdges"
+                  >
+                    <path d={HEART_PATH} />
+                  </svg>
+                ) : (
+                  <span key={f.id} className={`dq-hab-float is-${f.kind}`}>
+                    {f.text}
+                  </span>
+                )
+              )}
+            </span>
+        </div>
         </div>
       </div>
 
@@ -456,7 +465,7 @@ export default function Habitat({
               <dd>
                 <span>Nv {bondInfo.bondLevel}</span>
                 <span className="dq-hab-meter" aria-hidden="true">
-                  <span style={{ width: `${bondInfo.percentage}%` }} />
+                  <span style={{ '--fill': `${bondInfo.percentage}%` }} />
                 </span>
               </dd>
             </div>
@@ -471,7 +480,7 @@ export default function Habitat({
                     : 'forma final'}
                 </span>
                 <span className="dq-hab-meter is-evo" aria-hidden="true">
-                  <span style={{ width: `${Math.round((nextEvo?.progressRatio ?? 1) * 100)}%` }} />
+                  <span style={{ '--fill': `${Math.round((nextEvo?.progressRatio ?? 1) * 100)}%` }} />
                 </span>
               </dd>
             </div>

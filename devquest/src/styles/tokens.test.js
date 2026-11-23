@@ -47,7 +47,7 @@ describe('3-layer CSS token architecture & Anti-Slop Design Gate (UIZZE / pen.de
     expect(cIdx).toBeGreaterThan(sIdx);
   });
 
-  it('enforces zero raw hex/rgb/hsl colors in semantic, component, app, and showcase CSS', () => {
+  it('enforces zero raw hex/rgb/hsl colors in semantic, component, app, and screen CSS', () => {
     expect(SCREEN_STYLESHEETS).toContain('binder.css');
     for (const file of SCREEN_STYLESHEETS) {
       const css = readStyle(file);
@@ -55,7 +55,7 @@ describe('3-layer CSS token architecture & Anti-Slop Design Gate (UIZZE / pen.de
     }
   });
 
-  it('prevents Layer 1 --primitive-* leaks in component, app, and showcase CSS', () => {
+  it('prevents Layer 1 --primitive-* leaks in component, app, and screen CSS', () => {
     for (const file of ['tokens.components.css', ...SCREEN_ONLY_STYLESHEETS]) {
       const css = readStyle(file);
       expect(css, `${file} must reference semantic/component tokens only, never --primitive-*`).not.toMatch(

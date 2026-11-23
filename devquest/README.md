@@ -26,7 +26,6 @@ npm run dev
 
 Abra `http://localhost:5173/devquest/`.
 
-- Showcase isolado do Design System: `http://localhost:5173/devquest/?showcase=design-system`
 - Forçar replay do Onboarding: `http://localhost:5173/devquest/?onboarding=1`
 
 ---

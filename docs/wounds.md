@@ -104,3 +104,19 @@
 - **Root Cause:** The card rotates from `rotateY(180deg)` while stacked above the pack; its back face renders by default and it sat on a higher z-index.
 - **Prevention Rule:** Any flip-in reveal sets `backface-visibility: hidden` on the flipping element and starts *behind* the thing it emerges from; stack reveal layers in one grid cell (`grid-area: 1/1`) instead of toggling `position: absolute`, so nothing jumps when the state flips.
 - **Verify:** Scrub the timeline with `document.getAnimations().forEach(a => { a.pause(); a.currentTime = t })` and screenshot key frames.
+
+### W-021 — WAAPI animations finished instantly in production only
+- **Symptom:** The trail fox teleported and stations popped open with no flip on the deployed build; in dev everything animated.
+- **Root Cause:** `durationToken()` did `parseFloat(getPropertyValue('--duration-flip'))`; the production CSS minifier rewrites `640ms` as `.64s`, so the duration became 0.64 ms.
+- **Prevention Rule:** Never `parseFloat` a CSS time and assume ms. Read motion tokens through `parseCssTime`/`durationToken` (`src/utils/motion.js`, unit-tested) and verify motion on `npm run build` + `vite preview`, not only `npm run dev`.
+- **Verify:** Sample `document.getAnimations()` in real time (rAF loop) after the trigger; a run that disappears right after its delay has a ~0 duration.
+
+### W-022 — Level-up badge numeral invisible; toast covering the celebration sheet
+- **Symptom:** "Nível N" rendered as a plain mint disc; on phones the quest toast sat on top of the level-up sheet's title.
+- **Root Cause:** The face was `--color-gold-soft` (translucent) over a solid `--color-gold` ring, with `--color-gold` text — mint on mint. The toast's `--z-toast` outranks `--z-modal`.
+- **Prevention Rule:** Soft (`-soft`) tokens are tints, never a standalone face: layer them over an opaque surface and pair them with the matching `-ink`. While a modal is open, the toast drops under the backdrop (`motion.css`).
+
+### W-023 — Home transitions never played after a quest
+- **Symptom:** Completing a quest never showed the station unlock flip or the trail lighting up.
+- **Root Cause:** `Trail` diffed statuses against a `useRef` of its previous render, but quests are won in the Arena and the Home remounts on the way back, so "previous" was always the current state.
+- **Prevention Rule:** Changes earned on another page are diffed against what the player last *saw* (module-scope snapshot, see `lastSeenTrail` / `lastSeenXp`), and the catch-up choreography plays on arrival. Scrub it with `page.clock.pauseAt()` so app timers can't cancel runs mid-capture.
