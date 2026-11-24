@@ -1,0 +1,696 @@
+/* ==========================================================================
+   DEVQUEST — PROFILE STUDIO ("Herói & Mascote")
+   Centered, proportional studio layout (zero ultrawide stretch):
+   1. Unified Hero Banner (identity + scannable stats, zero duplicate XP bar)
+   2. Equal-height 2-column Studio (compact Portrait Showcase + Structured Tabs)
+   Tokens only; 0-1-2 containment; >=44px targets; transform/opacity motion.
+   ========================================================================== */
+
+.dq-profile {
+  width: min(76rem, 100%);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+/* --- Row 1: Unified Hero Identity Banner --- */
+.dq-profile-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+  flex-wrap: wrap;
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-2xl);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.dq-profile-identity {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.dq-profile-sigil {
+  flex: none;
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: var(--radius-lg);
+  background-color: var(--color-stage-soft);
+  color: var(--color-stage-ink);
+  display: grid;
+  place-items: center;
+}
+
+.dq-profile-identity-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.dq-profile-identity-top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.dq-profile-name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--color-text);
+}
+
+.dq-profile-role {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.dq-profile-kpis {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  margin: 0;
+  padding: 0;
+}
+
+.dq-profile-kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 4.5rem;
+}
+
+.dq-profile-kpi + .dq-profile-kpi {
+  padding-left: var(--space-5);
+  border-left: 1px solid var(--color-border-subtle);
+}
+
+.dq-profile-kpi dt {
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-subtle);
+}
+
+.dq-profile-kpi dd {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--color-text);
+}
+
+.dq-profile-kpi dd span {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+/* --- Row 2: Balanced 2-Column Studio Grid --- */
+.dq-profile-grid {
+  display: grid;
+  grid-template-columns: minmax(21rem, 24.5rem) minmax(0, 1fr);
+  gap: var(--space-5);
+  align-items: stretch;
+}
+
+/* --- Left: Compact Portrait Showcase Card --- */
+.dq-showcase {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-2xl);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.dq-showcase-plate {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 3rem;
+  padding: var(--space-2) var(--space-3) var(--space-2) var(--space-4);
+  border-radius: var(--radius-xl);
+  background-color: var(--color-stage);
+  color: var(--color-text-inverse);
+}
+
+.dq-showcase-name {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.dq-showcase-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  opacity: 0.84;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.dq-showcase-stage {
+  margin-left: auto;
+  padding: 3px var(--space-2);
+  border-radius: var(--radius-full);
+  background-color: var(--color-text-inverse);
+  color: var(--color-stage-ink);
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  font-weight: 700;
+}
+
+.dq-showcase-canvas {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-4) var(--space-4);
+  border-radius: var(--radius-xl);
+  background:
+    radial-gradient(circle, var(--color-border-subtle) 1.5px, transparent 2px) 0 0 / 18px 18px,
+    var(--color-surface-sunken);
+  text-align: center;
+}
+
+.dq-showcase-desc {
+  margin: 0;
+  max-width: 30ch;
+  font-size: var(--text-xs);
+  line-height: var(--leading-normal);
+  color: var(--color-text-muted);
+}
+
+.dq-mood-strip {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 2px;
+  width: 100%;
+  padding: 3px;
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.dq-mood-btn {
+  min-height: 2.5rem;
+  padding: 0 var(--space-1);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-muted);
+  font-family: var(--font-sans);
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    transform var(--duration-press) var(--ease-out);
+}
+
+.dq-mood-btn:active {
+  transform: scale(0.96);
+}
+
+.dq-mood-btn.is-active {
+  background-color: var(--color-stage-soft);
+  color: var(--color-stage-ink);
+}
+
+.dq-showcase-meters {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  margin: 0;
+  padding: var(--space-1) var(--space-2);
+}
+
+.dq-showcase-meters dt {
+  font-size: var(--text-2xs);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-subtle);
+}
+
+.dq-showcase-meters dd {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 4px 0 0;
+  font-size: var(--text-xs);
+  font-weight: 800;
+  color: var(--color-text);
+}
+
+.dq-showcase-cta {
+  width: 100%;
+}
+
+/* --- Right: Customization Studio Panel --- */
+.dq-studio-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-5) var(--space-6);
+  border-radius: var(--radius-2xl);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.dq-studio-pane {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  animation: dq-step-slide var(--duration-fast) var(--ease-out) both;
+}
+
+.dq-studio-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.dq-studio-section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.dq-studio-section-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.dq-studio-section-hint {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+/* --- Stage Selector (3-Column Equal Evolution Track) --- */
+.dq-stage-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.dq-stage-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  min-height: 5.5rem;
+  padding: var(--space-3) var(--space-4);
+  border: 0;
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface-raised);
+  color: var(--color-text);
+  text-align: left;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    transform var(--duration-press) var(--ease-out);
+}
+
+.dq-stage-card:active {
+  transform: scale(0.98);
+}
+
+.dq-stage-card.is-active {
+  background-color: var(--color-stage-soft);
+  color: var(--color-stage-ink);
+}
+
+.dq-stage-card-top {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.dq-stage-card-num {
+  display: inline-grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface);
+  color: var(--color-text-muted);
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  font-weight: 700;
+}
+
+.dq-stage-card.is-active .dq-stage-card-num {
+  background-color: var(--color-stage);
+  color: var(--color-text-inverse);
+}
+
+.dq-stage-card-badge {
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  background-color: var(--color-surface);
+  color: var(--color-text-muted);
+  font-size: var(--text-2xs);
+  font-weight: 700;
+}
+
+.dq-stage-card.is-active .dq-stage-card-badge {
+  color: var(--color-stage-ink);
+}
+
+.dq-stage-card-name {
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.dq-stage-card-meta {
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.dq-stage-card.is-active .dq-stage-card-meta {
+  color: var(--color-stage-ink);
+  opacity: 0.85;
+}
+
+/* --- Accessories Grid (Symmetrical 3x2 — Zero Orphans) --- */
+.dq-acc-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.dq-acc-tile {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 3.75rem;
+  padding: var(--space-3);
+  border: 0;
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface-raised);
+  color: var(--color-text);
+  text-align: left;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    transform var(--duration-press) var(--ease-out);
+}
+
+.dq-acc-tile:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.dq-acc-tile:disabled {
+  background-color: var(--color-surface-sunken);
+  color: var(--color-text-subtle);
+  cursor: not-allowed;
+}
+
+.dq-acc-tile.is-active {
+  background-color: var(--color-stage-soft);
+  color: var(--color-stage-ink);
+}
+
+.dq-acc-tile-icon {
+  flex: none;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  color: var(--color-text-muted);
+  display: grid;
+  place-items: center;
+}
+
+.dq-acc-tile.is-active .dq-acc-tile-icon {
+  background-color: var(--color-stage);
+  color: var(--color-text-inverse);
+}
+
+.dq-acc-tile:disabled .dq-acc-tile-icon {
+  background-color: var(--color-surface);
+  color: var(--color-text-subtle);
+}
+
+.dq-acc-tile-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.dq-acc-tile-name {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.dq-acc-tile-sub {
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dq-acc-tile.is-active .dq-acc-tile-sub {
+  color: var(--color-stage-ink);
+  opacity: 0.85;
+}
+
+/* --- Clean Sunken Studio Input --- */
+.dq-studio-input {
+  width: 100%;
+  min-height: var(--btn-min-height);
+  padding: var(--space-2) var(--space-4);
+  border: 0;
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface-sunken);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  transition: box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.dq-studio-input::placeholder {
+  color: var(--color-text-subtle);
+}
+
+.dq-studio-input:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+/* --- Hero Class Sigils (Symmetrical 3x2 Grid) --- */
+.dq-class-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.dq-class-tile {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 4rem;
+  padding: var(--space-3);
+  border: 0;
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface-raised);
+  color: var(--color-text);
+  text-align: left;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    transform var(--duration-press) var(--ease-out);
+}
+
+.dq-class-tile:active {
+  transform: scale(0.98);
+}
+
+.dq-class-tile.is-selected {
+  background-color: var(--color-stage-soft);
+  color: var(--color-stage-ink);
+}
+
+.dq-class-tile-icon {
+  flex: none;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  color: var(--color-stage-ink);
+  display: grid;
+  place-items: center;
+}
+
+.dq-class-tile.is-selected .dq-class-tile-icon {
+  background-color: var(--color-stage);
+  color: var(--color-text-inverse);
+}
+
+.dq-class-tile-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.dq-class-tile-name {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.dq-class-tile-role {
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.dq-class-tile.is-selected .dq-class-tile-role {
+  color: var(--color-stage-ink);
+  opacity: 0.85;
+}
+
+/* --- Account Tab Cards --- */
+.dq-account-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.dq-profile .dq-session-card {
+  background-color: var(--color-surface-raised);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4) var(--space-5);
+}
+
+.dq-profile .dq-session-card .dq-btn-secondary {
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+/* --- Focus & Hover Guards --- */
+.dq-mood-btn:focus-visible,
+.dq-stage-card:focus-visible,
+.dq-acc-tile:focus-visible,
+.dq-class-tile:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .dq-mood-btn:hover:not(.is-active) {
+    color: var(--color-text);
+  }
+
+  .dq-stage-card:hover:not(.is-active),
+  .dq-acc-tile:hover:not(:disabled):not(.is-active),
+  .dq-class-tile:hover:not(.is-selected) {
+    background-color: var(--color-border-subtle);
+  }
+}
+
+/* --- Responsive Breakpoints --- */
+@media (max-width: 1080px) {
+  .dq-profile-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .dq-showcase {
+    max-width: 30rem;
+    width: 100%;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .dq-profile {
+    gap: var(--space-4);
+  }
+
+  .dq-profile-hero {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-4);
+    padding: var(--space-4);
+  }
+
+  .dq-profile-kpis {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-2);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--color-border-subtle);
+  }
+
+  .dq-profile-kpi {
+    min-width: 0;
+  }
+
+  .dq-profile-kpi + .dq-profile-kpi {
+    padding-left: var(--space-3);
+  }
+
+  .dq-showcase {
+    max-width: none;
+  }
+
+  .dq-studio-panel {
+    padding: var(--space-4);
+  }
+
+  .dq-stage-cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .dq-acc-grid,
+  .dq-class-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dq-mood-btn {
+    min-height: var(--btn-min-height);
+  }
+}

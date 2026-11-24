@@ -47,6 +47,7 @@ import './styles/toca.css';
 import './styles/onboarding.css';
 import './styles/account.css';
 import './styles/grimoire.css';
+import './styles/profile.css';
 import './styles/motion.css';
 
 export default function App() {
