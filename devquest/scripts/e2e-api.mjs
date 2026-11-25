@@ -1,11 +1,37 @@
 /**
  * Live end-to-end check of the deployed API + Firestore rules.
  * Creates throwaway accounts (@devquest-test.example) and deletes them at the end.
+ * Reads VITE_FIREBASE_API_KEY (and optional VITE_FIREBASE_PROJECT_ID) from the
+ * environment or devquest/.env.local.
  *   node scripts/e2e-api.mjs https://devquest-rpg.vercel.app
  */
+import { existsSync, readFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+function loadEnvFile(filePath) {
+  if (!existsSync(filePath)) return;
+  for (const raw of readFileSync(filePath, 'utf8').split(/\r?\n/)) {
+    const line = raw.trim();
+    if (!line || line.startsWith('#')) continue;
+    const eq = line.indexOf('=');
+    if (eq === -1) continue;
+    const key = line.slice(0, eq).trim();
+    const val = line.slice(eq + 1).trim().replace(/^(['"])(.*)\1$/, '$2');
+    if (key && !(key in process.env)) process.env[key] = val;
+  }
+}
+
+loadEnvFile(resolve(dirname(fileURLToPath(import.meta.url)), '../.env.local'));
+
 const BASE = process.argv[2] ?? 'https://devquest-rpg.vercel.app';
-const KEY = 'AIzaSyA0jsiHGYLynCglojjbI0UPq6sDsKhytmA';
-const PROJECT = 'dev-quest-70563';
+const KEY = process.env.VITE_FIREBASE_API_KEY;
+const PROJECT = process.env.VITE_FIREBASE_PROJECT_ID ?? 'dev-quest-70563';
+
+if (!KEY) {
+  console.error('Missing VITE_FIREBASE_API_KEY. Set it in devquest/.env.local or pass it via the environment.');
+  process.exit(1);
+}
 const email = `e2e-${Date.now()}@devquest-test.example`;
 const password = `T3st-${Math.random().toString(36).slice(2)}!`;
 const results = [];

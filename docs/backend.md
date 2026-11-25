@@ -61,7 +61,7 @@ Legacy documents (written by the old client) are normalised and migrated on the 
 cd devquest
 npm run deploy:vercel          # production deploy (vercel CLI, linked project)
 npm run deploy:rules           # firestore.rules + indexes (firebase CLI)
-node scripts/e2e-api.mjs https://devquest-rpg.vercel.app   # 25 live checks with throwaway accounts
+node scripts/e2e-api.mjs https://devquest-rpg.vercel.app   # 25 live checks (reads VITE_FIREBASE_API_KEY from .env.local or env)
 FIREBASE_SERVICE_ACCOUNT_B64=… node scripts/set-role.mjs <uid|email> admin
 ```
 
